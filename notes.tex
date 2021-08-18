@@ -1,0 +1,198 @@
+\documentclass[10pt] {article}
+\usepackage{epsf}
+\usepackage{latexsym}
+\usepackage[T1]{fontenc}
+\usepackage{makeidx,epsfig,lscape}
+\usepackage{natbib}
+\usepackage{rotating}
+\usepackage{floatpag}
+\rotfloatpagestyle{empty}
+\usepackage{graphicx}
+\usepackage{graphics}
+\usepackage{epsf}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{latexsym}
+\usepackage{comment}
+\usepackage{bm}
+\usepackage{times}
+\setlength{\textheight}{22.5cm}
+\setlength{\textwidth}{16cm}
+\setlength{\oddsidemargin}{-5mm}
+\setlength{\topmargin}{-0.8cm}
+\setlength{\evensidemargin}{-5mm}
+\usepackage{listings}
+\newcommand{\grad}{\nabla}
+\newcommand{\tr}[1]{\text{tr}(#1)}
+\newcommand{\bp}{{\vm \beta}}
+\newcommand{\X}{{\vf X}}
+\newcommand{\E}{E}
+\newcommand{\vf}{\bf} %% vector type-setting
+\newcommand{\vm}{\bm} %% vector type-setting
+\newcommand{\ts}{^{\rm T}}
+\newcommand{\its}{^{-\rm T}}
+\newcommand{\bmat}[1]{\left [ \begin{array}{#1}}
+\newcommand{\emat}{\end{array}\right ]}
+\newcommand{\eps}[3]
+{{\begin{center}
+ \rotatebox{#1}{\scalebox{#2}{\includegraphics{#3}}}
+ \end{center}}
+}
+\DeclareMathOperator*{\argmin}{argmin}
+\DeclareMathOperator*{\argmax}{argmax} %% original {arg\,max} to space arg max
+\lstset{language=R,
+        basicstyle={\ttfamily\small},
+        keywordstyle=,
+        showstringspaces=false,
+        columns=flexible}
+
+%% Definitions
+\newcommand {\hide}[1] {\typeout{ #1 }}
+%Comment out to print all
+%\newcommand {\hide}[1] {{\it #1 }}
+%Comment out to hide some
+\newcommand{\beq}{\begin{equation}}
+\newcommand{\eeq}{\end{equation}}
+\newcommand{\dif}[2]{\frac{{\rm d} #1}{{\rm d} #2}}
+\newcommand{\ildif}[2]{{\rm d} #1/{{\rm d} #2 }}
+\newcommand{\ilpdif}[2]{\partial #1/{\partial #2 }}
+\newcommand{\pdif}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\pddif}[3]{\frac{\partial^2 #1}{\partial #2 \partial #3}}
+\newcommand{\ilpddif}[3]{\partial^2 #1/{\partial #2 \partial #3}}
+\newcommand{\comb}[2]{\left (\begin{array}{c}{#1}\\{#2}\end{array}\right )}
+\newcommand{\gfrac}[2]{\mbox{$ { \textstyle{ \frac{#1}{#2} }\displaystyle}$}}
+\newcommand{\R}{{\sf R }}
+\theoremstyle{definition}
+  \newtheorem*{definition}{Definition}
+  \newtheorem*{example}{Example}
+%\newcommand{\vm}{\bm}
+% comment out next line unless double spacing needed
+%\renewcommand{\baselinestretch}{2}
+
+\newtheorem{theorem}{Theorem}
+
+
+\begin {document}
+
+\centerline{\huge \bf Statistical Programming}
+
+\section{Software Requirements}
+
+To complete this course you will need to get yourself a free github account and install the following software on your computer: 
+\begin{itemize}
+\item R or Rstudio, git, pandoc and JAGS.
+\item R packages: ggplot2, rjags, rmarkdown, debug.
+\item Only if you do not already have latex installed, install tinytex. 
+\end{itemize}
+It is assumed that you have the basic computer skills to do this. If you do not, you will need to spend some time online acquiring them (that level of basic skills is not part of this course). If you have difficulty, you can post questions on piazza for other students to answer. Please answer other student's questions on installation on piazza. 
+
+In more detail.
+\begin{itemize}
+\item R is the free statistical programming language and environment that we will use. You can get a copy from the Comprehensive R Archive Network (CRAN)\\
+\verb+https://cran.r-project.org/+\\
+just follow the links under `Download and Install R'. 
+\item Rstudio is an alternative front end for R, which many people prefer to use. It provides an R code editor, R session window, R graphics window and other information, all in a convenient `integrated environment'. If you prefer this to R as available from CRAN, you can get it from\\
+\verb+https://www.rstudio.com/+\\
+at the foot of the page, under `R studio desktop'. 
+\item git is a version control system. It helps you to write code in teams, as you must do for this course, without breaking each others work. It also lets you keep a record of the changes you make, so that you can go back to earlier versions, if you need to. \\
+\verb+https://www.git-scm.com/+\\
+contains instructions for installation. {\tt linux} systems often have it installed already and something like \verb+sudo apt install git+ will install it if not. 
+\item pandoc is document conversion software used by the {\tt rmarkdown} package. Installation instructions:\\
+\verb+https://pandoc.org/installing.html+ 
+\item JAGS stands for `Just Another Gibbs Sampler'. We will use it for programming Bayesian models and sampling from them. Downloads are available here:\\
+\verb+https://sourceforge.net/projects/mcmc-jags/files/JAGS/4.x/+\\
+but under linux something like \verb+sudo apt install jags+ can be used. Note that if you have a new apple/mac with an apple silicon processor (rather than intel), then you will need to install MacPorts from\\ 
+\verb+https://www.macports.org/install.php+\\
+then install JAGS as described here\\
+\verb+https://ports.macports.org/port/jags/+
+\end{itemize}
+
+Once the above are installed, you will need to install some packages from the R session command line. R/Rstudio can install packaged in a local directory/folder for you, but I tend to start R as administrator/super user/root and then install them (e.g. on linux I would start R from the command line as \verb+sudo R+). Here are the packages you need:
+\begin{itemize}
+\item ggplot2 provides a nice alternative to built in R graphics. Install by typing\\
+\verb+install.packages("ggplot2")+\\
+at the R command line.
+\item rmarkdown provides a neat way of documenting data analyses using R. Install using\\
+ \verb+install.packages("rmarkdown")+
+\item rjags lets you use JAGS directly from R. Install using\\
+ \verb+install.packages("rjags")+
+\item Finally we need a debugging package, to help you to find errors in your code, or understand how code is working by stepping through it. What is built into R and Rstudio is not great, and a much better option is Mark Bravington's debug package. This is not available from CRAN, but only from Mark's repository, so to install, you need to do this:
+\begin{verbatim}
+options(repos=c("https://markbravington.github.io/Rmvb-repo",
+        getOption( "repos")))
+install.packages("debug")
+\end{verbatim}
+\item rmarkdown requires a latex installation in order to allow you to produce pdf documents. So, {\em only if you do not already have latex installed}, install {\tt tinytex} with
+\verb+install.packages("tinytex")+
+then if you are {\em really sure} that you do not already have latex installed run 
+\verb+tinytex::install_tinytex()+
+WARNING: this command may break existing latex installations!
+\end{itemize}
+Once you have the software installed, you need to do one more thing. Get a free github account (if you do not already have one).  \verb+https://github.com/join+ is where to get one. 
+
+For git and github, there is much useful information available at 
+\begin{itemize}
+\item \verb+https://guides.github.com/+
+\item \verb+https://git-scm.com/docs/gittutorial+
+\item \verb+https://training.github.com/+
+\end{itemize}
+It is a good idea to have a look at this to get an initial feeling for what github is about.
+
+\subsection{Using a terminal window, choose a text editor}
+
+This course involves programming - that is writing text instructions that get a computer to do something. Anyone who programmes rapidly discovers that writing text to get a computer to do something is often quicker and more convenient than clicking your way through a graphical interface. This sometimes includes for basic tasks such as file copying, or moving between directories/folders. 
+
+Whatever operating system you are using you will be able to launch a `terminal window' for this purpose. Make sure that for your operating system you know how to do this, how to list the names of the files in a directory/folder, how to change from one directory/folder to another, how to delete a file, and how to close the terminal window. 
+
+You will also need to edit text files containing the computer code you write. If you choose to use Rstudio, there is a built in editor, and you might choose to just use that. If you use plain R then you will need an external editor. Word is not suitable, as it will insert hidden characters in your code that will cause problems, so you instead should use something simpler (e.g. wordpad or notepad on windows). Make sure you know what is available on your computer and use that. I tend to use emacs, but this has more features than you actually need for this course. 
+
+\section{git and github}
+
+
+
+
+\section{Data re-arrangement and tidy data}
+
+In raw form many data sets are messy and have to be tidied up for statistical analysis. By tidying is meant that the data are re-arranged conveniently for analysis, not that the information in the data is in anyway modified unless an actual error is identified (no removal of outliers, for example). Since `data tidying' or `data re-arrangement' sound too boring and clerical for many enthusiasts for Modern Data Science, you will often hear terms like `data wrangling' and `data munging' used instead. These sound suitably rugged, as if the types engaged in them return home aching and covered in dust and mud after a day engaged in the honest toil of these muscular pursuits.
+
+By tidy data is meant that data are arranged in a matrix so that:
+\begin{enumerate}
+\item Each column is a variable.
+\item Each row is an observation (a unique combination of variables).
+\end{enumerate}
+and it is recognised that what counts as `an observation' can depend on the subset of variables of interest. For example,
+this data frame is in tidy form if interest is in student's grades each week. 
+\begin{verbatim}
+name    d.o.b.  nationality week grade
+George  11/2/01 GB          1    B
+George  11/2/01 GB          2    C
+George  11/2/01 GB          3    A
+Anna    15/6/00 GB          1    A
+Anna    15/6/00 GB          2    B
+Anna    15/6/00 GB          3    A
+.       .       .           .    .
+\end{verbatim}
+But if we are only interested in birth dates and nationality of students, then we would really want to simplify to
+\begin{verbatim}
+name    d.o.b.  nationality 
+George  11/2/01 GB          
+Anna    15/6/00 GB          
+.       .       .           
+\end{verbatim}
+It is easy to get the second data frame form the first (\verb+marks+, say) in base R using
+\begin{verbatim}
+student <- unique(marks[,c("name","d.o.b.","nationality")])
+\end{verbatim}
+which has selected the named columns of interest, and then found the unique rows. If you want to refer each row in \verb+marks+ to its row in \verb+student+ then you can use 
+\begin{verbatim}
+library(mgcv)
+student <- unique(marks[,c("name","d.o.b.","nationality")])
+ind <- attr(student,"index") ## ind[i] is row of 'student' corresponding to row i of 'marks'
+\end{verbatim}
+
+At this point, you are hopefully wondering about replicate data, and the definition of `observation' as `unique combination of variables'? If I repeat an experiment under identical conditions, could I not occasionally get identical results, and hence two identical rows in a data frame that are different observations? Well yes, but only if you do not include a variable recording the `replicate number'. If you don't record the replicate number then you do not really have tidy data, as it is not possible to distinguish the common error of accidental replication of some data, from genuine replicates.
+
+
+
+\end{document}
