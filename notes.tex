@@ -149,13 +149,38 @@ You will also need to edit text files containing the computer code you write. If
 
 \section{git and github}
 
-{\tt git} is a system that lets you track changes in code files and to manage those files when several people are working on them. In particular it lets you maintain a central repository of your code, which serves as the backed up master copy. Several people can make working local copies of the repository and work on the code, and git provides the tools to allow management of the master copy in a way that avoids or resolves conflicts. A conflict is when two people made contradictory changes to the code.  
+{\tt git} is a system that lets you track changes in code files and to manage those files when several people are working on them. In particular it lets you maintain a central {\em repository} of your code, which serves as the backed up master copy. The repository is just a folder/directory containing the master copy of your code. Several people can make working local copies of the repository (on their own computers) and work on the code, and git provides the tools to allow management of the master copy in a way that avoids or resolves conflicts. A conflict is when two people made contradictory changes to the code. 
 
-\subsection{Setting up github repo}
+\subsection{Setting up a repo on {\tt github}}
 
-To set up a repo
+An easy way to set up a central repository is to use {\tt github}.  
 \begin{itemize}
-\item Login to your github account, click on Repositories and then click on New to set up a new repository.
+\item Login to your github account on {\tt github.com}, click on {\tt Repositories} and then click on {\tt New} to set up a new repository.
+\item Follow the instructions. You probably want your repository to be private if it is for working on assessed coursework.
+\end{itemize}
+For group homework, one person sets up the repo and invites their team mates to collaborate on it. 
+\begin{itemize}
+\item Log on to github, nagivate to your repo, and click on {\tt Settings}.
+\item Click on {\tt Manage Access} from the left hand menu, and then on {\tt Invite a collaborator} - you will need their github user name. 
+\end{itemize}
+You can add files directly to your repo, via the web interface, but we will shortly cover how to add files to the local copy of your repo, and then {\em push} them to github. 
+
+\subsection{Using {\tt git}}
+
+Mostly, you will interact with your github repo via the {\tt git} software, and your local copy of your github repo. You will use {\tt git} by typing commands in a terminal window. To check everything is working before using {\tt git} for the first time you might open a terminal window and check the {\tt git} version, a follows (\verb+$+ indicates the command prompt, not something you type):
+\begin{verbatim}
+$ git --version
+\end{verbatim}
+This gives the answer \verb+git version 2.25.1+ for me. 
+
+After creating your github repo you need to make a local copy of it on your computer. 
+\begin{itemize}
+\item From your {\tt github} repo page (at {\tt github.com}) click on {\tt Code} select {\tt Clone} and copy the {\tt htpps} address for the repository that appears. For example, for my repo containing these notes, the address is \verb+https://github.com/simonnwood/sp-notes.git+
+\item In the terminal window on your local machine change directory ({\tt cd}) to the folder where you would like the local repo to be located. Then type {\tt git clone} followed by the address you copied. e.g. with the above address
+\begin{verbatim}
+git clone https://github.com/simonnwood/sp-notes.git
+\end{verbatim}
+
 \end{itemize}
 
 \section{Data re-arrangement and tidy data}
