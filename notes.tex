@@ -190,7 +190,7 @@ git clone https://github.com/simonnwood/sp-notes.git
 \end{itemize}
 A local copy of the repo is then created on your computer. 
 
-\subsubsection{Modifying work and synchronising with the github repo}
+\subsection{Modifying work and synchronising with the github repo}
 
 The local copy of your repo is just a directory/folder containing the files in your repo, and a hidden {\tt .git} subdirectory that {\tt git} uses to maintain an index of the files that it should keep track of, and the history of changes made. {\tt git} knows about all the files in the {\tt github} repo you cloned, but will only start keeping track of other files that you may add to your local repo when you tell it to do so (with \verb+git add+). 
 
@@ -198,10 +198,76 @@ Similarly {\tt git} does not keep a record of all the changes you make to your c
 
 Neither does {\tt git} automatically save all these snapshots to your master {\tt github} repo. That only happens when you tell it to using {\tt git push}. This is quite useful, you can keep a detailed record of the changes you make while working on code locally, without modifying the {\tt github} master repo until you are satisfied that the changes are complete and working.   
 
+Note that you can access the help pages for the main {\tt git} commands by typing {\tt git help} followed by the command name. For example, if you want to know more about {\tt fit add} type
+\begin{verbatim}
+git help add
+\end{verbatim}
 
+\subsubsection{Simple work cycle}
 
-The most basic way to use {\tt git} and {\tt github} is to work on the local copy of your repo, and once you have made the changes you want to make, have tested them and are happy with them, {\em commit} them and {\em push} them to the master {\tt github} repo. 
+Suppose we want to make some code changes in a file \verb+foo.r+ that already exists in the master repo. A typical work sequence would be as follows.
+\begin{enumerate}
+\item  Change directory ({\tt cd}) to the local repo. 
+\item If collaborating with others, you might want to check that you local repo is up to date with the master copy on {\tt github}, using \verb+git status+.
+\item If it is not up to date use \verb+git pull+ to get (`pull') the changes from {\tt github}. 
+\item Work on {\tt foo.r} until you are happy with the changes made, and have tested them. 
+\item Have {\tt git} take a snapshot of the changes made using something like 
+\begin{verbatim}
+git commit -a -m"added a wibbleblaster to foo.r"
+\end{verbatim}  
+The \verb+-a+ option tells {\tt git} to take a snapshot of every file that it is tracking that you have changed. If you omit \verb+-a+ then you must tell {\tt git} which files you want it to snapshot explicitly, for example using \verb+git add foo.r+, before committing. The option \verb+-m+ adds a message describing the changes. If you omit the \verb"-m" then {\tt git} will open an editor, in which you enter the message - this can be useful if you want to include a longer set of comments. These comments can be viewed on the {\tt github} repo, providing a useful record of whet the individual code changes were for.  
+\item Now `push' the changes to {\tt github}. 
+\begin{verbatim}
+git push
+\end{verbatim}
+If only you are working on the code, then you will be done at this point, but if others are working on it at the same time, then the {\tt push} command may fail because your new code conflicts with the code someone else has pushed to {\tt github} since you last pulled the repo. How to fix this is described next. 
+\end{enumerate} 
 
+Note that \verb+git log+ lets you view the commit history of your project (to review what has been done and why).
+
+\subsubsection{Simple conflict resolution}
+
+If your {\tt git push} command fails (and it will tell you if it has!) then you need to resolve the conflict. This is not so hard. 
+
+\begin{enumerate}
+\item After your {\tt git push} command has failed, issue the command
+\begin{verbatim}
+git pull
+\end{verbatim}
+This will get the latest versions of the files from the {\tt github} repo, compare them to your local copies, attempt to resolve conflicts automatically where possible, and where not modify your local copies so that whenever there is a conflict your local files contain both your code and the conflicting code from the {\tt github} master, with clear marking of which is which. 
+\item You check the conflicting files, changing the code to resolve any remaining flagged conflicts (often just selecting one or other of the alternative). 
+\item Now redo the commit and push steps
+\begin{verbatim}
+git commit -a -m"resolved conflict in favour of small end cracking"
+git push
+\end{verbatim} 
+If this fails because a teammate has meanwhile made another change, you really need to sort out your team communication - {\tt git} can't do that for you. 
+\end{enumerate}
+
+\subsubsection{Adding and deleting files with {\tt git}}
+
+You can add as many files as you like to your local copy of the repo, but {\tt git} will take no notice of them until you tell it to. For example, suppose you created a file {\tt bar.r} which should be treated as part of the project, tracked and included in the master repo on {\tt qithub}
+\begin{verbatim}
+git add bar.r
+git commit -a -m"added file bar.r containing the gribbler code"
+git push
+\end{verbatim}
+(You could omit the \verb+-a+ in this case, as the preceding \verb+add+ command will ensure \verb+bar.r+ is included in the next commit.)
+
+You might also want to remove files, of course. 
+\begin{verbatim}
+git rm bar.r
+\end{verbatim}
+deletes {\tt bar.r} from the local copy, and will cause it to be removed from the master repo at the next {\tt commit} and {\tt push}.
+
+\subsection{More advanced use}
+
+The above covers the most basic use of {\tt git}. It is sufficient for working on small projects in small teams on this course, and for understanding the basic principles of version control systems. We have not covered some key components of  
+{\tt git} and {\tt github} that are extremely useful for larger projects. In particular we have not covered project {\em branches}. {\tt git} allows you to simultaneously have several versions of your project ({\em  branches}) in addition to the master version. These versions can all be tracked and backed up, just as the main master branch is. 
+
+A typical use of branches is to code and work on complicated modifications - tracking and backing up the changes in those modifications, while not modifying the main project until is is clear that the modified code is really working and ready to be merged into the main project. 
+
+To give a concrete example, suppose you maintain a large R package, which relies on code written in C and Fortran, and you decide that it would be advantageous to replace all the Fortran code with C code. This is a major undertaking, and you would not want to simply start work on the stable working code for the main package, since this will almost certainly break it initially. That would be a real nuisance if you then needed to deal with a minor bug in the original package, but had only the half completed unstable modified code available. Much better to create a branch of the project on which to develop the new C based code, only merging into the maser branch, once everything in the revision is fully working.  
 
 
 \section{Data re-arrangement and tidy data}
