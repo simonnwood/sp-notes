@@ -171,17 +171,38 @@ Mostly, you will interact with your github repo via the {\tt git} software, and 
 \begin{verbatim}
 $ git --version
 \end{verbatim}
-This gives the answer \verb+git version 2.25.1+ for me. 
+This gives the answer \verb+git version 2.25.1+ for me. Here we will cover only the most basic use of {\tt git} and {\tt github}: the minimum needed to collaborate on projects and keep your work backed up. You can find much more at:
+\begin{itemize}
+\item \verb+https://git-scm.com/docs/gittutorial+
+\item \verb+https://guides.github.com/+
+\item \verb+https://training.github.com/+
+\end{itemize}
+
+\subsubsection{Making a local working copy of the repo}
 
 After creating your github repo you need to make a local copy of it on your computer. 
 \begin{itemize}
 \item From your {\tt github} repo page (at {\tt github.com}) click on {\tt Code} select {\tt Clone} and copy the {\tt htpps} address for the repository that appears. For example, for my repo containing these notes, the address is \verb+https://github.com/simonnwood/sp-notes.git+
-\item In the terminal window on your local machine change directory ({\tt cd}) to the folder where you would like the local repo to be located. Then type {\tt git clone} followed by the address you copied. e.g. with the above address
+\item In the terminal window on your local machine change directory ({\tt cd}) to the folder where you would like the local repo to be located. Then type {\tt git clone} followed by the address you copied. e.g. 
 \begin{verbatim}
 git clone https://github.com/simonnwood/sp-notes.git
 \end{verbatim}
-
 \end{itemize}
+A local copy of the repo is then created on your computer. 
+
+\subsubsection{Modifying work and synchronising with the github repo}
+
+The local copy of your repo is just a directory/folder containing the files in your repo, and a hidden {\tt .git} subdirectory that {\tt git} uses to maintain an index of the files that it should keep track of, and the history of changes made. {\tt git} knows about all the files in the {\tt github} repo you cloned, but will only start keeping track of other files that you may add to your local repo when you tell it to do so (with \verb+git add+). 
+
+Similarly {\tt git} does not keep a record of all the changes you make to your code as you work on it. Rather, it takes and stores a `snapshot' of the state of the files it is tracking only when you tell it to, using a {\tt git commit} command. 
+
+Neither does {\tt git} automatically save all these snapshots to your master {\tt github} repo. That only happens when you tell it to using {\tt git push}. This is quite useful, you can keep a detailed record of the changes you make while working on code locally, without modifying the {\tt github} master repo until you are satisfied that the changes are complete and working.   
+
+
+
+The most basic way to use {\tt git} and {\tt github} is to work on the local copy of your repo, and once you have made the changes you want to make, have tested them and are happy with them, {\em commit} them and {\em push} them to the master {\tt github} repo. 
+
+
 
 \section{Data re-arrangement and tidy data}
 
