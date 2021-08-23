@@ -77,7 +77,10 @@
 
 \centerline{\huge \bf Statistical Programming}
 
-\section{Software Requirements}
+\tableofcontents
+
+
+\section{Software Requirements: R, git, JAGS etc}
 
 To complete this course you will need to get yourself a free github account and install the following software on your computer: 
 \begin{itemize}
@@ -85,7 +88,7 @@ To complete this course you will need to get yourself a free github account and 
 \item R packages: ggplot2, rjags, rmarkdown, debug.
 \item Only if you do not already have latex installed, install tinytex. 
 \end{itemize}
-It is assumed that you have the basic computer skills to do this. If you do not, you will need to spend some time online acquiring them (that level of basic skills is not part of this course). If you have difficulty, you can post questions on piazza for other students to answer. Please answer other student's questions on installation on piazza. 
+It is assumed that you have the basic computer skills to do this. If not, you will need to spend some time online acquiring them (this course is about programming, not basic computer skills). If you have difficulty, you can post questions on piazza for other students to answer. Please answer other student's questions on installation on piazza. 
 
 In more detail.
 \begin{itemize}
@@ -108,7 +111,7 @@ then install JAGS as described here\\
 \verb+https://ports.macports.org/port/jags/+
 \end{itemize}
 
-Once the above are installed, you will need to install some packages from the R session command line. R/Rstudio can install packaged in a local directory/folder for you, but I tend to start R as administrator/super user/root and then install them (e.g. on linux I would start R from the command line as \verb+sudo R+). Here are the packages you need:
+Once the above are installed, you will need to install some packages from the R session command line. R/Rstudio can install packages in a local directory/folder for you, but I tend to start R as administrator/super user/root and then install them (e.g. on linux I would start R from the command line as \verb+sudo R+). Here are the packages you need:
 \begin{itemize}
 \item ggplot2 provides a nice alternative to built in R graphics. Install by typing\\
 \verb+install.packages("ggplot2")+\\
@@ -131,17 +134,10 @@ WARNING: this command may break existing latex installations!
 \end{itemize}
 Once you have the software installed, you need to do one more thing. Get a free github account (if you do not already have one).  \verb+https://github.com/join+ is where to get one. 
 
-For git and github, there is much useful information available at 
-\begin{itemize}
-\item \verb+https://guides.github.com/+
-\item \verb+https://git-scm.com/docs/gittutorial+
-\item \verb+https://training.github.com/+
-\end{itemize}
-It is a good idea to have a look at this to get an initial feeling for what github is about.
 
 \subsection{Using a terminal window, choose a text editor}
 
-This course involves programming - that is writing text instructions that get a computer to do something. Anyone who programmes rapidly discovers that writing text to get a computer to do something is often quicker and more convenient than clicking your way through a graphical interface. This sometimes includes for basic tasks such as file copying, or moving between directories/folders. 
+This course involves programming - that is writing text instructions that get a computer to do something. Anyone who programmes rapidly discovers that writing text to get a computer to do something is often quicker, more convenient and more reproducible than clicking your way through a graphical interface. This sometimes true even for basic tasks such as file copying, or moving between directories/folders. 
 
 Whatever operating system you are using you will be able to launch a `terminal window' for this purpose. Make sure that for your operating system you know how to do this, how to list the names of the files in a directory/folder, how to change from one directory/folder to another, how to delete a file, and how to close the terminal window. 
 
@@ -177,6 +173,8 @@ This gives the answer \verb+git version 2.25.1+ for me. Here we will cover only 
 \item \verb+https://guides.github.com/+
 \item \verb+https://training.github.com/+
 \end{itemize}
+Note that {\tt Rstudio} offers built in facilities for using {\tt github}, which you may find useful. However before using them it is better to first learn how {\tt git} and {\tt github} work by using them in the way described here, which is transferable to any project, not just R programming with {\tt Rstudio}.  
+
 
 \subsubsection{Making a local working copy of the repo}
 
@@ -215,7 +213,7 @@ Suppose we want to make some code changes in a file \verb+foo.r+ that already ex
 \begin{verbatim}
 git commit -a -m"added a wibbleblaster to foo.r"
 \end{verbatim}  
-The \verb+-a+ option tells {\tt git} to take a snapshot of every file that it is tracking that you have changed. If you omit \verb+-a+ then you must tell {\tt git} which files you want it to snapshot explicitly, for example using \verb+git add foo.r+, before committing. The option \verb+-m+ adds a message describing the changes. If you omit the \verb"-m" then {\tt git} will open an editor, in which you enter the message - this can be useful if you want to include a longer set of comments. These comments can be viewed on the {\tt github} repo, providing a useful record of whet the individual code changes were for.  
+The \verb+-a+ option tells {\tt git} to take a snapshot of every file that it is tracking that you have changed. If you omit \verb+-a+ then you must tell {\tt git} which files you want it to snapshot explicitly, for example using \verb+git add foo.r+, before committing. The option \verb+-m+ adds a message describing the changes. If you omit the \verb"-m" then {\tt git} will open an editor, in which you enter the message - this can be useful if you want to include a longer set of comments. These comments can be viewed on the {\tt github} repo, providing a useful record of what the individual code changes were for.  
 \item Now `push' the changes to {\tt github}. 
 \begin{verbatim}
 git push
@@ -234,7 +232,7 @@ If your {\tt git push} command fails (and it will tell you if it has!) then you 
 \begin{verbatim}
 git pull
 \end{verbatim}
-This will get the latest versions of the files from the {\tt github} repo, compare them to your local copies, attempt to resolve conflicts automatically where possible, and where not modify your local copies so that whenever there is a conflict your local files contain both your code and the conflicting code from the {\tt github} master, with clear marking of which is which. 
+This will get the latest versions of the files from the {\tt github} repo, compare them to your local copies, and attempt to resolve conflicts automatically where possible. Where auto-fixing is not possible, it will modify your local copies so that whenever there is a conflict your local files contain both your code and the conflicting code from the {\tt github} master, with clear marking of which is which. 
 \item You check the conflicting files, changing the code to resolve any remaining flagged conflicts (often just selecting one or other of the alternative). 
 \item Now redo the commit and push steps
 \begin{verbatim}
@@ -268,6 +266,116 @@ The above covers the most basic use of {\tt git}. It is sufficient for working o
 A typical use of branches is to code and work on complicated modifications - tracking and backing up the changes in those modifications, while not modifying the main project until is is clear that the modified code is really working and ready to be merged into the main project. 
 
 To give a concrete example, suppose you maintain a large R package, which relies on code written in C and Fortran, and you decide that it would be advantageous to replace all the Fortran code with C code. This is a major undertaking, and you would not want to simply start work on the stable working code for the main package, since this will almost certainly break it initially. That would be a real nuisance if you then needed to deal with a minor bug in the original package, but had only the half completed unstable modified code available. Much better to create a branch of the project on which to develop the new C based code, only merging into the maser branch, once everything in the revision is fully working.  
+
+\subsection{A simple {\tt git}/{\tt github} exercise}
+
+At this stage, it is essential that you try out git and github. So before reading on try the following exercise. If you are not sure how to do any part, then refer back to the material above that you have just read.
+\begin{enumerate}
+\item Using a web browser, set yourself up a new repo on {\tt github}, and edit the default {\tt README.md} file on {\tt github} to say something interesting (making sure to save and commit the change).
+\item Clone your {\tt github} repo to your local machine.
+\item Add a file to your local repo, edit it and add it to the files tracked by {\tt git}.
+\item Commit your edits and push the repo to {\tt github}.
+\item Check that the repo on {\tt github} now contains your newly added file. 
+\item As soon as you know someone else on the course to work with, try out sharing repositories, and resolving conflicts.
+\end{enumerate}
+
+
+\section{Programming for statistical data analysis}
+
+Programming is the process of writing instructions to make a computer perform some task. The instructions have to be written in standard way that both the programmer and the computer can interpret. The rules and key words defining such a standard way of communicating define a computer language. There are many alternative languages designed for different classes of task. Here we will concentrate on the R language (and environment) for programming with data, which is widely used for the statistical analysis of data. A huge amount of statistical analysis software is written in R and is freely available. 
+
+{\em Statistical} analysis of data is concerned with the analysis of data that is in some sense a random {\em sample} from a larger {\em population}. We want to learn about the population from the sample, without being misled by particular features of the sample that arose by chance as part of the random sampling process. The random sampling approach is powerful because: 
+\begin{enumerate}
+\item it allows reliable conclusions with known levels of accuracy to be drawn without having to gather data from the whole population, which may be impossible, or prohibitively expensive.       
+\item random sampling eliminates the unknowably large bias that occurs if we try to learn about the population from a non-random sample, replacing that bias with a random uncertainty of known magnitude.   
+\end{enumerate}
+Note that while population here might mean something concrete like `population of people in the UK' it might be much more abstract like `the population of all experimental results that this experiment could have produced when replicated under the same conditions'.
+
+To understand the difference between statistical and non-statistical data analysis consider data on reported cases of Covid-19 each day. Many charts of these data are produced, and analyses are performed, such as producing running averages or looking for trends in the data. None of these analyses are statistical, as no attempt is made to consider what population the case data might be viewed as a random sample of. They are certainly not a random sample of the people who have Covid-19 on a given day, and neither is it remotely clear how the number of cases relates to the number of people with Covid on a particular day.  The government and media present these data {\em as if} they were a random sample from the population of Covid cases, but this is simply misleading. Any decent applied statistician should be able to list several sources of bias likely to occur by treating them as such. 
+
+In contrast, each week in the UK, the Office for National Statistics publishes the results of testing a randomly selected sample of the UK population for Covid. The analysis includes estimates of trends and uncertainties, from a properly statistical analysis. Unsurprisingly the ONS analysis often appears to contradict the naive interpretations of the case data given by the media and government. More surprisingly the media and government seem to give more weight to the non-statistical analyses of case data than to the statistical analyses of the ONS data, despite the latter being essentially unbiased and of known accuracy, while the former have bias of unknown magnitude. Even more surprisingly, the UK appears to be unique in even conducting unbiased sampling to establish Covid prevalence.
+
+The Covid cases example illustrates why statistical analysis software is dangerous. The easier software is to use, the easier it is to produce an analysis of data that resembles a statistical analysis in every superficial respect, but not in the key one that the data are in some sense a random sample from a population.  Beware of this problem.         
+
+\subsection*{Exercise}
+
+The following link is to an article in a national newspaper by two professors of statistics that appeared on 19th April 2020.
+{\small \verb+https://www.theguardian.com/commentisfree/2020/apr/19/coronavirus-deaths-data-uk+} 
+There is an astonishing statement in the second paragraph. Identify the statement and what is wrong with it.
+
+
+\section{Getting started with R}
+
+In this course we will concentrate on learning programming skills that as far as possible are transferable to other programming languages in addition to R. For this reason we will largely stick to programming using what is available with R itself, and we will ovoid over-reliance on any particular set of add on packages. There is an add on package providing functions for almost any simple task you might want to accomplish in R. The fact that we will here examine how to programme tasks for which it would be simpler to find an add on package, is not though a desire to re-invent the wheel. The point is not to learn the quickest way to perform the particular task, but rather to illustrate how to programme. 
+
+A word of warning. In much university work, getting something 80\% right is a first class performance. Unfortunately programming is not like that. 80\% right means 20\% wrong, and 20\% wrong computer code will likely result in your programme doing 0\% of what it is supposed to do. This fact calls for a more precise approach to working than is necessary for other topics.  
+
+\subsection{Dissecting a simple programming example}
+
+Let us start with an example, of a simple data manipulation task in R. Suppose that we have a vector of 1 or 2 digit numbers and want to create a new vector of the individual digits, in order. For example if the original vector is $[12,5,23,2]$ the new vector should be $[1,2,5,2,3,2]$. Before trying this we need to write down {\em how} we are going to do it. For example:
+\begin{enumerate}
+\item Identify the number and locations of the double digit numbers in the original vector (and hence the length of the new vector).
+\item Work out the locations of the `tens' digits in the new vector, compute and insert them.
+\item Work out the locations of the `units' digits in the new vector and insert them. 
+\end{enumerate}
+The following is R code for one way of doing this. It could be typed, line by line into the R console, but it is better to type it into a file and then copy and paste to the R console, or {\tt source} the file into R, or run it in Rstudio. 
+\begin{verbatim}
+x <- c(10,2,7,89,43,1) ## an example vector to try out
+ii <- which(x%/%10 > 0) ## indices of the double digits in x?
+xs <- rep(0,length(ii)+length(x)) ## vector to store the single digits
+iis <- ii+1:length(ii)-1 ## where should 10s digits go in xs?
+xs[iis] <- x[ii]%/%10 ## insert 10s digits
+xs[-iis] <- x%%10  ## insert the rest (units)
+\end{verbatim}  
+Anything after \verb+#+ on a line is ignored by R, so is a comment. It is a good idea to use lots of these. Here is what the code does in detail, line by line.
+\begin{enumerate}
+\item \verb+x <- c(10,2,7,89,43,1)+ creates an example vector to work on. The {\tt c} function takes the individual numbers supplied to it, and concatenates them into a single vector (it can also concatenate vectors). The results are stored in vector \verb+x+ using the assignment operator \verb+<-+. Notice how {\tt x} is created automatically by this assignment. Unlike in many computer languages, we do not have to declare {\tt x} first. 
+\item \verb+ii <- which(x%/%10 > 0)+ creates a vector, {\tt ii} of the indices of the double digit numbers in \verb+x+. It does this by computing the result of integer division by 10, for each element of {\tt x}, using the \verb+%/%+ operator, and then testing whether this result is greater than 0. The result of \verb+x%/%10 > 0+ will be a vector of {\tt TRUE} or {\tt FALSE} values of the same length as {\tt x}. For the given example it is $({\tt TRUE},{\tt FALSE},{\tt FALSE},{\tt TRUE},{\tt TRUE},{\tt FALSE})$. This vector is supplied directly to the {\tt which} function, which returns the indices for which the vector is {\tt TRUE} (1,4 and 5 for the example given). 
+\item \verb^xs <- rep(0,length(ii)+length(x))^ creates a vector of zeroes into which the individual digits will be inserted, using the {\tt rep} function. {\tt rep} simply repeats its first argument the number of times specified in its second argument. The {\tt length} function returns the number of elements in an existing vector. We need {\tt xs} to be the length of {\tt x} plus an extra element for each double digit number.
+\item \verb^iis <- ii+1:length(ii)-1^ creates a vector, {\tt iis}, containing the indices (locations) of the 10s digits in {\tt xs}. We have to account for the fact that each time we insert a digit, all the digits after move along one place, relative to where they were. So, the first 10s digit will occupy the same slot in {\tt x} and {\tt xs}, but the next 10s digit will be one element later in {\tt xs} than in {\tt x}, the next 2 elements later, and so on. \verb+1:length(ii)-1+ creates a sequence 0,1,2\ldots to add to {\tt ii} to achieve this. It uses the \verb+:+ operator --- if {\tt a} and {\tt b} are integers (and $a<=b$) \verb+a:b+ generates the sequence $a,a+1,a+2,\ldots,b$.
+\item \verb+xs[iis] <- x[ii]%/%10+ computes the 10s digits of the double digit numbers, indexed by {\tt ii}, using \verb+x[ii]%/%10+, and assigns them to the elements of {\tt xs} indexed by {\tt iis}.
+\item \verb+xs[-iis] <- x%%10+ computes the units digit for all the numbers in {\tt x} using \verb+x%%10+ where \verb+%%+ is the operator computing the remainder after integer division. These digits are stored in the elements of {\tt xs} {\em not} reserved for 10s digits. That is, \verb+xs[-iis]+, all the elements {\em except} those indexed by {\tt iis}. 
+\end{enumerate}
+Make sure you really understand what this code is doing. Run it one line at a time in R, and examine the result created by each line to make sure you understand exactly what is happening. To see what is in an R object, just type its name at the console, and it will be printed, by default. For example:
+\begin{verbatim}
+> xs  ## > just denotes the R prompt here
+[1] 1 0 2 7 8 9 4 3 1
+\end{verbatim}
+
+The preceding example has quite a bit of R packed in, and we used quite a few R functions and operators on the way. R provides a large number of functions for a variety of tasks, and the available add on packages vastly more. You can't hope to learn them all, so it is essential to learn how to use the R help system. This is easy. For any operator of function you know the name of then just type \verb+?+ followed by the function name, or the operator in quotes. For example
+\begin{verbatim}
+?which ## get the help for the 'which' function
+?"<-"  ## get help for the assignment operator
+help.start() ## launch html help in a browser
+\end{verbatim}  
+\ldots the last option is often best if you are not sure what you are looking for.
+
+\subsection{A second simple example: data are not always numbers}
+
+R vectors are not restricted to containing numbers. Character strings are another common data type that we can hold in a vector. For example \verb+x <- c("jane","bill","sue")+ creates a 3-vector, containing the 3 given character strings. Functions are provided for manipulating such character string data in various ways. For the moment suppose we want to achieve the same task as in the previous example, but for the case in which the numbers are supplied as character strings, and we want the separated digits as character strings too\footnote{As the point is to provide illustration of string handling, I'll resist the temptation to use {\tt as.numeric} to convert the character data to numbers, run the previous code, and then use {\tt as.character} to convert back.}.  
+
+We can use more or less the same approach as in the last section, but with one slight modification to the logic. For numbers it was easy to separate out 10s and units, with only the 2 digit numbers having a 10s digit. When the numbers are represented as character strings it is easier to separate out first and second digits, with only the two digit numbers having second digits. This means that rather than finding the indices of 10s digits, we'll find the indices of second digits. Here is the modified code:
+
+\begin{verbatim}
+x <- c("10","2","7","89","43","1") ## example vector
+ii <- which(nchar(x)>1) ## which elements of x are double digit?
+xs <- rep("",length(ii)+length(x)) ## vector to store the single digits
+iis <- ii+1:length(ii) ## where should second digit go in xs?
+xs[iis] <- substr(x[ii],2,2) ## insert 2nd digits
+xs[-iis] <- substr(x,1,1)    ## insert 1st digits
+\end{verbatim}
+Line by line, here is what it does:
+\begin{enumerate}
+\item \verb+x <- c("10","2","7","89","43","1")+ example vector, as before, but now of character type.
+\item \verb+ii <- which(nchar(x)>1)+ uses the {\tt nchar} function to count the characters in each element of {\tt x}. \verb+which(nchar(x)>1)+ returns the indices for which the corresponding element of {\tt x} was more than one character.
+\item  \verb^xs <- rep("",length(ii)+length(x))^ creates {\tt xs} as before, but this time it is a character vector.
+\item \verb^iis <- ii+1:length(ii)^ computes the locations for second digits in {\tt xs}. Same idea as before, but second digits are all located one place after the 10s digits.
+\item \verb+xs[iis] <- substr(x[ii],2,2)+. Function \verb+substr+ is used to obtain the 2nd character from each 2 digit element of {\tt x} ({\tt ii} indexes the 2 digit elements). \verb+substr(x[ii],2,2)+ extracts the characters between characters 2 and 2, from the elements of {\tt x[ii]} and returns them in a vector, which is copied into the appropriate locations in {\tt xs}.
+\item \verb+xs[-iis] <- substr(x,1,1)+ the first digits are then inserted in the locations not reserved for second digits. 
+\end{enumerate}
+
+  
+
 
 
 \section{Data re-arrangement and tidy data}
@@ -311,6 +419,6 @@ ind <- attr(student,"index") ## ind[i] is row of 'student' corresponding to row 
 
 At this point, you are hopefully wondering about replicate data, and the definition of `observation' as `unique combination of variables'? If I repeat an experiment under identical conditions, could I not occasionally get identical results, and hence two identical rows in a data frame that are different observations? Well yes, but only if you do not include a variable recording the `replicate number'. If you don't record the replicate number then you do not really have tidy data, as it is not possible to distinguish the common error of accidental replication of some data, from genuine replicates.
 
-
+%\makeindex
 
 \end{document}
