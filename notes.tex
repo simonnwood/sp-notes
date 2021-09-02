@@ -72,6 +72,7 @@
 
 \newtheorem{theorem}{Theorem}
 
+\makeindex
 
 \begin {document}
 
@@ -90,180 +91,183 @@ To complete this course you will need to get yourself a free github account and 
 \end{itemize}
 It is assumed that you have the basic computer skills to do this. If not, you will need to spend some time online acquiring them (this course is about programming, not basic computer skills). If you have difficulty, you can post questions on piazza for other students to answer. Please answer other student's questions on installation on piazza. 
 
+\index{git!installation}\index{github!account}\index{R!instalation}\index{JAGS!installation}\index{Rstudio!installation}
+\index{CRAN}
 In more detail.
 \begin{itemize}
-\item R is the free statistical programming language and environment that we will use. You can get a copy from the Comprehensive R Archive Network (CRAN)\\
-\verb+https://cran.r-project.org/+\\
+\item {\tt R} is the free statistical programming language and environment that we will use. You can get a copy from the Comprehensive R Archive Network (CRAN)\\
+\lstinline+https://cran.r-project.org/+\\
 just follow the links under `Download and Install R'. 
-\item Rstudio is an alternative front end for R, which many people prefer to use. It provides an R code editor, R session window, R graphics window and other information, all in a convenient `integrated environment'. If you prefer this to R as available from CRAN, you can get it from\\
-\verb+https://www.rstudio.com/+\\
+\item {\tt Rstudio} is an alternative front end for R, which many people prefer to use. It provides an R code editor, R session window, R graphics window and other information, all in a convenient `integrated environment'. If you prefer this to R as available from CRAN, you can get it from\\
+\lstinline+https://www.rstudio.com/+\\
 at the foot of the page, under `R studio desktop'. 
-\item git is a version control system. It helps you to write code in teams, as you must do for this course, without breaking each others work. It also lets you keep a record of the changes you make, so that you can go back to earlier versions, if you need to. To install {\tt git} follow the instructions at\\
-\verb+https://www.git-scm.com/+\\
-On Windows use the default options. {\tt linux} systems often have it installed already and something like \verb+sudo apt install git+ will install it if not. 
+\item {\tt git} is a version control system. It helps you to write code in teams, as you must do for this course, without breaking each other's work. It also lets you keep a record of the changes you make, so that you can go back to earlier versions, if you need to. To install {\tt git} follow the instructions at\\
+\lstinline+https://www.git-scm.com/+\\
+On Windows use the default options. {\tt linux} systems often have it installed already and something like \lstinline+sudo apt install git+ will install it if not. 
 \item For Mac or linux you also need to install the Git Credential Manager Core (this is automatically installed for Windows). Instructions are at:\\
 {\scriptsize \verb+https://docs.github.com/en/get-started/getting-started-with-git/caching-your-github-credentials-in-git+}\\
 Linux is slightly fiddly (I used the plain text option 4 for credential storage). 
-\item pandoc is document conversion software used by the {\tt rmarkdown} package. Installation instructions:\\
-\verb+https://pandoc.org/installing.html+ 
-\item JAGS stands for `Just Another Gibbs Sampler'. We will use it for programming Bayesian models and sampling from them. Downloads are available here:\\
-\verb+https://sourceforge.net/projects/mcmc-jags/files/JAGS/4.x/+\\
-but under linux something like \verb+sudo apt install jags+ can be used. Note that if you have a new apple/mac with an apple silicon processor (rather than intel), then you will need to install MacPorts from\\ 
-\verb+https://www.macports.org/install.php+\\
+\item {\tt pandoc} is document conversion software used by the {\tt rmarkdown} package. Installation instructions:\\
+\lstinline+https://pandoc.org/installing.html+ 
+\item {\tt JAGS} stands for `Just Another Gibbs Sampler'. We will use it for programming Bayesian models and sampling from them. Downloads are available here:\\
+\lstinline+https://sourceforge.net/projects/mcmc-jags/files/JAGS/4.x/+\\
+but under linux something like \lstinline+sudo apt install jags+ can be used. Note that if you have a new apple/mac with an apple silicon processor (rather than intel), then you will need to install MacPorts from\\ 
+\lstinline+https://www.macports.org/install.php+\\
 then install JAGS as described here\\
-\verb+https://ports.macports.org/port/jags/+
+\lstinline+https://ports.macports.org/port/jags/+
 \end{itemize}
 
-Once the above are installed, you will need to install some packages from the R session command line. R/Rstudio can install packages in a local directory/folder for you, but I tend to start R as administrator/super user/root and then install them (e.g. on linux I would start R from the command line as \verb+sudo R+). Here are the packages you need:
+Once the above are installed, you will need to install some packages from the R session command line. R/Rstudio can install packages in a local directory/folder for you, but I tend to start R as administrator/super user/root and then install them (e.g. on linux I would start R from the command line as \lstinline+sudo R+). Here are the packages you need:
 \begin{itemize}
-\item ggplot2 provides a nice alternative to built in R graphics. Install by typing\\
-\verb+install.packages("ggplot2")+\\
+\item {\tt ggplot2} provides a nice alternative to built in R graphics. Install by typing\\
+\lstinline+install.packages("ggplot2")+\\
 at the R command line.
-\item rmarkdown provides a neat way of documenting data analyses using R. Install using\\
- \verb+install.packages("rmarkdown")+
-\item rjags lets you use JAGS directly from R. Install using\\
- \verb+install.packages("rjags")+
+\item {\tt rmarkdown} provides a neat way of documenting data analyses using R. Install using\\
+ \lstinline+install.packages("rmarkdown")+
+\item {\tt rjags} lets you use JAGS directly from R. Install using\\
+ \lstinline+install.packages("rjags")+
 \item Finally we need a debugging package, to help you to find errors in your code, or understand how code is working by stepping through it. What is built into R and Rstudio is not great, and a much better option is Mark Bravington's debug package. This is not available from CRAN, but only from Mark's repository, so to install, you need to do this:
-\begin{verbatim}
+\begin{lstlisting}
 options(repos=c("https://markbravington.github.io/Rmvb-repo",
         getOption( "repos")))
 install.packages("debug")
-\end{verbatim}
-\item rmarkdown requires a latex installation in order to allow you to produce pdf documents. So, {\em only if you do not already have latex installed}, install {\tt tinytex} with
-\verb+install.packages("tinytex")+
+\end{lstlisting}
+\item {\tt rmarkdown} requires a latex installation in order to allow you to produce pdf documents. So, {\em only if you do not already have latex installed}, install {\tt tinytex} with
+\lstinline+install.packages("tinytex")+
 then if you are {\em really sure} that you do not already have latex installed run 
-\verb+tinytex::install_tinytex()+
+\lstinline+tinytex::install_tinytex()+
 WARNING: this command may break existing latex installations!
 \end{itemize}
-Once you have the software installed, you need to do one more thing. Get a free github account (if you do not already have one).  \verb+https://github.com/join+ is where to get one. 
+Once you have the software installed, you need to do one more thing. Get a free {\tt github} account (if you do not already have one).  \lstinline+https://github.com/join+ is where to get one. 
 
 
 \subsection{Using a terminal window, choose a text editor}
 
-This course involves programming - that is writing text instructions that get a computer to do something. Anyone who programmes rapidly discovers that writing text to get a computer to do something is often quicker, more convenient and more reproducible than clicking your way through a graphical interface. This sometimes true even for basic tasks such as file copying, or moving between directories/folders. 
+This course involves programming - that is writing text instructions that get a computer to do something. Anyone who programmes rapidly discovers that writing text to get a computer to do something is often quicker, more convenient and more reproducible than clicking your way through a graphical interface. This is sometimes true even for basic tasks such as file copying, or moving between directories/folders. 
 
 Whatever operating system you are using you will be able to launch a `terminal window' for this purpose. Make sure that for your operating system you know how to do this, how to list the names of the files in a directory/folder, how to change from one directory/folder to another, how to delete a file, and how to close the terminal window. 
 
-You will also need to edit text files containing the computer code you write. If you choose to use Rstudio, there is a built in editor, and you might choose to just use that. If you use plain R then you will need an external editor. Word is not suitable, as it will insert hidden characters in your code that will cause problems, so you instead should use something simpler (e.g. wordpad or notepad on windows). Make sure you know what is available on your computer and use that. I tend to use emacs, but this has more features than you actually need for this course. 
+You will also need to edit text files containing the computer code you write. If you choose to use {\tt Rstudio}, there is a built in editor, and you might choose to just use that. If you use plain {\tt R} then you will need an external editor. {\tt Word} is not suitable, as it will insert hidden characters in your code that will cause problems, so you instead should use something simpler (e.g. {\tt wordpad} or {\tt notepad} on windows). Make sure you know what is available on your computer and use that. I tend to use {\tt emacs}, but this has more features than you actually need for this course. 
 
 \section{git and github}
 
-{\tt git} is a system that lets you track changes in code files and to manage those files when several people are working on them. In particular it lets you maintain a central {\em repository} of your code, which serves as the backed up master copy. The repository is just a folder/directory containing the master copy of your code. Several people can make working local copies of the repository (on their own computers) and work on the code, and git provides the tools to allow management of the master copy in a way that avoids or resolves conflicts. A conflict is when two people made contradictory changes to the code. 
+{\tt git} is a system that lets you track changes in code files and to manage those files when several people are working on them. In particular it lets you maintain a central {\em repository} of your code, which serves as the backed up master copy. The repository is just a folder/directory containing the master copy of your code. Several people can make working local copies of the repository (on their own computers) and work on the code, only merging those changes into the master copy when they are ready. {\tt git} provides the tools to allow management of the master copy in a way that avoids or resolves conflicts. A conflict is when two people made contradictory changes to the code. \index{git}
 
 \subsection{Setting up a repo on {\tt github}}
 
-An easy way to set up a central repository is to use {\tt github}.  
+An easy way to set up a central repository is to use {\tt github}.\index{github!repository}  
 \begin{itemize}
-\item Login to your github account on {\tt github.com}, click on {\tt Repositories} and then click on {\tt New} to set up a new repository.
+\item Login to your {\tt github} account on {\tt github.com}, click on {\tt Repositories} and then click on {\tt New} to set up a new repository.
 \item Follow the instructions. You probably want your repository to be private if it is for working on assessed coursework.
 \end{itemize}
 For group homework, one person sets up the repo and invites their team mates to collaborate on it. 
 \begin{itemize}
-\item Log on to github, nagivate to your repo, and click on {\tt Settings}.
+\item Log on to {\tt github}, nagivate to your repo, and click on {\tt Settings}.
 \item Click on {\tt Manage Access} from the left hand menu, and then on {\tt Invite a collaborator} - you will need their github user name. 
 \end{itemize}
 You can add files directly to your repo, via the web interface, but we will shortly cover how to add files to the local copy of your repo, and then {\em push} them to github. 
 
 \subsection{Using {\tt git}}
 
-Mostly, you will interact with your github repo via the {\tt git} software, and your local copy of your github repo. You will use {\tt git} by typing commands in a terminal window. To check everything is working before using {\tt git} for the first time you might open a terminal window and check the {\tt git} version, a follows :
-\begin{verbatim}
+Mostly, you will interact with your {\tt github} repo via the {\tt git} software, and your local copy of your {\tt github} repo. You will use {\tt git} by typing commands in a terminal window. To check everything is working before using {\tt git} for the first time you might open a terminal window and check the {\tt git} version, a follows:\index{git}
+\begin{lstlisting}
 git --version
-\end{verbatim}
-This gives the answer \verb+git version 2.25.1+ for me. Here we will cover only the most basic use of {\tt git} and {\tt github}: the minimum needed to collaborate on projects and keep your work backed up. You can find much more at:
+\end{lstlisting}
+This gives the answer \lstinline+git version 2.25.1+ for me. Here we will cover only the most basic use of {\tt git} and {\tt github}: the minimum needed to collaborate on projects and keep your work backed up. You can find much more at:
 \begin{itemize}
-\item \verb+https://git-scm.com/docs/gittutorial+
-\item \verb+https://guides.github.com/+
-\item \verb+https://training.github.com/+
+\item \lstinline+https://git-scm.com/docs/gittutorial+
+\item \lstinline+https://guides.github.com/+
+\item \lstinline+https://training.github.com/+
 \end{itemize}
 Note that {\tt Rstudio} offers built in facilities for using {\tt github}, which you may find useful. However before using them it is better to first learn how {\tt git} and {\tt github} work by using them in the way described here, which is transferable to any project, not just R programming with {\tt Rstudio}.  
 
 Before moving on, if you are using a Mac or linux you probably want to issue the command:
-\begin{verbatim}
+\begin{lstlisting}
 git config --global core.autocrlf input
-\end{verbatim}
-which deals with the fact that line ends are dealt with differently by different operating systems and handles this gracefully (Windows is set to do this by default).
+\end{lstlisting}
+which deals with the fact that line ends are dealt with differently by different operating systems and handles this gracefully (Windows is set to do this by default).\index{git!line endings}
 
 \subsubsection{Making a local working copy of the repo}
 
 After creating your github repo you need to make a local copy of it on your computer. 
 \begin{itemize}
-\item From your {\tt github} repo page (at {\tt github.com}) click on {\tt Code} select {\tt Clone} and copy the {\tt htpps} address for the repository that appears. For example, for my repo containing these notes, the address is \verb+https://github.com/simonnwood/sp-notes.git+
+\item From your {\tt github} repo page (at {\tt github.com}) click on {\tt Code} select {\tt Clone} and copy the {\tt htpps} address for the repository that appears. For example, for my repo containing these notes, the address is \lstinline+https://github.com/simonnwood/sp-notes.git+
 \item In the terminal window on your local machine change directory ({\tt cd}) to the folder where you would like the local repo to be located. Then type {\tt git clone} followed by the address you copied. e.g. 
-\begin{verbatim}
+\begin{lstlisting}
 git clone https://github.com/simonnwood/sp-notes.git
-\end{verbatim}
+\end{lstlisting}
 \end{itemize}
-A local copy of the repo is then created on your computer. 
+A local copy of the repo is then created on your computer. \index{git!local copy} \index{git!clone}
 
 \subsection{Modifying work and synchronising with the github repo}
 
-The local copy of your repo is just a directory/folder containing the files in your repo, and a hidden {\tt .git} subdirectory that {\tt git} uses to maintain an index of the files that it should keep track of, and the history of changes made. {\tt git} knows about all the files in the {\tt github} repo you cloned, but will only start keeping track of other files that you may add to your local repo when you tell it to do so (with \verb+git add+). 
+The local copy of your repo is just a directory/folder containing the files in your repo, and a hidden {\tt .git} subdirectory that {\tt git} uses to maintain an index of the files that it should keep track of, and the history of changes made. {\tt git} knows about all the files in the {\tt github} repo you cloned, but will only start keeping track of other files that you may add to your local repo when you tell it to do so (with \lstinline+git add+). 
 
-Similarly {\tt git} does not keep a record of all the changes you make to your code as you work on it. Rather, it takes and stores a `snapshot' of the state of the files it is tracking only when you tell it to, using a {\tt git commit} command. 
+Similarly {\tt git} does not keep a record of all the changes you make to your code as you work on it. Rather, it takes and stores a `snapshot' of the state of the files it is tracking only when you tell it to, using a {\tt git commit} command. \index{git!commit}
 
-Neither does {\tt git} automatically save all these snapshots to your master {\tt github} repo. That only happens when you tell it to using {\tt git push}. This is quite useful, you can keep a detailed record of the changes you make while working on code locally, without modifying the {\tt github} master repo until you are satisfied that the changes are complete and working.   
+Neither does {\tt git} automatically save all these snapshots to your master {\tt github} repo. That only happens when you tell it to using {\tt git push}. This is quite useful, you can keep a detailed record of the changes you make while working on code locally, without modifying the {\tt github} master repo until you are satisfied that the changes are complete and working.   \index{git!push}
 
-Note that you can access the help pages for the main {\tt git} commands by typing {\tt git help} followed by the command name. For example, if you want to know more about {\tt git add} type
-\begin{verbatim}
+Note that you can access the help pages for the main {\tt git} commands by typing {\tt git help} followed by the command name. For example, if you want to know more about {\tt git add} type \index{git!help}
+\begin{lstlisting}
 git help add
-\end{verbatim}
+\end{lstlisting}
 
 \subsubsection{Simple work cycle}
 
-Suppose we want to make some code changes in a file \verb+foo.r+ that already exists in the master repo. A typical work sequence would be as follows.
+Suppose we want to make some code changes in a file \lstinline+foo.r+ that already exists in the master repo. A typical work sequence would be as follows.
 \begin{enumerate}
-\item  Change directory ({\tt cd}) to the local repo. 
-\item If collaborating with others, you might want to make sure that you local repo is up to date with the master copy on {\tt github}, using \verb+git pull+ to get (`pull') any changes from {\tt github}. (\verb+git diff @{upstream}+ can be used to view the changes first, if you prefer.) 
+\item  Change directory ({\tt cd}) to the local repo.\index{git!pull} 
+\item If collaborating with others, you might want to make sure that you local repo is up to date with the master copy on {\tt github}, using \lstinline+git pull+ to get (`pull') any changes from {\tt github}. (\lstinline+git diff @{upstream}+ can be used to view the changes first, if you prefer.) 
 \item Work on {\tt foo.r} until you are happy with the changes made, and have tested them. 
 \item Have {\tt git} take a snapshot of the changes made using something like 
-\begin{verbatim}
+\begin{lstlisting}
 git commit -a -m"added a wibbleblaster to foo.r"
-\end{verbatim}  
-The \verb+-a+ option tells {\tt git} to take a snapshot of every file that it is tracking that you have changed. If you omit \verb+-a+ then you must tell {\tt git} which files you want it to snapshot explicitly, for example using \verb+git add foo.r+, before committing. The option \verb+-m+ adds a message describing the changes. If you omit the \verb"-m" then {\tt git} will open an editor, in which you enter the message - this can be useful if you want to include a longer set of comments. These comments can be viewed on the {\tt github} repo, providing a useful record of what the individual code changes were for.  
+\end{lstlisting}  \index{git!commit}
+The \lstinline+-a+ option tells {\tt git} to take a snapshot of every file that it is tracking that you have changed. If you omit \lstinline+-a+ then you must tell {\tt git} which files you want it to snapshot explicitly, for example using \lstinline+git add foo.r+, before committing. The option \lstinline+-m+ adds a message describing the changes. If you omit the \lstinline"-m" then {\tt git} will open an editor, in which you enter the message - this can be useful if you want to include a longer set of comments. These comments can be viewed on the {\tt github} repo, providing a useful record of what the individual code changes were for. \index{git!add} 
 \item Now `push' the changes to {\tt github}. 
-\begin{verbatim}
+\begin{lstlisting}
 git push
-\end{verbatim}
+\end{lstlisting}\index{git!add}
 If only you are working on the code, then you will be done at this point, but if others are working on it at the same time, then the {\tt push} command may fail because your new code conflicts with the code someone else has pushed to {\tt github} since you last pulled the repo. How to fix this is described next. 
 \end{enumerate} 
 
-Note that \verb+git log+ lets you view the commit history of your project (to review what has been done and why).
+Note that \lstinline+git log+ lets you view the commit history of your project (to review what has been done and why).
+\index{git!log}
 
 \subsubsection{Simple conflict resolution}
 
 If your {\tt git push} command fails (and it will tell you if it has!) then you need to resolve the conflict. This is not so hard. 
 
-\begin{enumerate}
+\begin{enumerate}\index{git!resolve conflict}
 \item After your {\tt git push} command has failed, issue the command
-\begin{verbatim}
+\begin{lstlisting}
 git pull
-\end{verbatim}
+\end{lstlisting}
 This will get the latest versions of the files from the {\tt github} repo, compare them to your local copies, and attempt to resolve conflicts automatically where possible. Where auto-fixing is not possible, it will modify your local copies so that whenever there is a conflict your local files contain both your code and the conflicting code from the {\tt github} master, with clear marking of which is which. 
 \item You check the conflicting files, changing the code to resolve any remaining flagged conflicts (often just selecting one or other of the alternative). 
 \item Now redo the commit and push steps
-\begin{verbatim}
+\begin{lstlisting}
 git commit -a -m"resolved conflict in favour of small end cracking"
 git push
-\end{verbatim} 
+\end{lstlisting} \index{git!commit}\index{git!push}
 If this fails because a teammate has meanwhile made another change, you really need to sort out your team communication - {\tt git} can't do that for you. 
 \end{enumerate}
 
 \subsubsection{Adding and deleting files with {\tt git}}
 
 You can add as many files as you like to your local copy of the repo, but {\tt git} will take no notice of them until you tell it to. For example, suppose you created a file {\tt bar.r} which should be treated as part of the project, tracked and included in the master repo on {\tt qithub}
-\begin{verbatim}
+\begin{lstlisting}
 git add bar.r
 git commit -a -m"added file bar.r containing the gribbler code"
 git push
-\end{verbatim}
-(You could omit the \verb+-a+ in this case, as the preceding \verb+add+ command will ensure \verb+bar.r+ is included in the next commit.)
+\end{lstlisting}\index{git!add}
+(You could omit the \lstinline+-a+ in this case, as the preceding \lstinline+add+ command will ensure \lstinline+bar.r+ is included in the next commit.)
 
 You might also want to remove files, of course. 
-\begin{verbatim}
+\begin{lstlisting}
 git rm bar.r
-\end{verbatim}
-deletes {\tt bar.r} from the local copy, and will cause it to be removed from the master repo at the next {\tt commit} and {\tt push}.
+\end{lstlisting}
+deletes {\tt bar.r} from the local copy, and will cause it to be removed from the master repo at the next {\tt commit} and {\tt push}. \index{git!delete file}
 
 \subsection{More advanced use}
 
@@ -272,11 +276,13 @@ The above covers the most basic use of {\tt git}. It is sufficient for working o
 
 A typical use of branches is to code and work on complicated modifications - tracking and backing up the changes in those modifications, while not modifying the main project until is is clear that the modified code is really working and ready to be merged into the main project. 
 
-To give a concrete example, suppose you maintain a large R package, which relies on code written in C and Fortran, and you decide that it would be advantageous to replace all the Fortran code with C code. This is a major undertaking, and you would not want to simply start work on the stable working code for the main package, since this will almost certainly break it initially. That would be a real nuisance if you then needed to deal with a minor bug in the original package, but had only the half completed unstable modified code available. Much better to create a branch of the project on which to develop the new C based code, only merging into the maser branch, once everything in the revision is fully working.  
+To give a concrete example, suppose you maintain a large R package, which relies on code written in C and Fortran, and you decide that it would be advantageous to replace all the Fortran code with C code. This is a major undertaking, and you would not want to simply start work on the stable working code for the main package, since this will almost certainly break it initially. That would be a real nuisance if you then needed to deal with a minor bug in the original package, but had only the half completed unstable modified code available. Much better to create a branch of the project on which to develop the new C based code, only merging into the master branch, once everything in the revision is fully working.  
+\index{git!branch}
+
 
 \subsection{A simple {\tt git}/{\tt github} exercise}
 
-At this stage, it is essential that you try out git and github. So before reading on try the following exercise. If you are not sure how to do any part, then refer back to the material above that you have just read.
+At this stage, it is {\em essential} that you try out {\tt git} and {\tt github}. So before reading on try the following exercise. If you are not sure how to do any part, then refer back to the material above that you have just read.
 \begin{enumerate}
 \item Using a web browser, set yourself up a new repo on {\tt github}, and edit the default {\tt README.md} file on {\tt github} to say something interesting (making sure to save and commit the change).
 \item Clone your {\tt github} repo to your local machine.
@@ -289,102 +295,153 @@ At this stage, it is essential that you try out git and github. So before readin
 
 \section{Programming for statistical data analysis}
 
-Programming is the process of writing instructions to make a computer perform some task. The instructions have to be written in standard way that both the programmer and the computer can interpret. The rules and key words defining such a standard way of communicating define a computer language. There are many alternative languages designed for different classes of task. Here we will concentrate on the R language (and environment) for programming with data, which is widely used for the statistical analysis of data. A huge amount of statistical analysis software is written in R and is freely available. 
+Programming is the process of writing instructions to make a computer perform some task. The instructions have to be written in standard way that both the programmer and the computer can interpret. The rules and key words defining such a standard way of communicating define a computer language. There are many alternative languages designed for different classes of task. Here we will concentrate on the R language (and environment) for programming with data, which is widely used for the statistical analysis of data. A huge amount of statistical analysis software is written in R and is freely available. \index{R}
 
-{\em Statistical} analysis of data is concerned with the analysis of data that is in some sense a random {\em sample} from a larger {\em population}. We want to learn about the population from the sample, without being misled by particular features of the sample that arose by chance as part of the random sampling process. The random sampling approach is powerful because: 
+{\em Statistical} analysis of data is concerned with the analysis of data that is in some sense a random {\em sample} from a larger {\em population}. We want to learn about the population from the sample, without being misled by particular features of the sample that arose by chance as part of the random sampling process. The random sampling approach is powerful because: \index{statistical analysis}
 \begin{enumerate}
 \item it allows reliable conclusions with known levels of accuracy to be drawn without having to gather data from the whole population, which may be impossible, or prohibitively expensive.       
 \item random sampling eliminates the unknowably large bias that occurs if we try to learn about the population from a non-random sample, replacing that bias with a random uncertainty of known magnitude.   
 \end{enumerate}
-Note that while population here might mean something concrete like `population of people in the UK' it might be much more abstract like `the population of all experimental results that this experiment could have produced when replicated under the same conditions'.
+Note that while `population' might mean something concrete like `population of people in the UK' it might be much more abstract like `the population of all experimental results that this experiment could have produced when replicated under the same conditions'. \index{random sample}\index{population}
 
 To understand the difference between statistical and non-statistical data analysis consider data on reported cases of Covid-19 each day. Many charts of these data are produced, and analyses are performed, such as producing running averages or looking for trends in the data. None of these analyses are statistical, as no attempt is made to consider what population the case data might be viewed as a random sample of. They are certainly not a random sample of the people who have Covid-19 on a given day, and neither is it remotely clear how the number of cases relates to the number of people with Covid on a particular day.  The government and media present these data {\em as if} they were a random sample from the population of Covid cases, but this is simply misleading. Any decent applied statistician should be able to list several sources of bias likely to occur by treating them as such. 
 
-In contrast, each week in the UK, the Office for National Statistics publishes the results of testing a randomly selected sample of the UK population for Covid. The analysis includes estimates of trends and uncertainties, from a properly statistical analysis. Unsurprisingly the ONS analysis often appears to contradict the naive interpretations of the case data given by the media and government. More surprisingly the media and government seem to give more weight to the non-statistical analyses of case data than to the statistical analyses of the ONS data, despite the latter being essentially unbiased and of known accuracy, while the former have bias of unknown magnitude. Even more surprisingly, the UK appears to be unique in even conducting unbiased sampling to establish Covid prevalence.
+In contrast, each week the UK Office for National Statistics publishes the results of testing a randomly selected sample of the UK population for Covid. The analysis includes estimates of trends and uncertainties, from a proper statistical analysis. Unsurprisingly the ONS analysis often appears to contradict the naive interpretations of the case data given by the media and government. More surprisingly the media and government seem to give more weight to the non-statistical analyses of case data than to the statistical analyses of the ONS data, despite the latter being essentially unbiased and of known accuracy, while the former have bias of unknown magnitude. Even more surprisingly, the UK appears to be unique in even conducting unbiased sampling to establish Covid prevalence.
 
-The Covid cases example illustrates why statistical analysis software is dangerous. The easier software is to use, the easier it is to produce an analysis of data that resembles a statistical analysis in every superficial respect, but not in the key one that the data are in some sense a random sample from a population.  Beware of this problem.         
+The Covid cases example illustrates why statistical analysis software is dangerous. The easier software is to use, the easier it is to produce an analysis of data that resembles a statistical analysis in every superficial respect, but not in the key one that the data are in some sense a random sample from a population of interest.  Beware!
 
 \subsection*{Exercise}
 
 The following link is to an article in a national newspaper by two professors of statistics that appeared on 19th April 2020.
-{\small \verb+https://www.theguardian.com/commentisfree/2020/apr/19/coronavirus-deaths-data-uk+} 
+{\small \lstinline+https://www.theguardian.com/commentisfree/2020/apr/19/coronavirus-deaths-data-uk+} 
 There is an astonishing statement in the second paragraph. Identify the statement and what is wrong with it.
 
 
 \section{Getting started with R}
 
-In this course we will concentrate on learning programming skills that as far as possible are transferable to other programming languages in addition to R. For this reason we will largely stick to programming using what is available with R itself, and we will ovoid over-reliance on any particular set of add on packages. There is an add on package providing functions for almost any simple task you might want to accomplish in R. The fact that we will here examine how to programme tasks for which it would be simpler to find an add on package, is not though a desire to re-invent the wheel. The point is not to learn the quickest way to perform the particular task, but rather to illustrate how to programme. 
+In this course we will concentrate on learning programming skills that as far as possible are transferable to other programming languages in addition to R. For this reason we will largely stick to programming using what is available with R itself, and we will avoid over-reliance on any particular set of add on packages. There is an add on package providing functions for almost any simple task you might want to accomplish in R. The fact that we will here examine how to programme tasks for which it would be simpler to find an add on package, is not through a desire to re-invent the wheel. The point is not to learn the quickest way to perform the particular task, but rather to illustrate how to programme. 
 
-A word of warning. In much university work, getting something 80\% right is a first class performance. Unfortunately programming is not like that. 80\% right means 20\% wrong, and 20\% wrong computer code will likely result in your programme doing 0\% of what it is supposed to do. This fact calls for a more precise approach to working than is necessary for other topics.  
+A word of warning. In much university work, getting something 80\% right is a first class performance. Unfortunately programming is not like that. 80\% right means 20\% wrong, and 20\% wrong computer code will likely result in your programme doing 0\% of what it is supposed to do. This fact calls for a more careful approach to working than is necessary for other topics.  
+
+\subsection{A first R session \label{firstR}}
+
+\index{R!basics}
+To get started, let's do some trivial things in R. Start {\tt R} or {\tt Rstudio}, go to the terminal window and type
+\begin{lstlisting}
+a <- 2
+\end{lstlisting}
+You just created an object {\tt a} that contains the number 2. \lstinline+<-+ is the assignment operator. If you assign something to an object that does not yet exist, it is created. If you type the name of an object at the R terminal and nothing else, then the contents of the object gets printed. Exactly how this is done depends on the class of the object - more later. For example (\lstinline+>+ is just the R prompt, not something to type): \index{assignment operator}
+\begin{lstlisting}
+> a
+[1] 2
+\end{lstlisting}
+We can make objects from other objects of course. For example
+\begin{lstlisting}
+> b <- 1/a
+> b
+[1] 0.5
+\end{lstlisting}
+
+R is a functional programming language: it is structured around functions that take objects as arguments and produce other objects as results. Many functions are built in to base R and even basic operators like \lstinline^+^ and \lstinline+/+ are actually implemented as functions. Suppose we want to create a function to take arguments $x$ and $y$ and return the value of $x \cos(y - k)$ where $k$ is a constant usually taking the value 0.5. Here is the code to define such a function object, named {\tt foo} in this case. \index{functions}
+\begin{lstlisting}
+foo <- function(x,y,k=0.5) {
+  x * cos(y - k)
+}
+\end{lstlisting}
+Curly brackets, \lstinline+{}+, enclose the R code defining how the function arguments are turned into its result. There can be as many lines of code as you like, but what ever is produced on the last line is taken as the object to be returned as the function result. \lstinline+k=0.5+ is used to indicate that if no value of {\tt k} is supplied, then it should take the default value of 0.5. This default system is used extensively by R and its add on packages. Let's try out {\tt foo}. \index{functions!argument}\index{functions!default argument}
+\begin{lstlisting}
+> foo(3,2)   ## using default k=0.5
+[1] 0.2122116
+> foo(3,2,0) ## setting k=0
+[1] -1.248441
+\end{lstlisting}
+
+R is an interpreted language. Code\footnote{I'll use `code' to mean programmes and commands written in R (or indeed other computer languages).} is interpreted and executed line by line as it is encountered. This contrasts with compiled languages, where code is converted to binary instructions en masse, and this binary `machine code' (the native language of the computers processor) is then executed separately. R evaluates lines of code when they appear complete, and a line end has been encountered. If you want to split code over several lines then you need to be careful that the line does not appear complete before you meant it to be. e.g. suppose we want to evaluate $a=1+2+3+4+5$\index{interpreted language}
+\begin{lstlisting}
+> a <- 1 + 2 + 3 ## split line but it looks complete to R!
+> + 4 + 5 
+[1] 9
+> a 
+[1] 6  ## oops
+> a <- 1 + 2 + 3 + ## split line that does not look complete
++ 4 + 5
+> a
+[1] 15 ## success
+\end{lstlisting}
+Several complete statements can be included on the same line by separating them with a `{\tt ;}'. e.g.
+\begin{lstlisting}
+a <- 2; b <- 1/a; d <- log(b)
+\end{lstlisting}
+Now leave R with the \lstinline+q()+ command. By default you will be asked if you want to save your workspace - usually you do not. You can avoid being asked by typing \lstinline+q("no")+. \index{quiting R}
 
 \subsection{Dissecting a simple programming example}
 
-Let us start with an example, of a simple data manipulation task in R. Suppose that we have a vector of 1 or 2 digit numbers and want to create a new vector of the individual digits, in order. For example if the original vector is $[12,5,23,2]$ the new vector should be $[1,2,5,2,3,2]$. Before trying this we need to write down {\em how} we are going to do it. For example:
+Let us continue with an example of a simple data manipulation task in R. Suppose that we have a vector of 1 or 2 digit numbers and want to create a new vector of the individual digits, in order. For example if the original vector is $[12,5,23,2]$ the new vector should be $[1,2,5,2,3,2]$. Before trying this we need to write down {\em how} we are going to do it. For example:
 \begin{enumerate}
 \item Identify the number and locations of the double digit numbers in the original vector (and hence the length of the new vector).
 \item Work out the locations of the `tens' digits in the new vector, compute and insert them.
 \item Work out the locations of the `units' digits in the new vector and insert them. 
 \end{enumerate}
-The following is R code for one way of implementing this. It could be typed, line by line into the R console, but it is better to type it into a file and then copy and paste to the R console, or {\tt source} the file into R, or run it in Rstudio. 
-\begin{verbatim}
+The following is R code for one way of implementing this. It could be typed, line by line, into the R console, but it is better to type it into a file and then copy and paste to the R console, or {\tt source} the file into R, or run it in Rstudio. \index{which}\index{length}\index{rep}\index{integer division}\index{mod (integer remainder)}
+\begin{lstlisting}
 x <- c(10,2,7,89,43,1) ## an example vector to try out
 ii <- which(x%/%10 > 0) ## indices of the double digits in x?
 xs <- rep(0,length(ii)+length(x)) ## vector to store the single digits
 iis <- ii+1:length(ii)-1 ## where should 10s digits go in xs?
 xs[iis] <- x[ii]%/%10 ## insert 10s digits
 xs[-iis] <- x%%10  ## insert the rest (units)
-\end{verbatim}  
-Anything after \verb+#+ on a line is ignored by R, so is a comment. It is a good idea to use lots of these. Here is what the code does in detail, line by line.
+\end{lstlisting}  
+Anything after \lstinline+#+ on a line is ignored by R, so is a comment. It is a good idea to use lots of these. Here is what the code does in detail, line by line.\index{concatenate}\index{TRUE}\index{FALSE}\index{index vector}
 \begin{enumerate}
-\item \verb+x <- c(10,2,7,89,43,1)+ creates an example vector to work on. The {\tt c} function takes the individual numbers supplied to it, and concatenates them into a single vector (it can also concatenate vectors). The results are stored in vector \verb+x+ using the assignment operator \verb+<-+. Notice how {\tt x} is created automatically by this assignment. Unlike in many computer languages, we do not have to declare {\tt x} first. 
-\item \verb+ii <- which(x%/%10 > 0)+ creates a vector, {\tt ii} of the indices of the double digit numbers in \verb+x+. It does this by computing the result of integer division by 10, for each element of {\tt x}, using the \verb+%/%+ operator, and then testing whether this result is greater than 0. The result of \verb+x%/%10 > 0+ will be a vector of {\tt TRUE} or {\tt FALSE} values of the same length as {\tt x}. For the given example it is $({\tt TRUE},{\tt FALSE},{\tt FALSE},{\tt TRUE},{\tt TRUE},{\tt FALSE})$. This vector is supplied directly to the {\tt which} function, which returns the indices for which the vector is {\tt TRUE} (1,4 and 5 for the example given). 
-\item \verb^xs <- rep(0,length(ii)+length(x))^ creates a vector of zeroes into which the individual digits will be inserted, using the {\tt rep} function. {\tt rep} simply repeats its first argument the number of times specified in its second argument. The {\tt length} function returns the number of elements in an existing vector. We need {\tt xs} to be the length of {\tt x} plus an extra element for each double digit number.
-\item \verb^iis <- ii+1:length(ii)-1^ creates a vector, {\tt iis}, containing the indices (locations) of the 10s digits in {\tt xs}. We have to account for the fact that each time we insert a digit, all the digits after move along one place, relative to where they were. So, the first 10s digit will occupy the same slot in {\tt x} and {\tt xs}, but the next 10s digit will be one element later in {\tt xs} than in {\tt x}, the next 2 elements later, and so on. \verb+1:length(ii)-1+ creates a sequence 0,1,2\ldots to add to {\tt ii} to achieve this. It uses the \verb+:+ operator --- if {\tt a} and {\tt b} are integers (and $a<=b$) \verb+a:b+ generates the sequence $a,a+1,a+2,\ldots,b$.
-\item \verb+xs[iis] <- x[ii]%/%10+ computes the 10s digits of the double digit numbers, indexed by {\tt ii}, using \verb+x[ii]%/%10+, and assigns them to the elements of {\tt xs} indexed by {\tt iis}.
-\item \verb+xs[-iis] <- x%%10+ computes the units digit for all the numbers in {\tt x} using \verb+x%%10+ where \verb+%%+ is the operator computing the remainder after integer division. These digits are stored in the elements of {\tt xs} {\em not} reserved for 10s digits. That is, \verb+xs[-iis]+, all the elements {\em except} those indexed by {\tt iis}. 
+\item \lstinline+x <- c(10,2,7,89,43,1)+ creates an example vector to work on. The {\tt c} function takes the individual numbers supplied to it, and concatenates them into a single vector (it can also concatenate vectors). The results are stored in vector \lstinline+x+ using the assignment operator \lstinline+<-+. Notice how {\tt x} is created automatically by this assignment. Unlike in many computer languages, we do not have to declare {\tt x} first. 
+\item \lstinline+ii <- which(x%/%10 > 0)+ creates a vector, {\tt ii}, of the indices of the double digit numbers in \lstinline+x+. It does this by computing the result of integer division by 10, for each element of {\tt x}, using the \lstinline+%/%+ operator, and then testing whether this result is greater than 0. The result of \lstinline+x%/%10 > 0+ will be a vector of {\tt TRUE} or {\tt FALSE} values of the same length as {\tt x}. For the given example it is $({\tt TRUE},{\tt FALSE},{\tt FALSE},{\tt TRUE},{\tt TRUE},{\tt FALSE})$. This vector is supplied directly to the {\tt which} function, which returns the indices for which the vector is {\tt TRUE} (1,4 and 5 for the example given). 
+\item \lstinline^xs <- rep(0,length(ii)+length(x))^ creates a vector of zeroes into which the individual digits will be inserted, using the {\tt rep} function. {\tt rep} simply repeats its first argument the number of times specified in its second argument. The {\tt length} function returns the number of elements in an existing vector. We need {\tt xs} to be the length of {\tt x} plus an extra element for each double digit number.
+\item \lstinline^iis <- ii+1:length(ii)-1^ creates a vector, {\tt iis}, containing the indices (locations) of the 10s digits in {\tt xs}. We have to account for the fact that each time we insert a digit, all the digits after move along one place, relative to where they were. So, the first 10s digit will occupy the same slot in {\tt x} and {\tt xs}, but the next 10s digit will be one element later in {\tt xs} than in {\tt x}, the next 2 elements later, and so on. \lstinline+1:length(ii)-1+ creates a sequence 0,1,2\ldots to add to {\tt ii} to achieve this. It uses the \lstinline+:+ operator --- if {\tt a} and {\tt b} are integers (and $a<=b$) \lstinline+a:b+ generates the sequence $a,a+1,a+2,\ldots,b$.\index{sequence}\index{vector!indexing}
+\item \lstinline+xs[iis] <- x[ii]%/%10+ computes the 10s digits of the double digit numbers, indexed by {\tt ii}, using \lstinline+x[ii]%/%10+, and assigns them to the elements of {\tt xs} indexed by {\tt iis}.
+\item \lstinline+xs[-iis] <- x%%10+ computes the units digit for all the numbers in {\tt x} using \lstinline+x%%10+ where \lstinline+%%+ is the operator computing the remainder after integer division. These digits are stored in the elements of {\tt xs} {\em not} reserved for 10s digits. That is, \lstinline+xs[-iis]+, all the elements {\em except} those indexed by {\tt iis}. 
 \end{enumerate}
-Make sure you really understand what this code is doing. Run it one line at a time in R, and examine the result created by each line to make sure you understand exactly what is happening. To see what is in an R object, just type its name at the console, and it will be printed, by default. For example:
-\begin{verbatim}
+Make sure you really understand what this code is doing. Run it one line at a time in {\tt R}, and examine the result created by each line to make sure you understand exactly what is happening. To see what is in an R object, just type its name at the console, and it will be printed, by default. For example:
+\begin{lstlisting}
 > xs  ## > just denotes the R prompt here
 [1] 1 0 2 7 8 9 4 3 1
-\end{verbatim}
+\end{lstlisting}
 
-The preceding example has quite a bit of R packed in, and we used quite a few R functions and operators on the way. R provides a large number of functions for a variety of tasks, and the available add on packages vastly more. You can't hope to learn them all, so it is essential to learn how to use the R help system. This is easy. For any operator of function you know the name of then just type \verb+?+ followed by the function name, or the operator in quotes. For example
-\begin{verbatim}
+The preceding example has quite a bit of R packed in, and we used quite a few R functions and operators on the way. R provides a large number of functions for a variety of tasks, and the available add on packages vastly more. You can't hope to learn them all, so it is essential to learn how to use the R help system. This is easy. For any operator of function you know the name of then just type \lstinline+?+ followed by the function name, or the operator in quotes. For example
+\begin{lstlisting}
 ?which ## get the help for the 'which' function
 ?"<-"  ## get help for the assignment operator
 help.start() ## launch html help in a browser
-\end{verbatim}  
-\ldots the last option is often best if you are not sure what you are looking for.
+\end{lstlisting}  
+\ldots the last option is often best if you are not sure what you are looking for. \index{R!help}
 
 \subsection{A second simple example: data are not always numbers}
 
-R vectors are not restricted to containing numbers. Character strings are another common data type that we can hold in a vector. For example \verb+x <- c("jane","bill","sue")+ creates a 3-vector, containing the 3 given character strings. Functions are provided for manipulating such character string data in various ways. For the moment suppose we want to achieve the same task as in the previous example, but for the case in which the numbers are supplied as character strings, and we want the separated digits as character strings too\footnote{As the point is to provide illustration of string handling, I'll resist the temptation to use {\tt as.numeric} to convert the character data to numbers, run the previous code, and then use {\tt as.character} to convert back.}.  
+R vectors are not restricted to containing numbers. Character strings are another common data type that we can hold in a vector. For example \lstinline+x <- c("jane","bill","sue")+ creates a 3-vector, containing the 3 given character strings. Functions are provided for manipulating such character string data in various ways. For the moment suppose we want to achieve the same task as in the previous example, but for the case in which the numbers are supplied as character strings, and we want the separated digits as character strings too\footnote{As the point is to provide illustration of string handling, I'll resist the temptation to use {\tt as.numeric} to convert the character data to numbers, run the previous code, and then use {\tt as.character} to convert back.}.  \index{string}\index{character data}
 
-We can use more or less the same approach as in the last section, but with one slight modification to the logic. For numbers it was easy to separate out 10s and units, with only the 2 digit numbers having a 10s digit. When the numbers are represented as character strings it is easier to separate out first and second digits, with only the two digit numbers having second digits. This means that rather than finding the indices of 10s digits, we'll find the indices of second digits. Here is the modified code:
+We can use more or less the same approach as in the last section, but with one slight modification to the logic. For numbers it was easy to separate out 10s and units, with only the 2 digit numbers having a 10s digit. When the numbers are represented as character strings it is easier to separate out first and second digits, with only the two digit numbers having second digits. This means that rather than finding the indices of 10s digits, we'll find the indices of second digits. Here is the modified code: \index{nchar}\index{substr}\index{character string!substr}
 
-\begin{verbatim}
+\begin{lstlisting}
 x <- c("10","2","7","89","43","1") ## example vector
 ii <- which(nchar(x)>1) ## which elements of x are double digit?
 xs <- rep("",length(ii)+length(x)) ## vector to store the single digits
 iis <- ii+1:length(ii) ## where should second digit go in xs?
 xs[iis] <- substr(x[ii],2,2) ## insert 2nd digits
 xs[-iis] <- substr(x,1,1)    ## insert 1st digits
-\end{verbatim}
+\end{lstlisting}
 Line by line, here is what it does:
 \begin{enumerate}
-\item \verb+x <- c("10","2","7","89","43","1")+ example vector, as before, but now of character type.
-\item \verb+ii <- which(nchar(x)>1)+ uses the {\tt nchar} function to count the characters in each element of {\tt x}. \verb+which(nchar(x)>1)+ returns the indices for which the corresponding element of {\tt x} was more than one character.
-\item  \verb^xs <- rep("",length(ii)+length(x))^ creates {\tt xs} as before, but this time it is a character vector.
-\item \verb^iis <- ii+1:length(ii)^ computes the locations for second digits in {\tt xs}. Same idea as before, but second digits are all located one place after the 10s digits.
-\item \verb+xs[iis] <- substr(x[ii],2,2)+. Function \verb+substr+ is used to obtain the 2nd character from each 2 digit element of {\tt x} ({\tt ii} indexes the 2 digit elements). \verb+substr(x[ii],2,2)+ extracts the characters between characters 2 and 2, from the elements of {\tt x[ii]} and returns them in a vector, which is copied into the appropriate locations in {\tt xs}.
-\item \verb+xs[-iis] <- substr(x,1,1)+ the first digits are then inserted in the locations not reserved for second digits. 
+\item \lstinline+x <- c("10","2","7","89","43","1")+ example vector, as before, but now of character type.
+\item \lstinline+ii <- which(nchar(x)>1)+ uses the {\tt nchar} function to count the characters in each element of {\tt x}.\\ \lstinline+which(nchar(x)>1)+ returns the indices for which the corresponding element of {\tt x} has $>1$ character.
+\item  \lstinline^xs <- rep("",length(ii)+length(x))^ creates {\tt xs} as before, but this time it is a character vector.
+\item \lstinline^iis <- ii+1:length(ii)^ computes the locations for second digits in {\tt xs}. Same idea as before, but second digits are all located one place after the 10s digits.
+\item \lstinline+xs[iis] <- substr(x[ii],2,2)+. Function \lstinline+substr+ is used to obtain the 2nd character from each 2 digit element of {\tt x} ({\tt ii} indexes the 2 digit elements). \lstinline+substr(x[ii],2,2)+ extracts the characters between characters 2 and 2, from the elements of {\tt x[ii]} and returns them in a vector, which is copied into the appropriate locations in {\tt xs}.
+\item \lstinline+xs[-iis] <- substr(x,1,1)+ the first digits are then inserted in the locations not reserved for second digits. 
 \end{enumerate}
 
 \subsubsection{Another simple text processing task}
 
-The above example is a bit artificial. Let's consider a slightly more realistic task to undertake on character data. Suppose we have a string containing  some `poetry', and we want to count the number of words, tabulate the number of letters per word, count the number of words containing at least one `e' and mark all words containing an `a' and an `e' with a `*'. Here is R code to do this.
-\begin{verbatim}
+The above example is a bit artificial. Let's consider a slightly more realistic task to undertake on character data. Suppose we have a string containing  some `poetry', and we want to count the number of words, tabulate the number of letters per word, count the number of words containing at least one `e' and mark all words containing an `a' and an `e' with a `*'. Here is R code to do this.\index{character string!nchar}\index{character string!strsplit}\index{strsplit}\index{character string!grep}\index{grep}\index{character string!paste}\index{paste}\index{character string!split}\index{character string!join}\index{character string!search}\index{tabulate}
+\begin{lstlisting}
 poem <- paste("Inside me is a skeleton, of this I have no doubt,",
         "now it's got my flesh on, but it's waiting to get out.")
 pow <- strsplit(poem," ")[[1]] ## vector of poem words
@@ -396,34 +453,456 @@ ia <- grep("a",pow,fixed=TRUE) ## find `a' words
 iea <- ia[ia %in% ie] ## find words with `e' and `a'
 pow[iea] <- paste(pow[iea],"*",sep="") ## mark `e' `a' words
 paste(pow,collapse=" ") ## and put words back in one string.
-\end{verbatim}
+\end{lstlisting}
 Line by line it works like this:
 \begin{enumerate}
 \item The first line just creates a text string, {\tt poem}, containing the given text. The {\tt paste} function joins the two given strings into one string. The only reason to use it here was to split the string nicely across lines for these notes - we could just as well have written everything in one string to start with.
-\item \verb+pow <- strsplit(poem," ")[[1]]+ splits {\tt poem} into a vector of its individual words, using\\ \verb+strsplit(poem," ")+, which splits the string in {\tt poem} at the breaks given by spaces, \verb+" "+. {\tt strsplit} can take a vector of strings as its first argument, and returns a {\em list} of vectors containing the split strings. In our case the list only has one element, which is what the \verb+[[1]]+ part of the code accesses. 
-\item \verb+n.words <- length(pow)+ counts the words in {\tt poem}, since there is one element of {\tt pow} per word.
-\item \verb+freq <- tabulate(nchar(pow))+ counts how many 1 letter, 2 letter, 3 letter, etc. words are in {\tt poem}. First function {\tt nchar} counts the letters in each word and then {\tt tabulate} tallies them up. Really we should have stripped out punctuation marks first - {\tt gsub} could be used to do this.
-\item \verb+ie <- grep("e",pow,fixed=TRUE)+ finds the indices of the words containing an `e' using the {\tt grep} function. By default {\tt grep} can do much more complicated pattern matching using `regular expressions (see {\tt ?regex}), for the moment this is turned off using \verb+fixed=TRUE+ (otherwise characters like \verb+.+ and \verb+*+ are not matched as you might expect, but treated differently).
-\item \verb+n.e <- length(ie)+ is the count of `e' words.
-\item \verb+ia <- grep("a",pow,fixed=TRUE)+ finds the indices of the words containing an `a'.
-\item \verb+iea <- ia[ia %in% ie]+ finds the indices of words containing an `a' and an `e'. \verb+ia %in% ie+ gives a {\tt TRUE} for each element of {\tt ia} that occurs in {ie} and a {\tt FALSE} for each element of {\tt ia} that doesn't. Hence {\tt iea} will contain the indices of the words containing both letters.
-\item \verb+pow[iea] <- paste(pow[iea],"*",sep="")+ adds a `*' to each word in {\tt pow} containing an `e' an an `a'. The {\tt paste} function is used for this, with \verb+sep=""+ indicating that no space is wanted between the words and the `*'.
-\item \verb+paste(pow,collapse=" ")+ is finally used to put the words in {\tt pow} back into a single string. It is the setting of {\tt collapse} to something non-NULL (here a space) that signals to {\tt paste} that this should happen.
+\item \lstinline+pow <- strsplit(poem," ")[[1]]+ splits {\tt poem} into a vector of its individual words, using\\ \lstinline+strsplit(poem," ")+, which splits the string in {\tt poem} at the breaks given by spaces, \lstinline+" "+. {\tt strsplit} can take a vector of strings as its first argument, and returns a {\em list} of vectors containing the split strings. In our case the list only has one element, which is what the \lstinline+[[1]]+ part of the code accesses. 
+\item \lstinline+n.words <- length(pow)+ counts the words in {\tt poem}, since there is one element of {\tt pow} per word.
+\item \lstinline+freq <- tabulate(nchar(pow))+ counts how many 1 letter, 2 letter, 3 letter, etc. words are in {\tt poem}. First function {\tt nchar} counts the letters in each word and then {\tt tabulate} tallies them up. Really we should have stripped out punctuation marks first - {\tt gsub} could be used to do this.
+\item \lstinline+ie <- grep("e",pow,fixed=TRUE)+ finds the indices of the words containing an `e' using the {\tt grep} function. By default {\tt grep} can do much more complicated pattern matching using `regular expressions (see {\tt ?regex}). For the moment this is turned off using \lstinline+fixed=TRUE+ (otherwise characters like \lstinline+.+ and \lstinline+*+ are not matched as you might expect, but treated differently).
+\item \lstinline+n.e <- length(ie)+ is the count of `e' words.
+\item \lstinline+ia <- grep("a",pow,fixed=TRUE)+ finds the indices of the words containing an `a'.
+\item \lstinline+iea <- ia[ia %in% ie]+ finds the indices of words containing an `a' and an `e'. \lstinline+ia %in% ie+ gives a {\tt TRUE} for each element of {\tt ia} that occurs in {\tt ie} and a {\tt FALSE} for each element of {\tt ia} that doesn't. Hence {\tt iea} will contain the indices of the words containing both letters.
+\item \lstinline+pow[iea] <- paste(pow[iea],"*",sep="")+ adds a `*' to each word in {\tt pow} containing an `e' an an `a'. The {\tt paste} function is used for this, with \lstinline+sep=""+ indicating that no space is wanted between a word and `*'.
+\item \lstinline+paste(pow,collapse=" ")+ is finally used to put the words in {\tt pow} back into a single string. It is the setting of {\tt collapse} to something non-NULL (here a space) that signals to {\tt paste} that this should happen.
 \end{enumerate}
+
+\section{A slightly more systematic look at R}
+
+When you start the {\tt R} programme, two important things are created. The first is an {\tt R} terminal, into which you can type commands written in the R programming language - this is visible. The second is an {\em environment}, known as the user workspace or global environment which will hold the objects created by your commands - this is invisible, but is there as an extendable piece of computer memory. In R an environment consists of a set of symbols used as the names of objects along with the data defining those objects (known together as a {\em frame}) and a pointer to an enclosing `parent' environment. R makes extensive use of sets of nested environments, but we don't need to go into too much detail on this aspect at the moment.
+
+Like any computer language, the R language defines basic data structures, key words used to control programme flow, operators and functions, plus a set of rules about how these things are used and combined. This section introduces these. 
+
+\subsection{Objects, classes and attributes}
+
+Everything in R is an object living in an environment, including R commands themselves. Objects have {\em classes} which R can use to determine how the object should be handled (for example which version of the print function is appropriate for it).  Objects can also be given {\em attributes}: these are basically other objects that have been `stuck onto' the object and are carried around with it. A bit like a set of virtual post-it notes. Attributes are useful for storing information about an object.  For example, matrices in R have class \lstinline+"matrix"+ and a \lstinline+dim+ attribute. The \lstinline+dim+ attribute stores the number of rows and columns in the matrix. \index{R!objects} \index{matrix} \index{attributes}
+
+\subsection{Data structures: vectors, arrays, lists and data frames}  
+
+Let's look at the basic data structures you {\em must} know about to programme in R. When reading through this, try out the code yourself in R, and also try modifying it to check your understanding. 
+
+\subsubsection{Vectors and recycling}
+
+The most basic type of data structure in R is a vector (a one dimensional array). \lstinline+x[i]+ accesses element {\tt i} of vector {\tt x} ({\tt i} is a positive integer). Even scalars are just vectors of length 1 (so e.g. \lstinline+3[1]+ is perfectly valid and evaluates to 3, of course). As we have already seen, vectors can store data of different {\em types}: integer or real numbers (type 'double'), character strings, logical variables. The class of vectors is simply determined by the type of thing they contain. Here are some basic examples. \index{R!class}\index{typeof}\index{data types}\index{vectors}
+\begin{lstlisting}
+> a3d <- c(TRUE,FALSE,FALSE) ## create an example logical vector
+> class(a3d)     ## its class
+[1] "logical"
+> typeof(a3d)    ## its type
+[1] "logical"
+> a3d[2:3]       ## print its 2nd and 3rd elements 
+[1] FALSE FALSE
+> a3d[2] <- TRUE ## change the 2nd element
+> a3d            ## print the resulting vector
+[1]  TRUE  TRUE FALSE
+> 
+> bb <- 1:10  ## create numeric example
+> class(bb)   ## check class
+[1] "integer"
+> bb[c(1,4,9)] <- c(.1,-3,2.2) ## change selected elements
+> class(bb)   ## note automatic change of class 
+[1] "numeric"
+> typeof(bb)  ## how it is actually being stored
+[1] "double"
+> bb[3:8]     ## print elements 3:8 
+[1]  3 -3  5  6  7  8
+\end{lstlisting}
+Since vectors are the basic data structure, operators and most functions are also vectorized - they operate on whole vectors. For example given two vectors, {\tt a} and {\tt b} of the same length then \lstinline+c <- sin(a) * b+ actually forms \lstinline+c[i] <- sin(a[i]) * b[i]+ for all {\tt i} from 1 to the length of the vector. Similarly \lstinline^c <- a * b + 2^ actually forms \lstinline^c[i] <- a[i] * b[i] + 2^ for the same set of {\tt i} values. \index{vectorized code}
+
+Notice how the scalar {\tt 2} got reused for each {\tt i} in that last example. So is a scalar more than just a length one vector after all? Actually no, {\tt 2} is being treated like any other vector --- R has a {\bf recycling rule} for vector arithmetic. Any operator that combines two vectors will recycle the values in the shorter vector as many times as required to match the length of the longer vector. So if a vector contains only one value, that one value is just recycled as often as needed. Here are a couple of examples  \index{recycling rule} \index{vectors}
+\begin{lstlisting}
+> a <- 1:4 # a 4-vector 
+> b <- 5:6 # a 2-vector
+> a*b      # multiplication with recycling
+[1]  5 12 15 24
+> b <- 5:7 # a 3 vector
+> a*b      # multiplication with recycling
+[1]  5 12 21 20
+Warning message:
+In a * b : longer object length is not a multiple of shorter object length
+\end{lstlisting}
+
+\subsubsection{Matrices and arrays}
+
+While vectors are one dimensional arrays data, matrices are 2 dimensional arrays, and in general an array can have as many dimensions as we find useful. We can create an array with the {\tt array function}. For example:\index{array}
+\begin{lstlisting}
+a <- array(1:24,c(3,2,4))
+\end{lstlisting}
+creates a $3 \times 2 \times 4$ array, filling it with the numbers given in the first argument. To access the array we just give the dimension indices for the elements required. Leaving an index blank implies that we require all elements for that dimension. For example.
+\begin{lstlisting}
+> a[3,2,3] ## element 3,2,3
+[1] 18
+> a[1:2,1,] 
+     [,1] [,2] [,3] [,4]
+[1,]    1    7   13   19
+[2,]    2    8   14   20
+\end{lstlisting}  
+notice how the second example accesses all elements for which the first index is 1 or 2, and the second index is 1.
+
+Arrays are actually stored as vectors, with class \lstinline+"array"+ and a {\tt dim} attribute. The {\tt dim} attribute is a vector containing the length of each dimension (so $3,2,4$ above). Since the underlying storage is vector, we can also access it as such, we just need to know that the data are stored in the vector in `column major order'. For example if $d$ is the {\tt dim} attribute of a 3 dimensional array, $a$, then $a[i,j,k]$ is equivalent to $a[i + (j-1)d_1 + (k-1)d_1d_2]$. For example \index{array!vector access}
+\begin{lstlisting}
+> d <- dim(a) ## get the 'dim' attribute
+> a[3+1*d[1]+2*d[1]*d[2]] ## vector access to a[3,2,3]
+[1] 18
+\end{lstlisting}
+Notice that this is quite useful if you need to fill in or access several scattered individual elements of an array at once.
+
+Two dimensional arrays, {\bf matrices}, play a central role in statistics. Data properly arranged for analysis are usually in matrix form with columns as variables and rows as observations (often referred to as `tidy data'), while many statistical methods rely heavily on matrix computations. Hence matrices are treated as a special class of array, with their own \lstinline+"matrix"+ class, a {\tt matrix} function used to create them, special operators for matrix multiplication and other matrix products, and functions implementing many matrix decomposition and matrix equation solving tasks. We will cover this in more detail later, but here is a quick example, which uses the matrix multiplication operator, \lstinline+%*%+.\index{matrix}\index{matrix!multiplication}\index{tidy data}
+\begin{lstlisting}
+B <- matrix(1:6,2,3); B ## create a matrix (filled by col)
+     [,1] [,2] [,3]
+[1,]    1    3    5
+[2,]    2    4    6
+> B[1,2] <- -1            ## change elment 1,2
+> a <- c(.3,-1.2,2.3)    ## a 3-vector
+> B %*% a                 ## matrix multiplication
+     [,1]
+[1,] 13.0
+[2,]  9.6
+> B*a                     ## element wise multiplication with recycling!!
+     [,1] [,2] [,3]
+[1,]  0.3 -2.3 -6.0
+[2,] -2.4  1.2 13.8
+\end{lstlisting}   
+Do make sure you {\em really} understand the difference between the last two commands! It {\em really} matters.
+
+\subsubsection{Lists}
+
+Lists are the basic building blocks of all sorts of complicated objects in R. Each item of a list can be any sort R object, including another list, and each item can be named. Suppose {\tt a} is a list. Individual items can be accessed by number using \lstinline+a[[i]]+ where {\tt i} is an integer. If an item has a name, \lstinline+"foo"+ for example, it can also be retrieved that way using \lstinline+a[["foo"]]+ or \lstinline+a$foo+. We can also access sublists, also by name of number. e.g. \lstinline+a[c(2,4)]+ or \lstinline+a[c("foo","bar")]+ both produce 2 item lists. Note the difference: \lstinline+[[]]+ retrieves the item, \lstinline+[]+ retrieves a list of the required items (even if there is only one). Here is a simple example, which uses function {\tt list} to create an example list.\index{list}
+\begin{lstlisting}
+> stuff <- list(a=1:6,txt="furin cleavage site",l2 = function(x) log(x^2),
++          more = list(a="er",b=42))
+> stuff[[1]]
+[1] 1 2 3 4 5 6
+> stuff[["l2"]]
+function(x) log(x^2)
+> stuff$a
+[1] 1 2 3 4 5 6
+> stuff[c(1,2)]
+$a
+[1] 1 2 3 4 5 6
+$txt
+[1] "furin cleavage site"
+\end{lstlisting}  
+
+\subsubsection{Data frames and factors -- statistical data structures}
+
+R provides two types of data structure that are particularly useful for statistics: {\bf factor} variables are a special class of variables especially useful for data that consist of labels that serve to classify other data; {\bf data frames} are 2 dimensional arrays of data where the columns are variables, {\em which can be of different types}, and the rows are observations. 
+
+{\bf Factors} are vectors of labels. For example a clinical trial might record the {\tt sex}, {\tt nationality} and {\tt treatment} received for each subject. All three are labels that categorize the subject. The different values that the label can take are known as {\em levels} of the factor (although they usually have no ordering, and it they do it is generally ignored). For example in a multi-centre vaccine trial {\tt nationality} might have levels {\tt "GB"}, {\tt "Brazil"}, {\tt "USA"}. In R factors are of class \lstinline+"factor"+ and the {\tt levels} function can be used to access their \lstinline+"levels"+ attribute. In fact the actual labels of a factor variable are only stored in the \lstinline+"levels"+ attribute, the variable itself is a set of integers indexing the levels. Why all this fuss? Because factor variables are very useful in statistical modelling, and setting them up this way makes them easy for modelling functions to handle. Here is a simple example.\index{data frame} \index{factor}
+\begin{lstlisting}
+> fac <- factor(c("fred","sue","sue","bill","fred"))
+> class(fac)
+[1] "factor"
+> fac         ## default printing for class factor 
+[1] fred sue  sue  bill fred
+Levels: bill fred sue
+> levels(fac) ## extract the levels attribute
+[1] "bill" "fred" "sue" 
+> as.numeric(fac)  ## look at the underlying coding
+[1] 2 3 3 1 2
+\end{lstlisting}
+
+{\bf Data Frames} are basically matrices, in which the columns have names and can have different types (numeric, logical, factor, character, etc). The can be accessed like matrices, or like lists. They provide the best way of organising data for many types of statistical analysis. Here is a basic example 
+\begin{lstlisting}
+> dat <- data.frame(y = c(.3,.7,1.2),x = 1:3,fac = factor(c("a","b","a")))
+> dat      ## a data.frame
+    y x fac
+1 0.3 1   a
+2 0.7 2   b
+3 1.2 3   a
+> dim(dat) ## like a matrix
+[1] 3 3
+> dat$fac  ## and lie a list!
+[1] a b a
+Levels: a b
+\end{lstlisting}
+\subsubsection{str and object structure}
+
+Before moving on from data structures it is worth mentioning one useful function: {\tt str} prints a summary of the structure of any R object. This is a good way of seeing what an object actually looks like, since many classes of object have their own {\tt print} function, so that only rather limited information is printed when you simply type the object name at the command line. For example \index{str, structure}
+\begin{lstlisting}
+> str(dat)
+'data.frame':	3 obs. of  3 variables:
+ $ y  : num  0.3 0.7 1.2
+ $ x  : int  1 2 3
+ $ fac: Factor w/ 2 levels "a","b": 1 2 1
+\end{lstlisting}
+
+\subsection{Loops and conditional execution}
+
+Many programming tasks require that some operation is repeated many times for different values of some index, or require that the choice of which operation to carry out should depend on some conditions.
+
+Let's start with conditional execution of code. Often this is coded in an implicit vectorized way. For example \lstinline+x[x<0] <- 0+ finds all the elements of \lstinline+x+ that are less than 0 and sets them to zero. i.e. we have set \lstinline+x[i]+ to zero only if originally \lstinline+x[i]+ was less than zero. But sometimes we need a more explicit way of doing this: {\tt if} and {\tt else} are used to achieve this. The basic form is \index{if, else} 
+\begin{lstlisting}
+if (logical condition) {
+  ## one version of code
+} else {
+  ## another version of code
+}
+\end{lstlisting}  
+Leaving out the {\tt else} means that nothing is done if the {\tt condition} is {\tt FALSE}. For example we could simulate a coin toss:\index{runif}
+\begin{lstlisting}
+if (runif(1)>.5) cat("heads\n") else cat("tails\n")
+\end{lstlisting}
+{\tt runif} generates uniform random numbers on $(0,1)$ and {\tt cat} is a simple function for printing (\lstinline+"\n"+ produces a line end). In R you will often see code with the following sort of structure\index{cat}\index{print}
+\begin{lstlisting}
+a <- if (a<0) 0 else a + 1
+\end{lstlisting}
+i.e. what is assigned to an object depends on a logical condition. {\tt if} statements can also be chained together of course. Here is a pointless example:
+\begin{lstlisting}
+if (runif(1)>.5) {
+  cat("heads\n")
+} else if (runif(1)>.7) {
+  cat("tails\n")
+} else cat("also tails\n")
+\end{lstlisting}
+
+
+Let's move on to looping. The {\tt for} loop is the most commonly used example. It repeats a set of R commands once for each element of some vector. The basic syntax is \index{for loop}
+\begin{lstlisting}
+for (a in vec) {
+  ## some R code goes here
+}
+\end{lstlisting} 
+which repeats the code between the brackets\footnote{you can drop the brackets if there is only one statement to execute at each iteration.}, for {\tt a} set to each value in {\tt vec} in turn. Here's a simple example\footnote{for which a loop is in no way needed: you should be able to replace this with a single call to {\tt cat}.}
+\begin{lstlisting}
+> vec <- c("I","am","bored")
+> for (a in vec) cat(a," ")
+I  am  bored
+\end{lstlisting}
+Perhaps the most common use of a {\tt for} loop is to loop over all integers between some limits. For example \lstinline+for (i in 1:10) {...}+ evaluates all the commands in \lstinline+{...}+ for $i=1,2,\ldots,10$. (Take care if you have programmed in other languages -- in R \lstinline+for (i in 1:0) {...}+ {\em will} execute the loop for 1 and then for 0). Here is an example iterating a chaotic map:
+\begin{lstlisting}
+n <- 100;p <- rep(NA,n); p[1] <- 0.1
+for (i in 2:n) p[i] <- 3.7 * p[i-1] * (1 - p[i-1]) 
+plot(1:n,p,type="l",xlab="i")
+\end{lstlisting}
+\eps{-90}{.6}{chaos.eps}
+
+\noindent What if I wanted to stop the above loop if \lstinline+p[i]+ exceeded 0.92? I could do that by using the {\tt break} command inside the loop, to break out if the condition was met. i.e. \index{for loop!break}
+\begin{lstlisting}
+for (i in 2:n) { 
+  p[i] <- 3.7 * p[i-1] * (1 - p[i-1])
+  if (p[i]>.92) break
+}   
+\end{lstlisting}
+Occasionally you might want to {\tt repeat} indefinitely until a condition is met that causes you to {\tt break}. The basic structure is this \index{repeat loop}
+\begin{lstlisting}
+repeat {
+  some code
+  if (condition) break
+}
+\end{lstlisting}
+Another possibility is a {\tt while} loop, something like \index{while loop}
+\begin{lstlisting}
+while (condition) {
+  R code
+}
+\end{lstlisting}
+{\tt for} loops are the most commonly used.
+
+Note that for a vector oriented language like R, these sorts of tasks can often be accomplished efficiently by exploiting the fact that vectorized operations loop over vectors automatically, while vectors can also be subsetted so that we act only on the parts meeting some condition. Vectorized operations are usually much faster than explicitly coded loops, so generally it is a good idea to only write explicit loops when vectorization is not possible, or if the operations to be conducted at each loop iteration are expensive enough that the overhead of explicit looping is unimportant. For example, you should never write \lstinline+for (i in 1:length(x)) y[i] <- x[i]+ since \lstinline+y <- x+ does the same thing more efficiently, with less code:
+\begin{lstlisting}
+> n <- 10000000; x <- runif(n) ## simulate 10 million random numbers 
+> system.time(y <- x)   ## time a vector copy
+   user  system elapsed 
+  0.000   0.000   0.001 
+> system.time(for (i in 1:n) y[i] <- x[i]) ## time the equivalent copy loop
+   user  system elapsed 
+  0.538   0.028   0.567
+\end{lstlisting}
+In an interpreted language like R, there is more interpreting what to do than actual doing in the loop case. 
+\index{vectorized code}
+\subsection{Functions}
+
+Functions were introduced in Section \ref{firstR}, but some more detail is required to write them effectively.  Formally a function consists of an argument list, a body (the code defining what it does), and an environment (which is the environment where it was created). Generally, functions take objects as arguments and manipulate them to produce an object, which is returned. There are two caveats to this general principle. \index{functions}
+\begin{enumerate}
+\item A function may have side effects, such as printing some output to the console or producing a plot. Indeed a function may only produce a side effect, and no return object. Generally side effects that modify objects that are external to the function are to be avoided, if code is to be clean and easy to debug. 
+\item A function may make use of objects not in its argument list: if R encounters a symbol not in the function argument list and not previously created within the function, then it searches for it, first in the environment in which the function was {\em defined}\footnote{This is known as `lexical scoping', because the parent environment of the \index{R!lexical scoping} function is where it was written down.} (which is not necessarily the environment from which it was called). If that fails it looks in the environments returned by function {\lstinline+search()+}. A benign use of this mechanism is to call other functions not in a function's argument list, or to access constants such as those stored in {\lstinline+.Machine+}. Using this mechanism to provide a function with other objects that you have created is generally bad practice, because it makes for complex hard-to-debug code. Generally all objects that a function needs should be provided as its arguments. If this gets unwieldy, then group the arguments into a smaller number of list arguments.   
+\end{enumerate}
+
+Here is an example of a function definition. It generalises one-to-one real functions with power series representations to symmetric matrices using the following idea. The eigen-decomposition of symmetric matrix ${\bf A}$ is ${\bf A} = {\bf U}{\bm \Lambda}{\bf U}\ts$ where the columns of ${\bf U}$ are eigenvectors of $\bf A$ and ${\bm \Lambda}$ is the diagonal matrix of eigenvalues. The generalization of a function, $f$ is then $f({\bf A}) = {\bf U} f({\bm \Lambda}){\bf U}\ts$, where $f$ is applied elementwise to $\bm \Lambda$. \index{functions!definition}\index{functions!argument}\index{eigen}\index{matrix!multiplication}
+\begin{lstlisting}
+mat.fun <- function(A,fun=I) {
+  ea <- eigen(A,symmetric=TRUE)
+  ea$vectors %*% (fun(ea$values)*t(ea$vectors)) ## note use of re-cycling rule!
+}
+\end{lstlisting}\index{recycling rule}
+`{\lstinline+function(A,fun=I)+}' indicates that a function is to be created with arguments {\lstinline+A+} and {\lstinline+fun+}. In this case the function created is given the name {\lstinline+mat.fun+}, but functions are sometimes used without being given a name (for example, in the arguments to other functions). The argument list gives the names by which the function arguments will be referred to within the function body. Arguments may be given default values to be used in the event that the function is called without providing a value for that argument. This is done using \lstinline$name = default$ in the argument list. \lstinline+fun=I+ is an example of this, setting the default value of {\lstinline+fun+} to the identity function. \index{R!functions!argument list}
+
+Next comes the body of the function given by the R expressions within the curly brackets \lstinline+{ ... }+ (if the function body consists of a single expression, then the brackets are not needed). The function body can contain any valid R expressions. The object created on the last line of the function body is the object returned by the function. Alternatively the object can be returned explicitly using the {\lstinline+return+} function. For \lstinline+mat.fun+, the eigen decomposition of the first argument is obtained and then used to produce the generalised version of {\lstinline+fun+}. \index{R!functions!body}
+
+Now let us use the function, with a random matrix. First a sanity check that the identity function is correct:
+\begin{lstlisting}
+> set.seed(1)
+> m <- 3; B <- crossprod(matrix(runif(m*m),m,m)) ## example matrix
+> range(B - mat.fun(B)) ## cehck input matches output
+[1] -2.220446e-16  6.661338e-16
+\end{lstlisting}
+This confirms that the output matches the first argument when the default identity function is used.
+
+An aside: \index{precision!finite} why was the difference between the input and output not exactly 0? Because real numbers can only be stored in a computer to a finite precision, here equivalent to about 16 places of decimals. This inevitably means that arithmetic computations on real numbers are not exact --- rounding errors accumulate as calculations are performed. \index{rounding errors} A great deal of mathematical work has gone into minimising these numerical errors in matrix computations, but they can not be eliminated. \index{precision!machine} In this case we can say that the input and output matrices are identical {\em to machine precision}. You can get an idea of the size of number that counts as indistinguishable from zero by typing \lstinline+.Machine$double.eps+. Note, however that what counts as machine zero is relative to the size of numbers involved in a calculation. For example, here is what happens if {\tt B} is multiplied by $10^{10}$
+\begin{lstlisting}
+> B <- B * 1e10
+> range(B - mat.fun(B))
+[1] -3.814697e-06  3.814697e-06
+\end{lstlisting}
+
+Back to functions! What actually happened when the function was called (by \lstinline+mat.fun(B)+). R first matches the arguments of the function to those actually supplied, adopting a rather permissive approach to so doing. First it matches on the basis of exact matches to argument names (`{\lstinline+A+}' and `{\lstinline+fun+}' in the example). This does not mean that R is looking for {\lstinline+B+} to be called {\lstinline+A+} in the example; rather it is looking for statements of the form \lstinline+A=B+, specifying unambiguously that object {\lstinline+B+} is to be taken as argument `{\lstinline+A+}' of {\lstinline+mat.fun+}. After exact matching, R next tries partial matching of names on the remaining arguments; for example \lstinline+mat.fun(B,fu=sqrt)+ would cause the {\lstinline+sqrt+} function to be taken as the object to be used as argument {\lstinline+fun+}. After matching by name, the remaining arguments are matched by position in the argument list: this is how R has actually matched {\lstinline+B+} to {\lstinline+A+} earlier. Any unmatched argument is matched to its default value. \index{functions!argument matching}\index{functions!partial matching}
+
+R next creates an {\em evaluation frame}: an extendible piece of memory in which to store copies of the function arguments used in the function, as well as the other objects created in the function. This evaluation frame has the environment of the function as its parent (which is the environment where the function was defined, remember). \index{functions!evaluation frame}
+
+Having matched the arguments, R does not actually evaluate them immediately, but waits until they are needed to evaluate something in the function body: this is known as {\em lazy evaluation}. Evaluation of arguments takes place in the environment from which the function was called, except for arguments matched to their default values, which are evaluated in the function's own evaluation frame. \index{evaluation!lazy}
+
+Preliminaries over, R then evaluates the commands in the function body, and returns a result. 
+
+Notice that arguments are effectively copied into the function's evaluation frame, so nothing that is done to a function argument within the function has any effect on the object that supplied that argument `outside' the function. Within the body of {\lstinline+mat.mod+} argument {\lstinline+A+} could have been replaced by some poetry, but the matrix {\lstinline+B+} would have remained unaltered.
+
+Here is an example of calling {\lstinline+mat.mod+} to find a matrix inverse:
+\begin{lstlisting}
+> mat.fun(A = B, fun = function(x) 1/x)
+          [,1]      [,2]      [,3]
+[1,] 10.108591 -2.164337 -3.070143
+[2,] -2.164337  4.192241 -2.707381
+[3,] -3.070143 -2.707381  4.548381
+\end{lstlisting}
+In this case both arguments were supplied by their full name, and a function definition was used to supply argument {\lstinline+fun+}. 
+
+\subsection{The `{\tt \ldots}' argument}
+
+Functions can also have a special argument `\lstinline$...$', which is used to create functions that can have variable numbers of arguments. It is also used to pass arguments to a function that may in turn be passed on to other functions, without those arguments having to be declared as arguments of the calling function: this is useful for passing arguments that control settings of plotting functions, for example. \index{functions!variable number of arguments}
+\index{functions!\ldots argument}
+
+Any arguments supplied in the call to a function, that are not in the argument list in the function definition, are matched to its `\lstinline$...$' argument, if it has one.\footnote{This has the slightly unfortunate side effect that mistyped argument names do not generate obvious warnings.} The elements of `\lstinline$...$' can be extracted into a list, to work with, but here we will just consider how to use `\lstinline$...$' to pass arguments to a function called inside another function {\em without having to know the names of the arguments in advance}. 
+
+To make the problem concrete, suppose that we want to use our \lstinline$mat.fun$ function with the function argument defined by 
+\begin{lstlisting}
+foo <- function(x,a,b) x/a + b
+\end{lstlisting}
+Obviously {\tt foo} can not be used directly with \lstinline$mat.fun$ as the code assumes that whatever is passed in as {\tt fun} only has one argument. We certainly don't want to write a new version of \lstinline$mat.fun$ just for 3 argument functions with arguments called {\tt a} and {\tt b}. That's where `\lstinline$...$' comes to the rescue: we'll use it to pass {\tt a} and {\tt b}, or any other extra arguments (or none) to {\tt fun}, as follows
+\begin{lstlisting}
+mat.fun <- function(A,fun=I,...) { ## ... allows passing of extra arguments
+  ea <- eigen(A,symmetric=TRUE)
+  ea$vectors %*% (fun(ea$values,...)*t(ea$vectors)) ## to be passed to fun
+}
+\end{lstlisting}
+And it works\ldots
+\begin{lstlisting}
+mat.fun(B,fun=foo,a=2,b=3)
+           [,1]       [,2]       [,3]
+[1,] 2685660117 4154166277 4285541075
+[2,] 4154166277 8363105089 7782109902
+[3,] 4285541075 7782109902 8624247833
+\end{lstlisting}
+
+One irritation is worth being aware of. 
+\begin{lstlisting}
+ff <- function(res=1,...) res;f(r=2)
+\end{lstlisting}
+will return the answer 2 as a result of partial matching of argument names, even if you meant \lstinline+r+ to be part of the `\lstinline+...+' argument. It is easy to be caught out by this. If you want `\lstinline+...+' to be matched first, then it has to precede the arguments it might be confused with. So the following gives the answer 1:
+\begin{lstlisting}
+ff <- function(...,res=1) res;f(r=2)
+\end{lstlisting}
+
+\subsection{Planning and coding example: plotting an empirical CDF}
+
+The cumulative distribution function, $F$, of a random variable $X$ is defined as $F(x) = \text{Pr}(X\le x)$. Hence if we have a random sample $x_1, x_2, \ldots, x_n$ of observations of $X$ we can define an {\em empirical} cumulative distribution function
+$$
+\hat F(x) = \frac{1}{n}\sum_{i=0}^n \mathbb{I} (x_i \le x)
+$$
+where $\mathbb{I}$ is the indicator function. Suppose we want to write a function to take a sample of data in a vector $\bf x$ and plot its CDF. There are many ways to do this, so the first thing we have to do is to write down a plan. Usually this will involve jotting down ideas and maybe sketches on a piece of paper. Here are my notes for this task\ldots\index{CDF}\index{planning}
+
+\eps{0}{.7}{cdf-plan.pdf}
+
+The sketch of the CDF  is me trying to get my head around what the definition of $\hat F$ really means, and whether the $x_i$ values are at the start of a step or just before it (the former). As a result of this figuring out, I get to a plan that is a bit better than just evaluating the formula for $\hat F$ for a finely spaced sequence of $x$ values. Obviously more complicated tasks may involve several sheets of paper, false starts, and the need to summarize the design at the end. Code that involved no sheets of paper and none of this planning process is often poorly designed, error prone and slow to write. 
+
+To implement the design I used built in functions, {\tt sort}, {\tt plot} and {\tt lines}. Look up the help pages for these. For a little extra flourish I used {\tt expression} for defining the y axis label --- see {\tt ?plotmath} for how that works. Here is the code -- makes sure you understand each line. \index{plot}\index{sort}\index{lines}
+\begin{lstlisting}
+ecdf <- function(x) {
+## function to plot empirical cdf of sample x
+  n <- length(x)
+  p <- 1:n/n ## create cumulative probability vector 
+  xs <- sort(x) ## sort the x values
+  ## plot the x, p points
+  plot(xs,p,pch=19,cex=.5,xlab="x",ylab=expression(P(X<=x)))
+  ## now add in the lines of constant probability between x values
+  lines(c(2*xs[1]-xs[n],xs[1]),c(0,0))
+  for (i in 1:(n-1)) lines(c(xs[i],xs[i+1]),c(p[i],p[i]))
+  lines(c(2*xs[n]-xs[1],xs[n]),c(1,1))
+} ## ecdf
+
+## test it
+set.seed(8);
+x <- rgamma(50,shape=3,scale=2) ## test data
+ecdf(x)
+\end{lstlisting}
+\eps{-90}{.4}{ecdf.eps}
+\subsubsection{Avoiding the loop and vectorization}
+You will notice that {\tt ecdf} uses a {\tt for} loop for plotting each line segment in turn, but actually if you check the help page {\tt ?lines} you will see that {\tt lines} has a mechanism for plotting multiple separate line segments all at once - we just separate the co-ordinates defining the lines with an {\tt NA} (not available) to indicate that the points either side of the {\tt NA} should not be joined by a line. Since vectorized code is usually faster than loop code, lets think about how to uses this feature.
+\begin{enumerate}
+\item For $n$ data we have $n+1$ line segments, each defined by 2 $x,y$ points, and between each line segment we will need $n$ {\tt NA} values. 
+\item So let's create vectors, {\tt p1} and {\tt x1} each of length $3n+2$ to contain the line segment definitions and breaks, and fill them in\ldots
+\end{enumerate}
+Here is the code that could replace everything after \lstinline+## plot the x, p points+ in {\tt ecdf}.
+\begin{lstlisting}
+p1 <- x1 <- rep(NA,3*n+2) ## create p1 and x1 with NAs everywhere
+p1[1:n*3+2] <- p1[1:n*3+1] <- p ## fill in the step heights
+x1[1:n*3+1] <- xs ## step start
+x1[1:n*3+2] <- c(xs[-1],2*xs[n]-xs[1]) ## step ends
+p1[1:2] <- 0 ## initial prob is zero
+x1[1:2] <- c(2*xs[1]-xs[n],xs[1]) ## x co-ords for zero prob
+plot(xs,p,pch=19,cex=.5,xlab="x",ylab=expression(P(X<=x)))
+lines(x1,p1)
+\end{lstlisting}\index{vectorized code}
+Notice how this code is entirely vectorized --- no repeating of code $n$ times in a loop. It is therefore faster to run. But also notice that it is slower to read and understand. Also, with 500 data points the vectorized version of {\tt ecdf} is about 50 times faster than the original version. But it still takes only 0.7 seconds to run on my machine. So was it worth the effort of speeding up? That really depends on how often the function will be used and on what size data set. These are common trade-offs, which mean that you should beware of making a fetish out of vectorizing your code. Always vectorize if it is easy to write and understand the vectorized code, but otherwise think about whether the computer time savings will justify the effort.  
+
+\subsection{Useful built-in functions}
+
+R has a huge number of useful built in functions. This section is about how to find them.  Recall that R's extensive help system can be accessed by typing {\lstinline+help.start()+} at the command prompt, to obtain help in navigable HTML form, or by typing {\lstinline+?foo+} at the command line, where {\lstinline+foo+} is the function or other topic of interest. \index{functions!built in to R}
+
+\begin{center}
+\begin{tabular}{ll}
+{Help topic} & {Subject covered} \\ \hline
+{\tt ?Arithmetic} & Standard arithmetic operators \\
+{\tt ?Logic} & Standard logical operators \\
+{\tt ?sqrt} & Square root and absolute value functions \\
+{\tt ?Trig} & Trigonometric functions ({\lstinline+sin+}, {\lstinline+cos+}, etc.) \\
+{\tt ?Hyperbolic} & Hyperbolic functions ({\lstinline+tanh+}, etc.) \\
+{\tt ?Special} & Special mathematical functions ($\Gamma$ function, etc.)\\
+{\tt ?pgamma} & Partial gamma function\\
+{\tt ?Bessel} & Bessel functions\\
+{\tt ?log} & Logarithmic functions\\
+{\tt ?max} & Maximum, minimum and vectorised versions\\
+{\tt ?round} & Rounding, truncating, etc.\\
+{\tt ?distributions} & Statistical distributions built into R\\ \hline 
+\end{tabular} 
+\end{center}
+
+The {\lstinline+?distributions+} topic requires some more explanation. R has built-in functions for the {\lstinline+beta+}, {\lstinline+binomial+}, {\lstinline+cauchy+}, {\lstinline+chisq+}uared, {\lstinline+exp+}onential, {\lstinline+f+}, {\lstinline+gamma+}, {\lstinline+geom+}etric, {\lstinline+hyper+}geometric, {\lstinline+lnorm+}al (log-normal), {\lstinline+multinom+}ial, {\lstinline+nbinomial+} (negative binomial), {\lstinline+norm+}al, {\lstinline+pois+}son, {\lstinline+t+}, {\lstinline+unif+}orm and {\lstinline+weibull+} distributions. The R identifying names for these are shown in {\lstinline+courier+} font in this list. \index{R!distributions}\index{R!random numbers}
+
+For each distribution, with name {\lstinline+dist+}, say, there are four functions:\index{random deviates}
+\begin{enumerate}
+\item {\lstinline+ddist+} is the probability (density) function of {\lstinline+dist+}.
+\item {\lstinline+pdist+} is the cumulative distribution functions of {\lstinline+dist+}.
+\item {\lstinline+qdist+} is the quantile function of {\lstinline+dist+}.
+\item {\lstinline+rdist+} generates independent pseudorandom deviates from {\lstinline+dist+}. 
+\end{enumerate}
+
+\section{Reading and storing data in files}
 
 
 \section{Data re-arrangement and tidy data}
 
 In raw form many data sets are messy and have to be tidied up for statistical analysis. By tidying is meant that the data are re-arranged conveniently for analysis, not that the information in the data is in anyway modified unless an actual error is identified (no removal of outliers, for example). Since `data tidying' or `data re-arrangement' sound too boring and clerical for many enthusiasts for Modern Data Science, you will often hear terms like `data wrangling' and `data munging' used instead. These sound suitably rugged, as if the types engaged in them return home aching and covered in dust and mud after a day engaged in the honest toil of these muscular pursuits.
 
-By tidy data is meant that data are arranged in a matrix so that:
+By tidy data is meant that data are arranged in a matrix so that:\index{tidy data}\index{data frame}
 \begin{enumerate}
 \item Each column is a variable.
 \item Each row is an observation (a unique combination of variables).
 \end{enumerate}
 and it is recognised that what counts as `an observation' can depend on the subset of variables of interest. For example,
 this data frame is in tidy form if interest is in student's grades each week. 
-\begin{verbatim}
+\begin{lstlisting}
 name    d.o.b.  nationality week grade
 George  11/2/01 GB          1    B
 George  11/2/01 GB          2    C
@@ -432,27 +911,29 @@ Anna    15/6/00 GB          1    A
 Anna    15/6/00 GB          2    B
 Anna    15/6/00 GB          3    A
 .       .       .           .    .
-\end{verbatim}
+\end{lstlisting}
 But if we are only interested in birth dates and nationality of students, then we would really want to simplify to
-\begin{verbatim}
+\begin{lstlisting}
 name    d.o.b.  nationality 
 George  11/2/01 GB          
 Anna    15/6/00 GB          
 .       .       .           
-\end{verbatim}
-It is easy to get the second data frame form the first (\verb+marks+, say) in base R using
-\begin{verbatim}
+\end{lstlisting}
+It is easy to get the second data frame form the first (\lstinline+marks+, say) in base R using
+\begin{lstlisting}
 student <- unique(marks[,c("name","d.o.b.","nationality")])
-\end{verbatim}
-which has selected the named columns of interest, and then found the unique rows. If you want to refer each row in \verb+marks+ to its row in \verb+student+ then you can use 
-\begin{verbatim}
+\end{lstlisting}
+which has selected the named columns of interest, and then found the unique rows. If you want to refer each row in \lstinline+marks+ to its row in \lstinline+student+ then you can use 
+\begin{lstlisting}
 library(mgcv)
-student <- unique(marks[,c("name","d.o.b.","nationality")])
-ind <- attr(student,"index") ## ind[i] is row of 'student' corresponding to row i of 'marks'
-\end{verbatim}
+student <- uniquecombs(marks[,c("name","d.o.b.","nationality")])
+ind <- attr(student,"index") 
+## ... ind[i] is row of 'student' corresponding to row i of 'marks'
+\end{lstlisting}
 
-At this point, you are hopefully wondering about replicate data, and the definition of `observation' as `unique combination of variables'? If I repeat an experiment under identical conditions, could I not occasionally get identical results, and hence two identical rows in a data frame that are different observations? Well yes, but only if you do not include a variable recording the `replicate number'. If you don't record the replicate number then you do not really have tidy data, as it is not possible to distinguish the common error of accidental replication of some data, from genuine replicates.
+At this point, you are hopefully wondering about replicate data, and the definition of `observation' as `unique combination of variables'? If I repeat an experiment under identical conditions, could I not occasionally get identical results, and hence two identical rows in a data frame that are different observations? Well yes, but only if you do not include a variable recording the `replicate number'. If you don't record the replicate number then you do not really have tidy data, as it is not possible to distinguish the common error of accidental replication of some recorded data, from genuine replicates.
 
 %\makeindex
+\printindex
 
 \end{document}
