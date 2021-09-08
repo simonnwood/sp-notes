@@ -508,6 +508,8 @@ The most basic type of data structure in R is a vector (a one dimensional array)
 > bb[3:8]     ## print elements 3:8 
 [1]  3 -3  5  6  7  8
 \end{lstlisting}
+Whatever the type of a vector, some of its elements can always be set to {\tt NA} (not available), if required. Also numbers can take the values \verb+Inf+, \verb+-Inf+ and \verb+NaN+ (not a number e.g. $log(-1)$). \index{NA}\index{NaN}
+
 Since vectors are the basic data structure, operators and most functions are also vectorized - they operate on whole vectors. For example given two vectors, {\tt a} and {\tt b} of the same length then \lstinline+c <- sin(a) * b+ actually forms \lstinline+c[i] <- sin(a[i]) * b[i]+ for all {\tt i} from 1 to the length of the vector. Similarly \lstinline^c <- a * b + 2^ actually forms \lstinline^c[i] <- a[i] * b[i] + 2^ for the same set of {\tt i} values. \index{vectorized code}
 
 Notice how the scalar {\tt 2} got reused for each {\tt i} in that last example. So is a scalar more than just a length one vector after all? Actually no, {\tt 2} is being treated like any other vector --- R has a {\bf recycling rule} for vector arithmetic. Any operator that combines two vectors will recycle the values in the shorter vector as many times as required to match the length of the longer vector. So if a vector contains only one value, that one value is just recycled as often as needed. Here are a couple of examples  \index{recycling rule} \index{vectors}
@@ -629,6 +631,28 @@ Before moving on from data structures it is worth mentioning one useful function
  $ fac: Factor w/ 2 levels "a","b": 1 2 1
 \end{lstlisting}
 
+\subsection{Operators} 
+
+Here is a boring table of some operators in R.
+
+\begin{tabular}{cl|cl|cl}
+Operator & Description& Operator & Description & Operator & Description\\ \hline
+\verb+&+ & logical AND & \verb+|+ & logical OR & \verb+<+ & less than\\
+\verb+<=+ & $\le$ &\verb+>+ & greater than & \verb+>=+ & $\ge$\\
+\verb+==+ & testing equality & != & not equal & \verb+!+ & logical negation\\
+\verb+<-+& assignment & \verb+=+ & assignment & \verb^+^& addition \\
+\verb+-+ & subtraction & \verb+*+ & multiplication & \verb+/+ & division\\
+\verb+^+ & raise to power & \verb+%/%+ & integer division & \verb+%%+& integer remainder (mod)\\
+\verb+%*%+ & matrix multiplication & \verb+%x%+ & Kronecker product & \verb+%in%+ &logical match\\
+\hline
+\end{tabular}
+
+\bigskip
+
+\noindent These operators act element-wise on vectors, except for the final row, which are matrix operators, or in the case of \verb+%in%+ operates on vectors of different lengths (see \verb+?"%in%"+)  In addition \verb+||+ and \verb+&&+ are logical OR and AND operators that only evaluate the first element of their arguments, returning a single {\tt TRUE} or {\tt FALSE}. 
+
+For example suppose we want to set all elements of vector {\tt x} to zero, for which $x[i]$ is between 1 and 2, or less than -2. \lstinline+x[(x < 2 & x > 1) | x < -2] <- 0+ does it. 
+
 \subsection{Loops and conditional execution}
 
 Many programming tasks require that some operation is repeated many times for different values of some index, or require that the choice of which operation to carry out should depend on some conditions.
@@ -657,6 +681,7 @@ if (runif(1)>.5) {
   cat("tails\n")
 } else cat("also tails\n")
 \end{lstlisting}
+
 
 
 Let's move on to looping. The {\tt for} loop is the most commonly used example. It repeats a set of R commands once for each element of some vector. The basic syntax is \index{for loop}
@@ -816,7 +841,7 @@ where $\mathbb{I}$ is the indicator function. Suppose we want to write a functio
 
 The sketch of the CDF  is me trying to get my head around what the definition of $\hat F$ really means, and whether the $x_i$ values are at the start of a step or just before it (the former). As a result of this figuring out, I get to a plan that is a bit better than just evaluating the formula for $\hat F$ for a finely spaced sequence of $x$ values. Obviously more complicated tasks may involve several sheets of paper, false starts, and the need to summarize the design at the end. Code that involved no sheets of paper and none of this planning process is often poorly designed, error prone and slow to write. 
 
-To implement the design I used built in functions, {\tt sort}, {\tt plot} and {\tt lines}. Look up the help pages for these. For a little extra flourish I used {\tt expression} for defining the y axis label --- see {\tt ?plotmath} for how that works. Here is the code -- makes sure you understand each line. \index{plot}\index{sort}\index{lines}
+To implement the design I used built in functions, {\tt sort}, {\tt plot} and {\tt lines}. Look up the help pages for these. Plots is a high level function for producing scatter plots, while lines is a lower level function for adding lines to an existing plot ({\tt points} is an equivalent for adding points). For a little extra flourish I used {\tt expression} for defining the y axis label --- see {\tt ?plotmath} for how that works. Here is the code -- makes sure you understand each line. \index{plot}\index{sort}\index{lines}\index{points}
 \begin{lstlisting}
 ecdf <- function(x) {
 ## function to plot empirical cdf of sample x
@@ -888,8 +913,280 @@ For each distribution, with name {\lstinline+dist+}, say, there are four functio
 \item {\lstinline+rdist+} generates independent pseudorandom deviates from {\lstinline+dist+}. 
 \end{enumerate}
 
+\section{Simulations I: stochastic models and simulation studies}
+
+One major class of statistical programming task involves {\em stochastic simulation}. Simulating processes that involve random numbers. Strictly speaking {\em pseudorandom} numbers. There are several main sorts of simulation that we might need to undertake.
+\begin{enumerate}
+\item Simulate from a stochastic model. e.g. a model of disease spread, or a model of football teams competing, or a model of how shoppers will move around a store.
+\item Simulate the process of sampling data from a population, and analysing it using a statistical method, in order to assess how well the statistical method is working. 
+\item Simulate the process of sampling data directly, as part of a statistical analysis moethod.
+\item Simulate from the posterior distribution of the parameters in a Bayesian data analysis.
+\end{enumerate}  
+This section will take a look at examples of the first two. 
+
+\subsection{Random sampling building blocks}
+
+There are a couple of sorts of random sampling that we might want to do:
+\begin{enumerate}
+\item Sample observations from a set of data. 
+\item Sample random deviates from some particular probability distribution. 
+\end{enumerate}
+
+\subsubsection{Sampling data}
+Suppose {\tt x} is a vector and we would like to sample {\tt n} of its elements, at random, without replacement. {\tt sample} is a function for doing this. For example, let's draw a random sample of size 10 from the integers $1,2,\ldots,100$.
+\begin{lstlisting}
+> set.seed(0) ## just so you can reproduce what I got
+> sample(1:100,10)
+ [1]  14  68  39   1  34  87  43 100  82  59
+\end{lstlisting}
+This sampled each number with equal probability, {\em without replacement}. So each observation had the same chance of occurring in the sample, but could do so only once. This is the sort of sampling that you get if you put numbered balls in a bag, shake them up and then draw out a sample from the bag without looking. \index{sample}
+
+Notice the use of \lstinline+set.seed()+. We can not generate truly random numbers, but only sequences of numbers that appear indistinguishable from random using any statistical test you might apply. What ever sort of random number we eventually want, R starts by generating sequences that appear to be uniform random deviates from $U(0,1)$, and then transforming these. These uniform sequences are generated using a {\em random number} generator, and are in fact completely deterministic. If we repeatedly start the sequence off from the same state, it will generate the same sequence every time. Setting the random number generator to a particular state is known as {\em setting the seed}. To fix ideas, here is how it works for the basic uniform generator
+\begin{lstlisting}
+> set.seed(3);runif(5) ## 5 random numbers after setting seed
+[1] 0.1680415 0.8075164 0.3849424 0.3277343 0.6021007
+> runif(5) ## another 5 - all different
+[1] 0.6043941 0.1246334 0.2946009 0.5776099 0.6309793
+> set.seed(3);runif(5) ## and after setting the seed to 3 again - same as first time
+[1] 0.1680415 0.8075164 0.3849424 0.3277343 0.6021007
+\end{lstlisting}
+
+Let's get back to sampling. We might also want to sample {\em with replacement}. This is as if we sampled numbered balls from a bag, as before, but this time after noting the number we return the ball to the bag and give the bag a shake, before drawing the next ball.
+\begin{lstlisting}
+> sample(1:100,10,replace=TRUE)
+ [1] 51 97 85 21 54 74  7 73 79 85
+\end{lstlisting}
+Notice that 85 occurred twice in this sample. Obviously we can sample any vector in this way, not just a vector of integers, but sampling integers like this is especially convenient if you want to sample whole rows of data from a matrix or data.frame. You sample the row indices, and then use these to extract the sampled rows. For example, suppose we want a random sample of 30 rows of data frame, {\tt dat}:
+\begin{lstlisting}
+ii <- sample(1:nrow(dat),30) ## 'nrow' returns the number of rows of 'dat'
+dat1 <- dat[ii,]             ## 30 rows selected at random from 'dat'
+\end{lstlisting}
+It is also possible to sample with different probabilities of sampling each observation. For example let's sample the integers $i=1,2,\ldots,100$ each with probability $\propto 1/i$.  
+\begin{lstlisting}
+> sample(1:100,10,prob=1/1:100)
+ [1] 13  1  5 19 24 14 12 17 20 63 
+\end{lstlisting}
+Note that we are sampling with probability proportional to {\tt prob} -- {\tt sample} will normalise the probabilities so that they sum to one internally, before using them. In this example we only got one observation $<25$. Does that seem as expected? Let's work out the probability of sampling an observation $<25$ as a sanity check\ldots 
+\begin{lstlisting}
+> sum(1/1:24)/sum(1/1:100)
+[1] 0.7279127 ## seems fine!
+\end{lstlisting}
+
+\subsubsection*{Example: the birthday problem}
+
+A standard toy problem in probability is the birthday problem. What is the probability of at least 2 people in a group of 30 sharing the same birthday? Let's investigate this by simulation. As usual we start by planning. For each group we want to sample 30 birthdays at random from the numbers $1 \ldots 366$, with one of the numbers occurring only in leap years and therefore having 1/4 of the probability of the others. For each group we can then find the unique birthdays, and see how often there are fewer than 30 of them. So  
+\begin{enumerate}
+\item Randomly sample the $n $ lots of 30 birthdays, and put them in an $n \times 30 $ matrix.
+\item For each matrix row, count the unique birthdays.
+\item Find the proportion for which that count is $<30$ 
+\end{enumerate} 
+Here is an implementation, it uses the {\tt apply} functions to apply a function counting the unique birthdays to each row of the birthday matrix. The second argument of apply gives the dimensions of the first argument over which the function should be applied. Here the first argument is a matrix, so I give one as the second argument to apply over rows.
+\begin{lstlisting}
+n <- 1000000 ## number of groups
+bd <- matrix(sample(1:366,30*n,replace=TRUE,prob=c(rep(4,365),1)),n,30) ## birthdays
+p <- mean(apply(bd,1,function(x) length(unique(x)))!=30)
+\end{lstlisting}\index{apply}
+It gives the answer p=0.706. Obviously there is some stochastic variability in that answer - we could work out the standard error of the answer using the variance of a Bernoulli random variable: \lstinline+(p*(1-p)/n)^.5+ is about 0.0005. Or if we are lazy we could just run the simulation repeatedly to assess the variability of the answer. 
+
+There are two rather appealing features of this way of answering the question. Firstly, it was very easy, in a way that most people do not find the probability calculation based answer. More importantly, it is very easy to generalize to more modify in ways that would make the exact answer very difficult to work out. For example, births are not spread out evenly throughout the year, so the probabilities of the different birthdays are not all equal. Given appropriate data it would be easy to adjust the probabilities in the sampling step, and get an adjusted probability for that case too.  
+
+\subsubsection{Sampling from distributions}
+
+R has functions for simulating random variables from a wide variety of basic distributions: see {\tt ?distributions} for an overview. The functions all start with an {\tt r} followed by the distribution name. Their first argument is the number of values to simulate, and remaining arguments are vectors of distribution parameters. For example, if I would like 3 normal random deviates, with means 1, 3.2 and -0.5 and standard deviations 1, 1 and 2.5 then the following produces them\index{random numbers}
+\begin{lstlisting}
+> rnorm(3,mean=c(1,3.2,-.5),sd=c(1,1,2.5))
+[1] 0.4268462 2.1288700 2.3638236 ## you should get different answers here!
+\end{lstlisting}
+An immediate use for simulation is to quickly get approximate probabilities that may be awkward to compute otherwise. 
+
+For example the time from infection to onset of Covid-19 symptoms follows a log normal distribution with log scale mean and sd of 1.63 and 0.50. Meanwhile one estimate has the distribution of time from symptom onset to death estimated to be a gamma distribution with shape parameter 4 and scale parameter 4.2. Assuming independence of the 2 durations, what does the distribution of time from infection to death look like, and what is the probability that it is less than one week? 
+\begin{lstlisting}
+> n <- 100000
+> d <- rlnorm(n,1.63,.5) + rgamma(n,shape=4,scale=4.2)
+> mean(d<7)
+[1] 0.00646
+> hist(d,breaks=0:100) ## plots a histogram with bar breaks as given
+\end{lstlisting}
+\eps{-90}{.5}{i2d.eps}\index{histogram}
+
+\subsection{Simulation from a simple epidemic model}
+
+Let's put a few things together and build a slightly more complicated simulation. SEIR (Susceptible-Exposed-Infective-Recovered\footnote{often a euphemism for recovered or dead}) models are commonly used in disease modelling. In the simplest version almost everyone starts out susceptible, and then move to the exposed class according to their daily probability of being infected by someone in the infected class. This daily probability is assumed proportional to the number of people in the infected class, with constant of proportionality $\beta$. People move from the exposed to infected class with a constant probability, $\gamma$ , each day, and move from the infected to the R class with a different constant probability, $\delta$. 
+
+Suppose that we want to simulate from this stochastic SEIR model, maintaining a record of the populations in the different classes over time. And suppose in particular that we are interested in investigating scenarios in which people's daily probability of catching the disease is variable from person to person, so that each has a different $\beta$ value. In fact let's assume that each person has their own $\beta_i$ drawn from a gamma distribution. As usual we first need to think about code design. 
+\begin{enumerate}
+\item Since the code is for investigating multiple scenarios, we should produce a function that takes parameter values and control constants as inputs, and outputs vectors of the S, E, I and R populations over time.
+\item We could maintain vectors for the different stages, and move individuals between them, but this seems clumsy. It is probably better to have a single vector maintaining an integer state indicating each individual's current status 0 for S, 1 for E, 2 for I and 3 for R.
+\item The individual states are then updated daily according to the model, and the numbers in each state summed. 
+\end{enumerate}    
+Here is an implementation. 
+\begin{lstlisting}
+seir <- function(n=10000,ni=10,nt=100,gamma=1/3,delta=1/5,bmu=5e-5,bsc=1e-5) {
+## SEIR stochastic simulation model.
+## n = population size; ni = initially infective; nt = number of days
+## gamma = daily prob E -> I; delta = daily prob I -> R;
+## bmu = mean beta; bsc = var(beta) = bmu * bsc
+  x <- rep(0,n) ## initialize to susceptible state
+  beta <- rgamma(n,shape=bmu/bsc,scale=bsc) ## individual infection rates
+  x[1:ni] <- 2 ## create some infectives
+  S <- E <- I <- R <- rep(0,nt) ## set up storage for pop in each state
+  S[1] <- n-ni;I[1] <- ni ## initialize
+  for (i in 2:nt) { ## loop over days
+    u <- runif(n) ## uniform random deviates
+    x[x==2&u<delta] <- 3 ## I -> R with prob delta
+    x[x==1&u<gamma] <- 2 ## E -> I with prob gamma
+    x[x==0&u<beta*I[i-1]] <- 1 ## S -> E with prob beta*I[i-1]
+    S[i] <- sum(x==0); E[i] <- sum(x==1)
+    I[i] <- sum(x==2); R[i] <- sum(x==3)
+  }
+  list(S=S,E=E,I=I,R=R,beta=beta)
+} ## seir
+\end{lstlisting}
+Hopefully by now most of this should be relatively easy to understand. The lines like 
+\begin{lstlisting}
+x[x==2&u<delta] <- 3 
+\end{lstlisting}
+are doing most of the real work, so these are especially important to understand. First note that elements of the logical vector \lstinline+u<delta+ will be {\tt TRUE} with probability {\tt delta} and {\tt FALSE} otherwise. This is because the elements of {\tt u} are $U(0,1)$ deviates and hence have probability {\tt delta} of being less than {\tt delta}. Elements of \lstinline+x==2&u<delta+ are then {\tt TRUE} only when the corresponding elements of \lstinline+u<delta+ {\bf and} \lstinline+x==2+ are {\tt TRUE}. As a result  \lstinline+x[x==2&u<delta] <- 3+ takes each element of {\tt x} in state 2 and with probability {\tt delta} sets it to state 3. The other lines act similarly, with the probability for the state 0 to 1 transition varying between elements of {\tt x}. 
+
+The fixed $\beta$ version of this basic epidemic model is close to 100 years old. A great deal of the modelling work on Covid uses variations on this structure, perhaps surprisingly, given the simplistic way that the infection process is modelled. Even more surprisingly most of the models ignore the fact that there is wide variability in the number of contacts people have with other people each day, and in their chance of becoming infected at each contact -- i.e $\beta$ is not treated as random. We can use our simple implementation to investigate whether this matters. In particular consider a simulation with almost no variability in $\beta$, with {\tt bmu} and {\tt bsc} set to {\tt 7e-5} and {\tt 1e-7}. Then compare that to a simulation in which $\beta$ varies more widely (\lstinline+bsc=7e-5+). Finally consider a universal social distancing simulation, in which the mean and variability in $\beta$ are reduced (\lstinline+bmu=5e-5+, \lstinline+bsc=2e-6+).  
+\begin{lstlisting}
+par(mfcol=c(2,3),mar=c(4,4,1,1)) ## set plot window up for multiple plots
+epi <- seir(bmu=7e-5,bsc=1e-7)   ## run simulation
+hist(epi$beta,xlab="beta",main="") ## beta distribution
+plot(epi$S,ylim=c(0,max(epi$S)),xlab="day",ylab="N") ## S black
+points(epi$E,col=4);points(epi$I,col=2) ## E (blue) and I (red)
+...
+\end{lstlisting}
+\eps{-90}{.5}{seir.eps}
+Comparing the left two columns we see that neglecting the variability in $\beta$ means that the severity of the epidemic will be overestimated by the model. Comparing the right two columns we see that social distancing slows the epidemic down, but can make it larger in the long run, by suppressing the variability in $\beta$ (as everyone has to follow the same rules). Perhaps most surprising of all, scientists who tried to point out the problems with neglecting variability in $\beta$ had extreme difficulty getting published, and were often vilified on social media. Some models used for policy did represent the differences in contact rates between different age groups. But the main survey used to do this was based on one day diaries kept by survey participants of whom 7 were over 75 and none over 80. This is quite limited data for the age groups that make up 3/4 of Covid deaths to date. 
+
+\subsection{Simple simulation study: testing an approximate confidence interval}
+
+Suppose we observe a binomial random variable $X \sim \text{binom}(n,p)$ (number of successes in $n$ independent trials, each with probability of success $p$). $\hat p = X/n$ is an obvious estimator, of $p$, and a simple plug in estimate of its variance is then $\hat \sigma^2_p = \hat p (1-\hat p)/n$, suggesting approximate 95\% confidence interval $\hat p \pm \hat \sigma_p$. The central limit theorem implies that this interval will have the correct coverage probability in the $n \to \infty$ limit, but how will it behave when $n=20$, for example? Let's investigate this question for the case $p=.2$. 
+  
+The basic idea, is that we should generate a large number of observations $x$ and from each one compute a 95\% confidence interval for $p$. We then count up what proportion of those intervals include the true value of $p$ we used in the simulation. If the intervals were exact then that proportion would be very close to 0.95.
+
+\begin{lstlisting}
+n.rep <- 10000 ## number of CIs to compute 
+n.ci <- 0 ## counter for number that include the truth 
+n <- 20;p <- .2
+for (i in 1:n.rep) { 
+  x <- rbinom(1,n,p) ## generate x
+  p.hat <- x/n       ## compute the estimate of p
+  sig.p <- sqrt(p.hat*(1-p.hat)/n) ## and its standard error
+  if (p.hat - 1.96*sig.p <p && p.hat+1.96*sig.p > p) n.ci <- n.ci + 1 ## truth included?
+}
+n.ci/n.rep ## proportion of intervals including the truth
+\end{lstlisting}
+The result is about 0.92 --- so when $n=20$, 8\% of intervals fail to include the true value, instead of the 5\% that should. Many statistical methods rely on infinite sample size approximations, and this sort of simulation study is an essential way of checking out their performance at finite sample sizes.
+
+{\bf Exercise:} write vectorized code to do the preceding calculation without a loop, and investigate how the coverage probability changes as you increase the sample size to 200, 2000 etc.
+
+
 \section{Reading and storing data in files}
 
+Since statistics is about understanding what data are telling us about the world, a statistical programmer needs to know how to read data into computer memory. Recall that computer memory (or `random access memory') is the fast access temporary working memory of a computer. What is in it vanishes when you turn the computer off. It should not be confused with the long term storage provided by a hard disk, or solid state storage. The latter persists even when the computer is turned off, and is where `computer files' are stored, organised in a hierarchy of folders/directories. Persistent storage is also sometimes accessed remotely over the internet, but we will start with reading in files stored locally on your computer. 
+
+\subsection{working directories}
+
+R maintains a record of the current `working directory'. This is the directory on your computer's file system where it will assume that a file is stored if you don't tell it otherwise. You can find out what the working directory currently is as follows. \index{getwd}\index{setwd}\index{working directory}
+\begin{lstlisting}
+> getwd()
+[1] "/home/sw283" ## my working directory
+\end{lstlisting}
+The exact format depends on your operating system, but note that R uses \verb+/+ to separate subdirectories from parent directories, even on Windows. You can change the working directory as follows:
+\begin{lstlisting}
+> setwd("/home/sw283/lnotes")
+\end{lstlisting}
+making sure that you specify a valid path for your filesystem. For example, on windows the path includes a letter identifying the disk or other memory device where the directory is located. e.g. \lstinline+setwd("c:/foo/bar")+ for subdirectory `bar' of directory `foo' on \verb+c:+. Note the use of forward slashes in place of the windows default back slashes.
+
+\subsection{Reading in code: source()}
+\index{source}
+Before reading in data, consider reading in code. The \lstinline+source+ function reads in code and runs it from a file. This is particularly useful for reading in function definitions from a file, for example. For example:
+\begin{lstlisting}
+source("mycode.r")
+\end{lstlisting}
+reads in the contents of {\tt mycode.r}, first checking that it is valid R code and then running it. Running R code from a file like this is not exactly the same as typing it, or pasting it, into the R console. One main difference is that if you type the name of an object, and nothing else, at the console, then the object will be printed. If a line of sourced code contains the name of an object and nothing else, then the line causes nothing to happen. You would need to explicitly print the object if you want it to be printed. See {\tt ?source} for full details.
+
+A useful function related to {\tt source} is {\tt dump}, which writes a text representation of some R objects to a file as R code, in a way that can later be read back in to R using {\tt source}. For example suppose we have objects {\tt a}, {\tt alice} and {Ba} to save. All we have to do is supply {\tt dump} with a text vector of the object names, and the name of the file to write them to: \index{dump}
+\begin{lstlisting}
+dump(c("a","alice","Ba"),file="stuff.R")
+\end{lstlisting}
+
+\subsection{Reading from and writing to text files of data}
+
+Text files have information stored in human readable form. You can open the file in an editor and understand it. Text files are a very portable way of storing data, but the files are quite a bit larger than is strictly necessary to stroe the information in the file. R has a number of functions for reading data from text files. All have many arguments to let you adapt to the way that the data has been stored. \index{file!text}
+
+As a simple example consider a file called {\tt data.txt} containing 
+\begin{verbatim}
+"name" "age" "height"
+"sue"  21    1.6
+"fred" 19    1.7
+\end{verbatim}
+
+{\tt scan} reads data from a file into a vector. For example:\index{scan}
+\begin{lstlisting}
+> a <- scan("data.txt",what="c");a
+Read 9 items
+[1] "name"   "age"    "height" "sue"    "21"     "1.6"    "fred"   "19"  "1.7"
+\end{lstlisting}
+The type of the {\tt what} argument tells {\tt scan} what type of items it will be reading in. Character in this case, given \verb+"c"+ is of type character. {\tt scan} treats white space as the separating items to read, but sometimes the separator is something else, for example a comma. In that case you can specify the separator using the {\tt sep} argument. e.g. \lstinline+sep=","+.
+
+{\tt scan} can also read in data in which different columns of data have different types, returning the different columns as different items of a list. In that case {\tt what} is supplied as a list, with the type of the list items giving the types of the items to be read and stored. Here is an example in which the first line of the file is skipped using the {\tt skip} argument. 
+\begin{lstlisting}
+> b <- scan("data.txt",what=list("a",1,1),skip=1); b
+Read 2 records
+[[1]]
+[1] "sue"  "fred"
+
+[[2]]
+[1] 21 19
+
+[[3]]
+[1] 1.6 1.7
+\end{lstlisting} 
+Actually, the file does not strictly need to have the data arranged in columns, simply in a repeated pattern.
+
+Often the list form of the data is not as useful as having it in a data frame. So let's name the items in the list according to the first row of {\tt data.txt} and convert to a data frame.
+\begin{lstlisting}
+> names(b) <- scan("data.txt",what="c",n=3)
+> d <- data.frame(b); d
+  name age height
+1  sue  21    1.6
+2 fred  19    1.7
+\end{lstlisting}
+
+Reading columns of data into a data frame in R is such a common task that a number of functions are provided for this purpose. The main one is {\tt read.table}. Take a look at {\tt ?read.table} for the variations. An easier way of reading {\tt data.txt} directly into {\tt d} would be \index{data frame!read in}\index{read.table}
+\begin{lstlisting}
+d <- read.table("data.txt",header=TRUE) 
+\end{lstlisting}
+where \lstinline+header=TRUE+ simply indicates that the first line gives the variable names. {\tt sep} and {\tt skip} can also be used with {\tt read.table}. Unsurprisingly, the opposite task of writing a data frame out to a text file has it's own function {\tt write.table}. For example:\index{write.table}
+\begin{lstlisting}
+write.table(d,file="data1.txt") 
+\end{lstlisting}
+
+On occasion it is necessary to read lines of text into a character vector, for further processing. The {\tt readLines} function will do this, and there is an equivalent {\tt writeLines} function as well.\index{readLines}\index{writeLines}
+
+To write data other than a data frame or character vector to a text file you can use the {\tt cat} or {\tt write} functions: both take a {\tt file} argument specifying the file name to write to. {\tt dump} is another option covered in the previous section.\index{file!write text}
+
+\subsection{Reading and writing binary files}
+
+To save large R objects or data frames to file, it is more efficient to use a binary format and compression. {\tt save} can do this. It takes a sequence of R objects, and writes them to the file specified in its {\tt file} argument. {\tt  load} will read the objects back in from the file. Here is a simple example:
+\begin{lstlisting}
+A <- matrix(1:6,3,2); y <- rnorm(100) ## creat some objects
+save(A,y,file="stuff.Rd")  ## save them to a binary file
+rm(y,A)          ## delete the original objects
+load("stuff.Rd") ## load them back in again from the file
+\end{lstlisting}
+{\tt save} does allow you to choose to save the objects as text as well, but this requires larger files: for the above example twice as large, but sometimes {\em much} larger.\index{save}\index{load}\index{file!binary}
+
+\subsection{Reading data from other sources}
+
+Rather than reading standard files from storage on your local computer, you might want to read data from a file subject to some standard compression algorithm, or over a local network, or from a URL. Most of the functions for reading and writing data can use one of these other types of {\em connection} as their file argument. See {\tt ?connection} for details. Here is a single common example of reading data from a web address
+\begin{lstlisting}
+raw <- readLines("https://michaelgastner.com/DAVisR_data/homicides.txt") 
+\end{lstlisting}
+in this case lines of data are read into a character vector. \index{readLines} \index{connections}
 
 \section{Data re-arrangement and tidy data}
 
@@ -932,6 +1229,85 @@ ind <- attr(student,"index")
 \end{lstlisting}
 
 At this point, you are hopefully wondering about replicate data, and the definition of `observation' as `unique combination of variables'? If I repeat an experiment under identical conditions, could I not occasionally get identical results, and hence two identical rows in a data frame that are different observations? Well yes, but only if you do not include a variable recording the `replicate number'. If you don't record the replicate number then you do not really have tidy data, as it is not possible to distinguish the common error of accidental replication of some recorded data, from genuine replicates.
+
+\section{Graphics}
+
+Visualization of data and modelling results is an essential part of statistical analysis and data science more widely. As we have already seen, base R itself provides graphics functions, but there are also add on packages for various tasks. For example the {\tt lattice} package shipped with R is very useful for visualizing grouped data. Here let's cover base R graphics and the popular {\tt ggplot2} add on package. For a good many tasks {\tt ggplot2} lets you build quite complicated visually appealing plots fairly easily. The `gg' stands for `grammer of graphics' and in keeping with this the package uses its own language to describe plot elements, which is not always obvious. 
+
+In broad overview, the difference between base R graphics and {\tt ggplot} graphics is as follows.
+\begin{itemize}
+\item In base R a high level plotting command is called with user specified data to produce an initial plot on a graphics device (a plot window or graphics file driver). That plot can then be added to using various auxiliary graphics functions for adding things like lines, arrows, points, polygons and text to the last high level plot produced. The plotting data is passed to these auxiliary functions as needed.  When we are done, we close the device or call the next high level plotting function. 
+\item In {\tt ggplot2} plots are built up as R objects, and only actually plotted once the object is {\tt print}ed to a graphics device. A plot object consists of a data frame, a co-ordinate system set up with reference to variables in the data frame, and `geometric' elements such as points, lines, polygons, etc. The plot object is added to and changed by modifier functions. Each modifier function expects some standard variables (such as {\tt x} and {\tt y}), which it usually picks up from the plot's data frame. Mapping the data frame names to these standard variables, or providing the standard variable values directly, is achieved via the {\tt aes} function, as we will see.     
+\end{itemize}
+So in {\tt ggplot2} you build up an R object representing a plot, which is then `printed' to a graphics device, and in base R you create plots by calling a sequence of functions whose side effect is to draw things on a graphics device. Base R high level plot functions tend to have huge numbers of arguments to control the look of the plot. {\tt ggplot2} instead has a set of standard plot modification functions, which can make the code for producing a plot less messy, and often quicker and easier to use. The downside of {\tt ggplot2} is that it has its own jargon, which often serves to obscure as much as it illuminates.   
+
+A useful summary of {\tt ggplot2} functions is provided by\\ 
+\verb+https://github.com/rstudio/cheatsheets/raw/master/data-visualization.pdf+\\
+but it's incomprehensible without understanding some basics first!
+
+\subsection{Scatterplots} 
+
+Let's start by producing a scatterplot in base R and with {\tt ggplot2}. As an example consider the {\tt mpg} data frame supplied with {\tt ggplot2}. The following code loads it, takes a look and simplifies the {\tt trans} variable so that it simply differentiates between automatic and manual {\tt transmission}. Then it plots miles per gallon in highway driving against engine displacement (capacity), plotting the data for manual cars in black and automatic in red. 
+\begin{lstlisting}
+library(ggplot2)
+head(mpg)
+mpg$transmission <- rep("manual",nrow(mpg)) ## simplified transmission
+mpg$transmission[grep("auto",mpg$trans)] <- "automatic" ## note automatics
+par(mfrow=c(1,2),mar=c(4,4,1,1)) 
+plot(mpg$displ,mpg$hwy,xlab="displacement",ylab="highway mpg",
+     pch=19,col=(mpg$transmission=="automatic")+1)
+\end{lstlisting}
+The result is provided in the left hand plot below. Note that the \lstinline+par(mfrow=c(1,2),mar=c(4,4,1,1))+ sets up the plot device to have 1 row of plots with 2 columns, and for the margins to be 4 characters deep on the left and bottom, and 1 deep on top and right. The {\tt plot} function call is fairly self explanatory. \lstinline+mpg$displ+ and \lstinline+mpg$hwy+ are provided as the $x$ and $y$ variables of the plot, and nice axis labels are also given. \verb+pch=19+ chooses the plotting symbol, while  \lstinline^col=(mpg$transmission=="automatic")+1^ sets the symbol colour to 2 (red) for an automatic, and 1 (black) otherwise.
+
+The plot is fairly basic, and you might like a more modern look, with a nice grey background and white grid lines. Also the symbols are overlapping in an unhelpful way, so they could usefully be smaller. These changes are easy to produce, with a few lines of code.
+\begin{lstlisting}
+plot(mpg$displ,mpg$hwy,xlab="displacement",ylab="highway mpg",type="n") # empty plot
+rect(0,0,8,50,col="lightgrey") # add a grey rectangle over plot area 
+abline(v=2:7,h=seq(10,45,by=5),col="white") # add grid lines
+points(mpg$displ,mpg$hwy,col=(mpg$transmission=="automatic")+1,pch=19,cex=.5) # data
+\end{lstlisting}
+\lstinline+cex=.5+ sets the symbol size to half its default (we could have used it as an argument to {\tt plot} in the original plot).
+\eps{-90}{.7}{mpg-base.eps}
+
+{\tt ggplot2} produces plots like the right hand one with a bit less effort, and has lots of other built in features for quickly building plots that would otherwise take rather more coding in base R. For example to produce the sort of plot on the right hand side above might involve this:
+\begin{lstlisting}
+a <- ggplot(mpg,aes(x=displ,y=hwy)) + geom_point(aes(colour=transmission))
+a    ## 'print' plot object 'a' - that is plot it!
+\end{lstlisting}
+\eps{0}{.7}{mpg-gg.eps}
+The first line of code is creating the R object representing the plot. 
+\begin{itemize}
+\item \lstinline+ggplot(mpg,aes(x=displ,y=hwy))+ sets up the plot object, specifying the data frame on which it is based and then which variables in the data frame will be the default $x,y$ variables in the plot. The co-ordinate system and axis are set up with reference to those. This mapping of data frame names to axis variables is achieved by the {\tt aes} function. Any modifications we make to the base plot will use these variable as the $x, y$ variables, unless we explicitly tell the modifier function to use a different mapping.
+\item \lstinline^+ geom_point(aes(colour=transmission))^ adds points to the empty plot created by {\tt ggplot}. Modifications are always added to an existing plot using the \verb^+^ operator (there is no \verb^-^ operator). \lstinline+geom_point+ requires {\tt x} and {\tt y} variables to plot. Since we did not specify which variables to use for these, it will use the default $x,y$ variables already specified for the plot in the {\tt ggplot} call. Optionally we can also specify a {\tt colour} variable for the plotted points. Again {\tt colour} is a variable that may be mapped to a variable in the plot's data frame, so it is specified using the {\tt aes} function. In this case {\tt colour} is mapped to the {\tt transmission} variable. 
+\item \lstinline+a+ by default invokes the {\tt print} function for a {\tt ggplot} plot object, which causes the plot to be displayed. If you were wanting to display the plot from within a function you have written, you would need to invoke {\tt print} explicitly. That is \lstinline+print(a)+.    
+\end{itemize} 
+There are two unusual things about {\tt ggplot2} relative to the standard function based R programming that we met so far. One is the \verb^+^ operator for adding plot modifications. The other is that some of the variables required by the modifier functions are not provided as function arguments, but rather as mappings to the plot data frame variables, or as explicit values, using the {\tt aes} function. To be comfortable with {\tt ggplot} you need to understand these.
+\begin{enumerate}
+\item Like all operators in R, the \verb^+^ operator for adding modifications to a plot is actually implemented as a function with 2 arguments. R has a mechanism for different versions of functions to be used for different classes of objects, so it knows to call the {\tt ggplot} specific version of the {\tt +} operator function when `adding' modifications to a plot. So instead of modification being done using code like \lstinline^a <- a + geom_point()^ ({\tt a} being a plot objext), the {\tt ggplot2} authors could have chosen to implement modification like this \lstinline+a <- ggmod(a,geom_point())+ which is actually what the underlying code does. 
+\item Supplying variables to a modifier function as mappings to the plotting data, rather than as function arguments emphasises the plot to data link. The {\tt aes} function used to create such mappings takes its name from some peculiar {\tt ggplot} terminology: the non-argument variables used by a function, such as {\tt x} and {\tt y}, are termed {\em aesthetics}. Given the dictionary definition of {\em aesthetic}, that's an odd term to use for the actual data being plotted. I tend to think of {\tt aes} as {\em any extra stuff} instead, which gets the notion of adding definitions not inherited from the existing plot. However, when looking up the help file for a modifier function, these non argument variables are listed under the heading {\tt Aesthetics} (and not under {\tt Arguments}, obviously).      
+\end{enumerate}
+As a further example suppose we do not like the axis ranges of the last plot and want to modify them. This is easily achieved with the modifier \lstinline+coord_cartesian()+. Looking this up, we find that it is does not need to be supplied with any non-argument `Aesthetic' variables, just regular arguments, so the following would do the job.
+\begin{lstlisting}
+a <- a + coord_cartesian(xlim=c(0,8),ylim=c(0,50))
+\end{lstlisting} 
+
+\subsection{plotting to a file}
+
+What if you want to save your plot to a graphics file for incorporation in a report? For {\tt ggplot} or base R, you can simply open a file type graphics device, run the code to display your plot and then close the devise. For a complete list of the available graphics devices see {\tt ?Devices}. If you know how to use one graphics file device it is pretty easy to use any of them. So here is an example of producing an {\tt .eps} file using the {\tt postscript} device. 
+\begin{lstlisting}
+postscript("mpg-base.eps",width=8,height=3)
+## the code to produce the plot goes here - e.g. from previous section
+dev.off()
+\end{lstlisting}
+This was actually the command I used to produce the first plot in the previous section. The first argument to {\tt postscript} is the filename. You either need to change to the directory where you want the file to go using \lstinline+setwd+ before calling \lstinline+postscript+, or give a full path in the filename. {\tt width} and {\tt height} give the width and height of the plot in inches. See {\tt ?postscript} for how to use other units. It is essential to close the postscript file using \lstinline+dev.off()+ when done --- you won't get a properly formed file otherwise. Other commonly use devises are {\tt pdf}, {\tt png}, {\tt jpeg} and {\tt tiff}. 
+
+{\tt ggsave} is an even easier option for plotting {\tt ggplot2} plots to file. For example
+\begin{lstlisting}
+ggsave("mpg-gg.eps",width=5,height=3)
+\end{lstlisting}
+produced the second plot in the previous section. {\tt ggsave} infers the plot file type from its extension ({\tt .eps} here).
+
+\subsection{Some univariate data plots}
 
 %\makeindex
 \printindex
