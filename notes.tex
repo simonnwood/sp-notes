@@ -100,7 +100,8 @@ In more detail.
 just follow the links under `Download and Install R'. 
 \item {\tt Rstudio} is an alternative front end for R, which many people prefer to use. It provides an R code editor, R session window, R graphics window and other information, all in a convenient `integrated environment'. If you prefer this to R as available from CRAN, you can get it from\\
 \lstinline+https://www.rstudio.com/+\\
-at the foot of the page, under `R studio desktop'. 
+at the foot of the page, under `R studio desktop', or go straight to \\
+\lstinline+https://www.rstudio.com/products/rstudio/download/#download+
 \item {\tt git} is a version control system. It helps you to write code in teams, as you must do for this course, without breaking each other's work. It also lets you keep a record of the changes you make, so that you can go back to earlier versions, if you need to. To install {\tt git} follow the instructions at\\
 \lstinline+https://www.git-scm.com/+\\
 On Windows use the default options. {\tt linux} systems often have it installed already and something like \lstinline+sudo apt install git+ will install it if not. 
@@ -297,7 +298,7 @@ At this stage, it is {\em essential} that you try out {\tt git} and {\tt github}
 
 Programming is the process of writing instructions to make a computer perform some task. The instructions have to be written in standard way that both the programmer and the computer can interpret. The rules and key words defining such a standard way of communicating define a computer language. There are many alternative languages designed for different classes of task. Here we will concentrate on the R language (and environment) for programming with data, which is widely used for the statistical analysis of data. A huge amount of statistical analysis software is written in R and is freely available. \index{R}
 
-{\em Statistical} analysis of data is concerned with the analysis of data that is in some sense a random {\em sample} from a larger {\em population}. We want to learn about the population from the sample, without being misled by particular features of the sample that arose by chance as part of the random sampling process. The random sampling approach is powerful because: \index{statistical analysis}
+{\em Statistical} analysis of data is concerned with the analysis of data that are in some sense a random {\em sample} from a larger {\em population}. We want to learn about the population from the sample, without being misled by particular features of the sample that arose by chance as part of the random sampling process. The random sampling approach is powerful because: \index{statistical analysis}
 \begin{enumerate}
 \item it allows reliable conclusions with known levels of accuracy to be drawn without having to gather data from the whole population, which may be impossible, or prohibitively expensive.       
 \item random sampling eliminates the unknowably large bias that occurs if we try to learn about the population from a non-random sample, replacing that bias with a random uncertainty of known magnitude.   
@@ -468,6 +469,18 @@ Line by line it works like this:
 \item \lstinline+paste(pow,collapse=" ")+ is finally used to put the words in {\tt pow} back into a single string. It is the setting of {\tt collapse} to something non-NULL (here a space) that signals to {\tt paste} that this should happen.
 \end{enumerate}
 
+\subsection*{Exercises}
+
+\begin{enumerate}
+\item Look up the help page for {\tt gsub} function, and use {\tt gsub} to remove the commas and full stops from the poem before tabulating the length of words. 
+\item For the original {\tt poem}, write R code to insert a line end character, \lstinline+"\n"+, after each comma or full stop, and print out the result using the {\tt cat} function.
+\item Run the code \lstinline+set.seed(0);y <- rt(100,df=4)+. Use the {\tt hist} function to visualize {\tt y}. Now using the {\tt mean} and {\tt sd} functions to find the mean and standard deviation of {\tt y}, write code to remove any points in {\tt y} that are further than 2 standard deviations from the mean, and calculate the mean of the remainder.
+\item Using your code from the previous section to write a function that will take any vector {\tt y} and compute its mean after removal of points more than {\tt k} standard deviations from the original mean of {\tt y}. Set the default value of {\tt k} to 2.
+
+\end{enumerate}
+
+
+
 \section{A slightly more systematic look at R}
 
 When you start the {\tt R} programme, two important things are created. The first is an {\tt R} terminal, into which you can type commands written in the R programming language - this is visible. The second is an {\em environment}, known as the user workspace or global environment which will hold the objects created by your commands - this is invisible, but is there as an extendable piece of computer memory. In R an environment consists of a set of symbols used as the names of objects along with the data defining those objects (known together as a {\em frame}) and a pointer to an enclosing `parent' environment. R makes extensive use of sets of nested environments, but we don't need to go into too much detail on this aspect at the moment.
@@ -484,7 +497,7 @@ Let's look at the basic data structures you {\em must} know about to programme i
 
 \subsubsection{Vectors and recycling}
 
-The most basic type of data structure in R is a vector (a one dimensional array). \lstinline+x[i]+ accesses element {\tt i} of vector {\tt x} ({\tt i} is a positive integer). Even scalars are just vectors of length 1 (so e.g. \lstinline+3[1]+ is perfectly valid and evaluates to 3, of course). As we have already seen, vectors can store data of different {\em types}: integer or real numbers (type 'double'), character strings, logical variables. The class of vectors is simply determined by the type of thing they contain. Here are some basic examples. \index{R!class}\index{typeof}\index{data types}\index{vectors}
+The most basic type of data structure in R is a vector (a one dimensional array). \lstinline+x[i]+ accesses element {\tt i} of vector {\tt x} ({\tt i} is a positive integer). Even scalars are just vectors of length 1 (so e.g. \lstinline+3[1]+ is perfectly valid and evaluates to 3, of course). As we have already seen, vectors can store data of different {\em types}: integer or real numbers (type `double'), character strings, logical variables. The class of vectors is simply determined by the type of thing they contain. Here are some basic examples. \index{R!class}\index{typeof}\index{data types}\index{vectors}
 \begin{lstlisting}
 > a3d <- c(TRUE,FALSE,FALSE) ## create an example logical vector
 > class(a3d)     ## its class
@@ -532,14 +545,14 @@ While vectors are one dimensional arrays data, matrices are 2 dimensional arrays
 a <- array(1:24,c(3,2,4))
 \end{lstlisting}
 creates a $3 \times 2 \times 4$ array, filling it with the numbers given in the first argument. To access the array we just give the dimension indices for the elements required. Leaving an index blank implies that we require all elements for that dimension. For example.
-\begin{lstlisting}
+\begin{verbatim}
 > a[3,2,3] ## element 3,2,3
 [1] 18
 > a[1:2,1,] 
      [,1] [,2] [,3] [,4]
 [1,]    1    7   13   19
 [2,]    2    8   14   20
-\end{lstlisting}  
+\end{verbatim}  
 notice how the second example accesses all elements for which the first index is 1 or 2, and the second index is 1.
 
 Arrays are actually stored as vectors, with class \lstinline+"array"+ and a {\tt dim} attribute. The {\tt dim} attribute is a vector containing the length of each dimension (so $3,2,4$ above). Since the underlying storage is vector, we can also access it as such, we just need to know that the data are stored in the vector in `column major order'. For example if $d$ is the {\tt dim} attribute of a 3 dimensional array, $a$, then $a[i,j,k]$ is equivalent to $a[i + (j-1)d_1 + (k-1)d_1d_2]$. For example \index{array!vector access}
@@ -551,12 +564,12 @@ Arrays are actually stored as vectors, with class \lstinline+"array"+ and a {\tt
 Notice that this is quite useful if you need to fill in or access several scattered individual elements of an array at once.
 
 Two dimensional arrays, {\bf matrices}, play a central role in statistics. Data properly arranged for analysis are usually in matrix form with columns as variables and rows as observations (often referred to as `tidy data'), while many statistical methods rely heavily on matrix computations. Hence matrices are treated as a special class of array, with their own \lstinline+"matrix"+ class, a {\tt matrix} function used to create them, special operators for matrix multiplication and other matrix products, and functions implementing many matrix decomposition and matrix equation solving tasks. We will cover this in more detail later, but here is a quick example, which uses the matrix multiplication operator, \lstinline+%*%+.\index{matrix}\index{matrix!multiplication}\index{tidy data}
-\begin{lstlisting}
+\begin{verbatim}
 B <- matrix(1:6,2,3); B ## create a matrix (filled by col)
      [,1] [,2] [,3]
 [1,]    1    3    5
 [2,]    2    4    6
-> B[1,2] <- -1            ## change elment 1,2
+> B[1,2] <- -1            ## change element 1,2
 > a <- c(.3,-1.2,2.3)    ## a 3-vector
 > B %*% a                 ## matrix multiplication
      [,1]
@@ -566,12 +579,24 @@ B <- matrix(1:6,2,3); B ## create a matrix (filled by col)
      [,1] [,2] [,3]
 [1,]  0.3 -2.3 -6.0
 [2,] -2.4  1.2 13.8
-\end{lstlisting}   
+\end{verbatim}   
 Do make sure you {\em really} understand the difference between the last two commands! It {\em really} matters.
+
+\subsubsection*{Exercise}
+
+Run the code 
+\begin{lstlisting}
+set.seed(5); n <- 2000
+w <- runif(n)
+A <- matrix(runif(n*n),n,n)
+system.time(B <- diag(w) %*% A )
+\end{lstlisting}
+noting how long the last line takes to run. \lstinline+diag(w)+ forms the diagonal matrix with leading diagonal elements given by the elements of {\tt w} (try an $n=5$ example if that's not clear). By considering what actually happens when a diagonal matrix multiplies another matrix, and how matrices are stored in R, find a way of calculating {\tt B} using the recycling rule without using {\tt diag} or \lstinline+%*%+. Time this new code, and check that it gives the same answer as the old code (the {\tt range} function might be useful).
+
 
 \subsubsection{Lists}
 
-Lists are the basic building blocks of all sorts of complicated objects in R. Each item of a list can be any sort R object, including another list, and each item can be named. Suppose {\tt a} is a list. Individual items can be accessed by number using \lstinline+a[[i]]+ where {\tt i} is an integer. If an item has a name, \lstinline+"foo"+ for example, it can also be retrieved that way using \lstinline+a[["foo"]]+ or \lstinline+a$foo+. We can also access sublists, also by name of number. e.g. \lstinline+a[c(2,4)]+ or \lstinline+a[c("foo","bar")]+ both produce 2 item lists. Note the difference: \lstinline+[[]]+ retrieves the item, \lstinline+[]+ retrieves a list of the required items (even if there is only one). Here is a simple example, which uses function {\tt list} to create an example list.\index{list}
+Lists are the basic building blocks of all sorts of complicated objects in R. Each item of a list can be any sort of R object, including another list, and each item can be named. Suppose {\tt a} is a list. Individual items can be accessed by number using \lstinline+a[[i]]+ where {\tt i} is an integer. If an item has a name, \lstinline+"foo"+ for example, it can also be retrieved that way using \lstinline+a[["foo"]]+ or \lstinline+a$foo+. We can also access sublists, also by name or number. e.g. \lstinline+a[c(2,4)]+ or \lstinline+a[c("foo","bar")]+ both produce 2 item lists. Note the difference: \lstinline+[[]]+ retrieves the item, \lstinline+[]+ retrieves a list of the required items (even if there is only one). Here is a simple example, which uses function {\tt list} to create an example list.\index{list}
 \begin{lstlisting}
 > stuff <- list(a=1:6,txt="furin cleavage site",l2 = function(x) log(x^2),
 +          more = list(a="er",b=42))
@@ -606,7 +631,7 @@ Levels: bill fred sue
 [1] 2 3 3 1 2
 \end{lstlisting}
 
-{\bf Data Frames} are basically matrices, in which the columns have names and can have different types (numeric, logical, factor, character, etc). The can be accessed like matrices, or like lists. They provide the best way of organising data for many types of statistical analysis. Here is a basic example 
+{\bf Data Frames} are basically matrices, in which the columns have names and can have different types (numeric, logical, factor, character, etc). They can be accessed like matrices, or like lists. They provide the best way of organising data for many types of statistical analysis. Here is a basic example 
 \begin{lstlisting}
 > dat <- data.frame(y = c(.3,.7,1.2),x = 1:3,fac = factor(c("a","b","a")))
 > dat      ## a data.frame
@@ -616,10 +641,39 @@ Levels: bill fred sue
 3 1.2 3   a
 > dim(dat) ## like a matrix
 [1] 3 3
-> dat$fac  ## and lie a list!
+> dat$fac  ## and like a list!
 [1] a b a
 Levels: a b
 \end{lstlisting}
+
+\subsection{Attributes}
+
+As already mentioned, attributes are simply R objects attached to other objects, and carried around with them (a bit like a set of `post it' notes). They can be useful for storing things that are somehow properties of an object. We can find out about an objects attributes using the \lstinline+attributes+ function. For example
+\begin{lstlisting}
+> attributes(PlantGrowth) ## PlantGrowth is an R data set
+$names
+[1] "weight" "group" 
+
+$class
+[1] "data.frame"
+
+$row.names
+ [1]  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25
+[26] 26 27 28 29 30
+
+> A <- matrix(1:6,2,3) ## create a matrix
+> attributes(A)        ## check its attributes
+$dim
+[1] 2 3
+\end{lstlisting}
+Single attributes can be queried, reset or created using the \lstinline+attr+ function. For example.
+\begin{lstlisting}
+> attr(A,"dim") ## query attibute
+[1] 2 3
+> attr(A,"foo") <- list(1:3,"fred") ## create or reset attribute
+\end{lstlisting}
+Attributes can be quite useful when your programming task requires an object that modifies a standard object (e.g. a matrix) by adding some extra information to it, but you still want all the standard functions that work with the object to function as for the standard object (e.g. matrix decompositions).    
+
 \subsubsection{str and object structure}
 
 Before moving on from data structures it is worth mentioning one useful function: {\tt str} prints a summary of the structure of any R object. This is a good way of seeing what an object actually looks like, since many classes of object have their own {\tt print} function, so that only rather limited information is printed when you simply type the object name at the command line. For example \index{str, structure}
@@ -724,7 +778,7 @@ while (condition) {
   R code
 }
 \end{lstlisting}
-{\tt for} loops are the most commonly used.
+but {\tt for} loops are the most commonly used.
 
 Note that for a vector oriented language like R, these sorts of tasks can often be accomplished efficiently by exploiting the fact that vectorized operations loop over vectors automatically, while vectors can also be subsetted so that we act only on the parts meeting some condition. Vectorized operations are usually much faster than explicitly coded loops, so generally it is a good idea to only write explicit loops when vectorization is not possible, or if the operations to be conducted at each loop iteration are expensive enough that the overhead of explicit looping is unimportant. For example, you should never write \lstinline+for (i in 1:length(x)) y[i] <- x[i]+ since \lstinline+y <- x+ does the same thing more efficiently, with less code:
 \begin{lstlisting}
@@ -746,7 +800,7 @@ Functions were introduced in Section \ref{firstR}, but some more detail is requi
 \item A function may make use of objects not in its argument list: if R encounters a symbol not in the function argument list and not previously created within the function, then it searches for it, first in the environment in which the function was {\em defined}\footnote{This is known as `lexical scoping', because the parent environment of the \index{R!lexical scoping} function is where it was written down.} (which is not necessarily the environment from which it was called). If that fails it looks in the environments returned by function {\lstinline+search()+}. A benign use of this mechanism is to call other functions not in a function's argument list, or to access constants such as those stored in {\lstinline+.Machine+}. Using this mechanism to provide a function with other objects that you have created is generally bad practice, because it makes for complex hard-to-debug code. Generally all objects that a function needs should be provided as its arguments. If this gets unwieldy, then group the arguments into a smaller number of list arguments.   
 \end{enumerate}
 
-Here is an example of a function definition. It generalises one-to-one real functions with power series representations to symmetric matrices using the following idea. The eigen-decomposition of symmetric matrix ${\bf A}$ is ${\bf A} = {\bf U}{\bm \Lambda}{\bf U}\ts$ where the columns of ${\bf U}$ are eigenvectors of $\bf A$ and ${\bm \Lambda}$ is the diagonal matrix of eigenvalues. The generalization of a function, $f$ is then $f({\bf A}) = {\bf U} f({\bm \Lambda}){\bf U}\ts$, where $f$ is applied elementwise to $\bm \Lambda$. \index{functions!definition}\index{functions!argument}\index{eigen}\index{matrix!multiplication}
+Here is an example of a function definition. It generalises one-to-one real functions with power series representations to symmetric matrices using the following idea. The eigen-decomposition of symmetric matrix ${\bf A}$ is ${\bf A} = {\bf U}{\bm \Lambda}{\bf U}\ts$ where the columns of ${\bf U}$ are eigenvectors of $\bf A$ and ${\bm \Lambda}$ is the diagonal matrix of eigenvalues. The generalization of a function, $f$ is then $f({\bf A}) = {\bf U} f({\bm \Lambda}){\bf U}\ts$, where $f$ is applied element wise to $\bm \Lambda$'s diagonal. \index{functions!definition}\index{functions!argument}\index{eigen}\index{matrix!multiplication}
 \begin{lstlisting}
 mat.fun <- function(A,fun=I) {
   ea <- eigen(A,symmetric=TRUE)
@@ -761,7 +815,7 @@ Now let us use the function, with a random matrix. First a sanity check that the
 \begin{lstlisting}
 > set.seed(1)
 > m <- 3; B <- crossprod(matrix(runif(m*m),m,m)) ## example matrix
-> range(B - mat.fun(B)) ## cehck input matches output
+> range(B - mat.fun(B)) ## check input matches output
 [1] -2.220446e-16  6.661338e-16
 \end{lstlisting}
 This confirms that the output matches the first argument when the default identity function is used.
@@ -833,15 +887,15 @@ ff <- function(...,res=1) res;f(r=2)
 
 The cumulative distribution function, $F$, of a random variable $X$ is defined as $F(x) = \text{Pr}(X\le x)$. Hence if we have a random sample $x_1, x_2, \ldots, x_n$ of observations of $X$ we can define an {\em empirical} cumulative distribution function
 $$
-\hat F(x) = \frac{1}{n}\sum_{i=0}^n \mathbb{I} (x_i \le x)
+\hat F(x) = \frac{1}{n}\sum_{i=1}^n \mathbb{I} (x_i \le x)
 $$
 where $\mathbb{I}$ is the indicator function. Suppose we want to write a function to take a sample of data in a vector $\bf x$ and plot its CDF. There are many ways to do this, so the first thing we have to do is to write down a plan. Usually this will involve jotting down ideas and maybe sketches on a piece of paper. Here are my notes for this task\ldots\index{CDF}\index{planning}
 
 \eps{0}{.7}{cdf-plan.pdf}
 
-The sketch of the CDF  is me trying to get my head around what the definition of $\hat F$ really means, and whether the $x_i$ values are at the start of a step or just before it (the former). As a result of this figuring out, I get to a plan that is a bit better than just evaluating the formula for $\hat F$ for a finely spaced sequence of $x$ values. Obviously more complicated tasks may involve several sheets of paper, false starts, and the need to summarize the design at the end. Code that involved no sheets of paper and none of this planning process is often poorly designed, error prone and slow to write. 
+The sketch of the CDF  is me trying to get my head around what the definition of $\hat F$ really means, and whether the $x_i$ values are at the start of a step or just before it (the former). As a result of this figuring out, I get to a plan that is a bit better than just evaluating the formula for $\hat F$ for a finely spaced sequence of $x$ values. Obviously more complicated tasks may involve several sheets of paper, false starts, and the need to summarize the design at the end. Code that involves no sheets of paper and none of this planning process is often poorly designed, error prone and slow to write. 
 
-To implement the design I used built in functions, {\tt sort}, {\tt plot} and {\tt lines}. Look up the help pages for these. Plots is a high level function for producing scatter plots, while lines is a lower level function for adding lines to an existing plot ({\tt points} is an equivalent for adding points). For a little extra flourish I used {\tt expression} for defining the y axis label --- see {\tt ?plotmath} for how that works. Here is the code -- makes sure you understand each line. \index{plot}\index{sort}\index{lines}\index{points}
+To implement the design I used built in functions, {\tt sort}, {\tt plot} and {\tt lines}. Look up the help pages for these. {\tt plot} is a high level function for producing scatter plots, while {\tt lines} is a lower level function for adding lines to an existing plot ({\tt points} is an equivalent for adding points). For a little extra flourish I used {\tt expression} for defining the y axis label --- see {\tt ?plotmath} for how that works. Here is the code -- makes sure you understand each line. \index{plot}\index{sort}\index{lines}\index{points}
 \begin{lstlisting}
 ecdf <- function(x) {
 ## function to plot empirical cdf of sample x
@@ -865,8 +919,8 @@ ecdf(x)
 \subsubsection{Avoiding the loop and vectorization}
 You will notice that {\tt ecdf} uses a {\tt for} loop for plotting each line segment in turn, but actually if you check the help page {\tt ?lines} you will see that {\tt lines} has a mechanism for plotting multiple separate line segments all at once - we just separate the co-ordinates defining the lines with an {\tt NA} (not available) to indicate that the points either side of the {\tt NA} should not be joined by a line. Since vectorized code is usually faster than loop code, lets think about how to uses this feature.
 \begin{enumerate}
-\item For $n$ data we have $n+1$ line segments, each defined by 2 $x,y$ points, and between each line segment we will need $n$ {\tt NA} values. 
-\item So let's create vectors, {\tt p1} and {\tt x1} each of length $3n+2$ to contain the line segment definitions and breaks, and fill them in\ldots
+\item For $n$ data we have $n+1$ line segments, each defined by 2 $x,y$ points, and between each line segment we will need {\tt NA} values ($n$ in total). 
+\item So let's create vectors, {\tt p1} and {\tt x1} each of length $3n+2$ to contain the line segment definitions and breaks, and fill them in.
 \end{enumerate}
 Here is the code that could replace everything after \lstinline+## plot the x, p points+ in {\tt ecdf}.
 \begin{lstlisting}
@@ -966,7 +1020,7 @@ It is also possible to sample with different probabilities of sampling each obse
 > sample(1:100,10,prob=1/1:100)
  [1] 13  1  5 19 24 14 12 17 20 63 
 \end{lstlisting}
-Note that we are sampling with probability proportional to {\tt prob} -- {\tt sample} will normalise the probabilities so that they sum to one internally, before using them. In this example we only got one observation $<25$. Does that seem as expected? Let's work out the probability of sampling an observation $<25$ as a sanity check\ldots 
+Note that we are sampling with probability proportional to {\tt prob} -- {\tt sample} will normalise the probabilities so that they sum to one internally, before using them. In this example we only got one observation $>25$. Does that seem as expected? Let's work out the probability of sampling an observation $<25$ as a sanity check\ldots 
 \begin{lstlisting}
 > sum(1/1:24)/sum(1/1:100)
 [1] 0.7279127 ## seems fine!
@@ -980,7 +1034,7 @@ A standard toy problem in probability is the birthday problem. What is the proba
 \item For each matrix row, count the unique birthdays.
 \item Find the proportion for which that count is $<30$ 
 \end{enumerate} 
-Here is an implementation, it uses the {\tt apply} functions to apply a function counting the unique birthdays to each row of the birthday matrix. The second argument of apply gives the dimensions of the first argument over which the function should be applied. Here the first argument is a matrix, so I give one as the second argument to apply over rows.
+Here is an implementation, it uses the {\tt apply} functions to apply a function counting the unique birthdays to each row of the birthday matrix. The second argument of {\tt apply} gives the dimensions of the first argument over which the function should be applied. Here the first argument is a matrix, so I give one as the second argument, to apply over rows.
 \begin{lstlisting}
 n <- 1000000 ## number of groups
 bd <- matrix(sample(1:366,30*n,replace=TRUE,prob=c(rep(4,365),1)),n,30) ## birthdays
@@ -988,7 +1042,7 @@ p <- mean(apply(bd,1,function(x) length(unique(x)))!=30)
 \end{lstlisting}\index{apply}
 It gives the answer p=0.706. Obviously there is some stochastic variability in that answer - we could work out the standard error of the answer using the variance of a Bernoulli random variable: \lstinline+(p*(1-p)/n)^.5+ is about 0.0005. Or if we are lazy we could just run the simulation repeatedly to assess the variability of the answer. 
 
-There are two rather appealing features of this way of answering the question. Firstly, it was very easy, in a way that most people do not find the probability calculation based answer. More importantly, it is very easy to generalize to more modify in ways that would make the exact answer very difficult to work out. For example, births are not spread out evenly throughout the year, so the probabilities of the different birthdays are not all equal. Given appropriate data it would be easy to adjust the probabilities in the sampling step, and get an adjusted probability for that case too.  
+There are two rather appealing features of this way of answering the question. Firstly, it was very easy, in a way that most people do not find the probability calculation based answer. More importantly, it is very easy to generalize to situations for which the exact answer would be very difficult to work out. For example, births are not spread out evenly throughout the year, so the probabilities of the different birthdays are not all equal. Given appropriate data it would be easy to adjust the probabilities in the sampling step, and get an adjusted probability for that case too.  
 
 \subsubsection{Sampling from distributions}
 
@@ -1057,12 +1111,12 @@ plot(epi$S,ylim=c(0,max(epi$S)),xlab="day",ylab="N") ## S black
 points(epi$E,col=4);points(epi$I,col=2) ## E (blue) and I (red)
 ...
 \end{lstlisting}
-\eps{-90}{.5}{seir.eps}
+\eps{-90}{.6}{seir.eps}
 Comparing the left two columns we see that neglecting the variability in $\beta$ means that the severity of the epidemic will be overestimated by the model. Comparing the right two columns we see that social distancing slows the epidemic down, but can make it larger in the long run, by suppressing the variability in $\beta$ (as everyone has to follow the same rules). Perhaps most surprising of all, scientists who tried to point out the problems with neglecting variability in $\beta$ had extreme difficulty getting published, and were often vilified on social media. Some models used for policy did represent the differences in contact rates between different age groups. But the main survey used to do this was based on one day diaries kept by survey participants of whom 7 were over 75 and none over 80. This is quite limited data for the age groups that make up 3/4 of Covid deaths to date. 
 
 \subsection{Simple simulation study: testing an approximate confidence interval}
 
-Suppose we observe a binomial random variable $X \sim \text{binom}(n,p)$ (number of successes in $n$ independent trials, each with probability of success $p$). $\hat p = X/n$ is an obvious estimator, of $p$, and a simple plug in estimate of its variance is then $\hat \sigma^2_p = \hat p (1-\hat p)/n$, suggesting approximate 95\% confidence interval $\hat p \pm \hat \sigma_p$. The central limit theorem implies that this interval will have the correct coverage probability in the $n \to \infty$ limit, but how will it behave when $n=20$, for example? Let's investigate this question for the case $p=.2$. 
+Suppose we observe a binomial random variable $X \sim \text{binom}(n,p)$ (number of successes in $n$ independent trials, each with probability of success $p$). $\hat p = X/n$ is an obvious estimator, of $p$, and a simple plug in estimate of its variance is then $\hat \sigma^2_p = \hat p (1-\hat p)/n$, suggesting approximate 95\% confidence interval $\hat p \pm 1.96 \hat \sigma_p$. The central limit theorem implies that this interval will have the correct coverage probability in the $n \to \infty$ limit, but how will it behave when $n=20$, for example? Let's investigate this question for the case $p=.2$. 
   
 The basic idea, is that we should generate a large number of observations $x$ and from each one compute a 95\% confidence interval for $p$. We then count up what proportion of those intervals include the true value of $p$ we used in the simulation. If the intervals were exact then that proportion would be very close to 0.95.
 
@@ -1098,11 +1152,11 @@ The exact format depends on your operating system, but note that R uses \verb+/+
 \begin{lstlisting}
 > setwd("/home/sw283/lnotes")
 \end{lstlisting}
-making sure that you specify a valid path for your filesystem. For example, on windows the path includes a letter identifying the disk or other memory device where the directory is located. e.g. \lstinline+setwd("c:/foo/bar")+ for subdirectory `bar' of directory `foo' on \verb+c:+. Note the use of forward slashes in place of the windows default back slashes.
+making sure that you specify a valid path for your filesystem. For example, on windows the path includes a letter identifying the disk or other storage device where the directory is located. e.g. \lstinline+setwd("c:/foo/bar")+ for subdirectory `bar' of directory `foo' on \verb+c:+. Note the use of forward slashes in place of the windows default back slashes.
 
 \subsection{Reading in code: source()}
 \index{source}
-Before reading in data, consider reading in code. The \lstinline+source+ function reads in code and runs it from a file. This is particularly useful for reading in function definitions from a file, for example. For example:
+Before reading in data, consider reading in code. The \lstinline+source+ function reads in code and runs it from a file. This is particularly useful for reading in function definitions from a file. For example:
 \begin{lstlisting}
 source("mycode.r")
 \end{lstlisting}
@@ -1115,7 +1169,7 @@ dump(c("a","alice","Ba"),file="stuff.R")
 
 \subsection{Reading from and writing to text files of data}
 
-Text files have information stored in human readable form. You can open the file in an editor and understand it. Text files are a very portable way of storing data, but the files are quite a bit larger than is strictly necessary to stroe the information in the file. R has a number of functions for reading data from text files. All have many arguments to let you adapt to the way that the data has been stored. \index{file!text}
+Text files have information stored in human readable form. You can open the file in an editor and understand it. Text files are a very portable way of storing data, but the files are quite a bit larger than is strictly necessary to store the information in the file. R has a number of functions for reading data from text files. All have many arguments to let you adapt to the way that the data has been stored. \index{file!text}
 
 As a simple example consider a file called {\tt data.txt} containing 
 \begin{verbatim}
@@ -1148,13 +1202,13 @@ Read 2 records
 Actually, the file does not strictly need to have the data arranged in columns, simply in a repeated pattern.
 
 Often the list form of the data is not as useful as having it in a data frame. So let's name the items in the list according to the first row of {\tt data.txt} and convert to a data frame.
-\begin{lstlisting}
+\begin{verbatim}
 > names(b) <- scan("data.txt",what="c",n=3)
 > d <- data.frame(b); d
   name age height
 1  sue  21    1.6
 2 fred  19    1.7
-\end{lstlisting}
+\end{verbatim}
 
 Reading columns of data into a data frame in R is such a common task that a number of functions are provided for this purpose. The main one is {\tt read.table}. Take a look at {\tt ?read.table} for the variations. An easier way of reading {\tt data.txt} directly into {\tt d} would be \index{data frame!read in}\index{read.table}
 \begin{lstlisting}
@@ -1199,7 +1253,7 @@ By tidy data is meant that data are arranged in a matrix so that:\index{tidy dat
 \end{enumerate}
 and it is recognised that what counts as `an observation' can depend on the subset of variables of interest. For example,
 this data frame is in tidy form if interest is in student's grades each week. 
-\begin{lstlisting}
+\begin{verbatim}
 name    d.o.b.  nationality week grade
 George  11/2/01 GB          1    B
 George  11/2/01 GB          2    C
@@ -1208,14 +1262,14 @@ Anna    15/6/00 GB          1    A
 Anna    15/6/00 GB          2    B
 Anna    15/6/00 GB          3    A
 .       .       .           .    .
-\end{lstlisting}
+\end{verbatim}
 But if we are only interested in birth dates and nationality of students, then we would really want to simplify to
-\begin{lstlisting}
+\begin{verbatim}
 name    d.o.b.  nationality 
 George  11/2/01 GB          
 Anna    15/6/00 GB          
 .       .       .           
-\end{lstlisting}
+\end{verbatim}
 It is easy to get the second data frame form the first (\lstinline+marks+, say) in base R using
 \begin{lstlisting}
 student <- unique(marks[,c("name","d.o.b.","nationality")])
@@ -1237,27 +1291,25 @@ Visualization of data and modelling results is an essential part of statistical 
 In broad overview, the difference between base R graphics and {\tt ggplot} graphics is as follows.
 \begin{itemize}
 \item In base R a high level plotting command is called with user specified data to produce an initial plot on a graphics device (a plot window or graphics file driver). That plot can then be added to using various auxiliary graphics functions for adding things like lines, arrows, points, polygons and text to the last high level plot produced. The plotting data is passed to these auxiliary functions as needed.  When we are done, we close the device or call the next high level plotting function. 
-\item In {\tt ggplot2} plots are built up as R objects, and only actually plotted once the object is {\tt print}ed to a graphics device. A plot object consists of a data frame, a co-ordinate system set up with reference to variables in the data frame, and `geometric' elements such as points, lines, polygons, etc. The plot object is added to and changed by modifier functions. Each modifier function expects some standard variables (such as {\tt x} and {\tt y}), which it usually picks up from the plot's data frame. Mapping the data frame names to these standard variables, or providing the standard variable values directly, is achieved via the {\tt aes} function, as we will see.     
+\item In {\tt ggplot2} plots are built up as R objects, and only actually plotted once the object is {\tt print}ed to a graphics device. A plot object consists of a data frame, a co-ordinate system set up with reference to variables in the data frame, and `geometric' elements such as points, lines, polygons, etc. The plot object is added to and changed by modifier functions. Each modifier function expects some standard variables (such as {\tt x} and {\tt y}), which it usually picks up from the plot's data frame. Mapping the data frame names to these standard variables, or providing the standard variable values directly, is achieved via the {\tt aes} function, as we will see. \index{ggplot}\index{ggplot!aes}    
 \end{itemize}
-So in {\tt ggplot2} you build up an R object representing a plot, which is then `printed' to a graphics device, and in base R you create plots by calling a sequence of functions whose side effect is to draw things on a graphics device. Base R high level plot functions tend to have huge numbers of arguments to control the look of the plot. {\tt ggplot2} instead has a set of standard plot modification functions, which can make the code for producing a plot less messy, and often quicker and easier to use. The downside of {\tt ggplot2} is that it has its own jargon, which often serves to obscure as much as it illuminates.   
-
-A useful summary of {\tt ggplot2} functions is provided by\\ 
+So in {\tt ggplot2} you build up an R object representing a plot, which is then `printed' to a graphics device, and in base R you create plots by calling a sequence of functions whose side effect is to draw things on a graphics device. Base R high level plot functions tend to have huge numbers of arguments to control the look of the plot. {\tt ggplot2} instead has a set of standard plot modification functions, which can make the code for producing a plot less messy, and often quicker and easier to use. The downside of {\tt ggplot2} is that it has its own jargon, which often serves to obscure as much as it illuminates. A useful summary of {\tt ggplot2} functions is provided by\\ 
 \verb+https://github.com/rstudio/cheatsheets/raw/master/data-visualization.pdf+\\
 but it's incomprehensible without understanding some basics first!
 
-\subsection{Scatterplots} 
+\subsection{Scatterplots, ggplot and base R} 
 
-Let's start by producing a scatterplot in base R and with {\tt ggplot2}. As an example consider the {\tt mpg} data frame supplied with {\tt ggplot2}. The following code loads it, takes a look and simplifies the {\tt trans} variable so that it simply differentiates between automatic and manual {\tt transmission}. Then it plots miles per gallon in highway driving against engine displacement (capacity), plotting the data for manual cars in black and automatic in red. 
+Let's start by producing a scatterplot in base R and with {\tt ggplot2}. As an example consider the {\tt mpg} data frame supplied with {\tt ggplot2}, on fuel consumption of cars. The following code loads it, takes a look and simplifies the {\tt trans} variable so that it simply differentiates between automatic and manual {\tt transmission}. Then it plots miles per gallon in highway driving against engine displacement (capacity), plotting the data for manual cars in black and automatic in red. 
 \begin{lstlisting}
 library(ggplot2)
 head(mpg)
-mpg$transmission <- rep("manual",nrow(mpg)) ## simplified transmission
+mpg$transmission <- rep("manual",nrow(mpg)) ## simplified transmission variable
 mpg$transmission[grep("auto",mpg$trans)] <- "automatic" ## note automatics
 par(mfrow=c(1,2),mar=c(4,4,1,1)) 
 plot(mpg$displ,mpg$hwy,xlab="displacement",ylab="highway mpg",
      pch=19,col=(mpg$transmission=="automatic")+1)
-\end{lstlisting}
-The result is provided in the left hand plot below. Note that the \lstinline+par(mfrow=c(1,2),mar=c(4,4,1,1))+ sets up the plot device to have 1 row of plots with 2 columns, and for the margins to be 4 characters deep on the left and bottom, and 1 deep on top and right. The {\tt plot} function call is fairly self explanatory. \lstinline+mpg$displ+ and \lstinline+mpg$hwy+ are provided as the $x$ and $y$ variables of the plot, and nice axis labels are also given. \verb+pch=19+ chooses the plotting symbol, while  \lstinline^col=(mpg$transmission=="automatic")+1^ sets the symbol colour to 2 (red) for an automatic, and 1 (black) otherwise.
+\end{lstlisting}\index{plot}\index{plot!pch}\index{plot!col}\index{plot!xlab}\index{par!mfrow}\index{par!mar}
+The result is provided in the left hand plot below. Note that \lstinline+par(mfrow=c(1,2),mar=c(4,4,1,1))+ sets up the plot device to have 1 row of plots with 2 columns, and for the margins to be 4 characters deep on the left and bottom, and 1 deep on top and right. The {\tt plot} function call is fairly self explanatory. \lstinline+mpg$displ+ and \lstinline+mpg$hwy+ are provided as the $x$ and $y$ variables of the plot, and nice axis labels are also given. \verb+pch=19+ chooses the plotting symbol, while  \lstinline^col=(mpg$transmission=="automatic")+1^ sets the symbol colour to 2 (red) for an automatic, and 1 (black) otherwise.
 
 The plot is fairly basic, and you might like a more modern look, with a nice grey background and white grid lines. Also the symbols are overlapping in an unhelpful way, so they could usefully be smaller. These changes are easy to produce, with a few lines of code.
 \begin{lstlisting}
@@ -1265,33 +1317,40 @@ plot(mpg$displ,mpg$hwy,xlab="displacement",ylab="highway mpg",type="n") # empty 
 rect(0,0,8,50,col="lightgrey") # add a grey rectangle over plot area 
 abline(v=2:7,h=seq(10,45,by=5),col="white") # add grid lines
 points(mpg$displ,mpg$hwy,col=(mpg$transmission=="automatic")+1,pch=19,cex=.5) # data
-\end{lstlisting}
+\end{lstlisting}\index{rect}\index{abline}\index{points}\index{cex}
 \lstinline+cex=.5+ sets the symbol size to half its default (we could have used it as an argument to {\tt plot} in the original plot).
 \eps{-90}{.7}{mpg-base.eps}
 
-{\tt ggplot2} produces plots like the right hand one with a bit less effort, and has lots of other built in features for quickly building plots that would otherwise take rather more coding in base R. For example to produce the sort of plot on the right hand side above might involve this:
+{\tt ggplot2} produces plots like the right hand one with a bit less effort, and has lots of other built in features for quickly building plots that would otherwise take rather more coding in base R. For example to produce the sort of plot on the right hand side above might involve this:\index{ggplot}\index{ggplot!aes}\index{ggplot!\verb+geom_point+}
 \begin{lstlisting}
-a <- ggplot(mpg,aes(x=displ,y=hwy)) + geom_point(aes(colour=transmission))
+a <- ggplot(mpg,aes(x=displ,y=hwy)) + geom_point(aes(colour=transmission)) +
+      geom_smooth(method=gam,formula=y~s(x)) ## add a smooth as it's easy!
 a    ## 'print' plot object 'a' - that is plot it!
 \end{lstlisting}
-\eps{0}{.7}{mpg-gg.eps}
+\eps{0}{.7}{mpg-gg.pdf}
 The first line of code is creating the R object representing the plot. 
 \begin{itemize}
 \item \lstinline+ggplot(mpg,aes(x=displ,y=hwy))+ sets up the plot object, specifying the data frame on which it is based and then which variables in the data frame will be the default $x,y$ variables in the plot. The co-ordinate system and axis are set up with reference to those. This mapping of data frame names to axis variables is achieved by the {\tt aes} function. Any modifications we make to the base plot will use these variable as the $x, y$ variables, unless we explicitly tell the modifier function to use a different mapping.
 \item \lstinline^+ geom_point(aes(colour=transmission))^ adds points to the empty plot created by {\tt ggplot}. Modifications are always added to an existing plot using the \verb^+^ operator (there is no \verb^-^ operator). \lstinline+geom_point+ requires {\tt x} and {\tt y} variables to plot. Since we did not specify which variables to use for these, it will use the default $x,y$ variables already specified for the plot in the {\tt ggplot} call. Optionally we can also specify a {\tt colour} variable for the plotted points. Again {\tt colour} is a variable that may be mapped to a variable in the plot's data frame, so it is specified using the {\tt aes} function. In this case {\tt colour} is mapped to the {\tt transmission} variable. 
+\item \lstinline^ + geom_smooth(method=gam,formula=y~s(x))^ adds a smooth curve fitted to the data (blue above). It uses the \lstinline+gam+ function to do this - a modelling function that expects a \lstinline+formula+, also supplied.
 \item \lstinline+a+ by default invokes the {\tt print} function for a {\tt ggplot} plot object, which causes the plot to be displayed. If you were wanting to display the plot from within a function you have written, you would need to invoke {\tt print} explicitly. That is \lstinline+print(a)+.    
 \end{itemize} 
 There are two unusual things about {\tt ggplot2} relative to the standard function based R programming that we met so far. One is the \verb^+^ operator for adding plot modifications. The other is that some of the variables required by the modifier functions are not provided as function arguments, but rather as mappings to the plot data frame variables, or as explicit values, using the {\tt aes} function. To be comfortable with {\tt ggplot} you need to understand these.
 \begin{enumerate}
-\item Like all operators in R, the \verb^+^ operator for adding modifications to a plot is actually implemented as a function with 2 arguments. R has a mechanism for different versions of functions to be used for different classes of objects, so it knows to call the {\tt ggplot} specific version of the {\tt +} operator function when `adding' modifications to a plot. So instead of modification being done using code like \lstinline^a <- a + geom_point()^ ({\tt a} being a plot objext), the {\tt ggplot2} authors could have chosen to implement modification like this \lstinline+a <- ggmod(a,geom_point())+ which is actually what the underlying code does. 
-\item Supplying variables to a modifier function as mappings to the plotting data, rather than as function arguments emphasises the plot to data link. The {\tt aes} function used to create such mappings takes its name from some peculiar {\tt ggplot} terminology: the non-argument variables used by a function, such as {\tt x} and {\tt y}, are termed {\em aesthetics}. Given the dictionary definition of {\em aesthetic}, that's an odd term to use for the actual data being plotted. I tend to think of {\tt aes} as {\em any extra stuff} instead, which gets the notion of adding definitions not inherited from the existing plot. However, when looking up the help file for a modifier function, these non argument variables are listed under the heading {\tt Aesthetics} (and not under {\tt Arguments}, obviously).      
-\end{enumerate}
+\item Like all operators in R, the \verb^+^ operator for adding modifications to a plot is actually implemented as a function with 2 arguments. R has a mechanism for different versions of functions to be used for different classes of objects, so it knows to call the {\tt ggplot} specific version of the {\tt +} operator function when `adding' modifications to a plot. So instead of modification being done using code like \lstinline^a <- a + geom_point()^ ({\tt a} being a plot object), the {\tt ggplot2} authors could have chosen to implement modification like this \lstinline+a <- ggmod(a,geom_point())+ which is actually what the underlying code does. 
+\item Supplying variables to a modifier function as mappings to the plotting data, rather than as function arguments emphasises the plot to data link. The {\tt aes} function used to create such mappings takes its name from some peculiar {\tt ggplot} terminology: the non-argument variables used by a function, such as {\tt x} and {\tt y}, are termed {\em aesthetics}. Given the dictionary definition of {\em aesthetic}, that's an odd term to use for the actual data being plotted. I tend to think of {\tt aes} as {\em any extra stuff} instead, which gets the notion of adding definitions not inherited from the existing plot. However, when looking up the help file for a modifier function, these non argument variables are listed under the heading {\tt Aesthetics} (and not under {\tt Arguments}, obviously). In case that's all too clear - some of these {\tt Aesthetics} can also be passed to the modifier functions as regular arguments matched to \lstinline+...+: for example if you want to change the plot {\tt colour} to \lstinline+"red"+.  
+\end{enumerate}\index{ggplot!\verb+coord_cartesian+}\index{ggplot!axis range}\index{ggplot!aesthetics}
 As a further example suppose we do not like the axis ranges of the last plot and want to modify them. This is easily achieved with the modifier \lstinline+coord_cartesian()+. Looking this up, we find that it is does not need to be supplied with any non-argument `Aesthetic' variables, just regular arguments, so the following would do the job.
 \begin{lstlisting}
 a <- a + coord_cartesian(xlim=c(0,8),ylim=c(0,50))
 \end{lstlisting} 
+But what if we wanted more general changes to the axes scales? Browsing the {\tt ggplot2} documentation we might use \lstinline+scale_x_continuous+, e.g.
+\begin{lstlisting}
+a <- a + scale_x_continuous(limits=c(1,7),name="displacement (litres)")
+\end{lstlisting} 
+Note that {\tt limits} here does not reset the axis limits unless the existing axis limits are insufficient to cover the range given in {\tt limits}, and those axis limits were set automatically, rather than by \lstinline+coord_cartesian+. In fact {\tt limits} is an altogether dangerous option: it drops the plotting data outside of the interval defined by the limits, which can have undesirable knock on effects. Sometimes you need to read {\tt ggplot2} documentation quite carefully, and then experiment to test your understanding! 
 
-\subsection{plotting to a file}
+\subsection{Plotting to a file and graphical options}
 
 What if you want to save your plot to a graphics file for incorporation in a report? For {\tt ggplot} or base R, you can simply open a file type graphics device, run the code to display your plot and then close the devise. For a complete list of the available graphics devices see {\tt ?Devices}. If you know how to use one graphics file device it is pretty easy to use any of them. So here is an example of producing an {\tt .eps} file using the {\tt postscript} device. 
 \begin{lstlisting}
@@ -1299,16 +1358,179 @@ postscript("mpg-base.eps",width=8,height=3)
 ## the code to produce the plot goes here - e.g. from previous section
 dev.off()
 \end{lstlisting}
-This was actually the command I used to produce the first plot in the previous section. The first argument to {\tt postscript} is the filename. You either need to change to the directory where you want the file to go using \lstinline+setwd+ before calling \lstinline+postscript+, or give a full path in the filename. {\tt width} and {\tt height} give the width and height of the plot in inches. See {\tt ?postscript} for how to use other units. It is essential to close the postscript file using \lstinline+dev.off()+ when done --- you won't get a properly formed file otherwise. Other commonly use devises are {\tt pdf}, {\tt png}, {\tt jpeg} and {\tt tiff}. 
+This was actually the command I used to produce the first plot in the previous section. The first argument to {\tt postscript} is the filename. You either need to change to the directory where you want the file to go using \lstinline+setwd+ before calling \lstinline+postscript+, or give a full path in the filename. {\tt width} and {\tt height} give the width and height of the plot in inches. See {\tt ?postscript} for how to use other units. It is essential to close the postscript file using \lstinline+dev.off()+ when done --- you won't get a properly formed file otherwise. Other commonly use devises are {\tt pdf}, {\tt png}, {\tt jpeg} and {\tt tiff}. \index{graphics file} \index{graphic device}
+
+A very common adjustment needed when printing to file is to change the size of the axis lables and axis titles. In base R the arguments \lstinline+cex.axis+ and \lstinline+cex.lab+ can provided to most high level plot functions to change these. Values $>1$ enlarge, while $<1$ shrinks. You may also want to change plot symbols sizes, with \lstinline+cex}, or change the symbol with \lstinline+pch+ (a number or a character, including \lstinline+"."+ for the smallest possible point). Line widths are controlled with \lstinline+lwd+. See \lstinline+?par+ for all the graphical parameters that can be set. Several are high level parameters set at plot device level, but the rest can be supplied to most high level plotting functions. There are so many options that they are not listed for each high level plotting function, but are passed via \lstinline+...+, which makes sense as they often control lower level plotting functions. \index{plot options}\index{par}\index{plot!sizing}  
 
 {\tt ggsave} is an even easier option for plotting {\tt ggplot2} plots to file. For example
 \begin{lstlisting}
 ggsave("mpg-gg.eps",width=5,height=3)
 \end{lstlisting}
-produced the second plot in the previous section. {\tt ggsave} infers the plot file type from its extension ({\tt .eps} here).
+produced the second plot in the previous section. {\tt ggsave} infers the plot file type from its extension ({\tt .eps} here).\index{ggplot!graphics file}
 
 \subsection{Some univariate data plots}
 
+Suppose that you are interested in visualizing the distribution of a single variable. For a continuous variable perhaps the simplest plot is a histogram. This divides the range of your data into a series of contiguous intervals, and counts the number data falling within each of them. The intervals (also know as {\em bins}) are then arranged along a horizontal axis, and bars are plotted above each interval, with {\em area} proportional to the number of observations in the interval. If the intervals all have the same width, then the {\em height} of the bar is also proportional to the number of observations in the interval.   
+
+As an example the {\tt faithful} data frame in R contains 272 observations of the duration of the Old Faithful geyser's {\tt eruptions} in minutes (it also contains {\tt waiting} time between eruptions). Suppose we are interested in the distribution of eruption times. Here is the code to produce a couple of alternative histograms.
+\begin{lstlisting}
+par(mfrow=c(1,2)) ## set up to allow 2 histograms side by side
+hist(faithful$eruptions) ## default
+hist(faithful$eruptions,breaks=quantile(faithful$eruptions,seq(0,1,length=15)),
+     xlab="eruption time (mins)",main="Old Faithful geyser",col="purple")
+\end{lstlisting}
+\eps{-90}{.6}{geyser-base.eps}
+The left plot is from the first default call to \lstinline+hist+. The number and location of the x axis breaks defining the intervals has been chosen automatically, and the intervals are all of equal width. The y axis shows the count in each bar. Note the obvious interpretation of the bar heights as being proportional to counts per unit x axis interval. 
+
+We do not have to stick with the automatically computed intervals. The second call to \lstinline+hist+ produces the right hand plot. In addition to its lurid colour and nicer labels, the main noticeable feature is that I have supplied the breaks between intervals, and have not spaced those breaks evenly. In fact I have used the {\tt quantile} function to set the breaks at 15 empirical quantiles (equally spaced in probability) of the distribution of eruption durations\footnote{Recall that the $q^{th}$ quantile, $\tau_q$, of random variable $X$ is defined so that $P(X<\tau_q) = q$.}. So here we have bars of uneven width, the height of which is still proportional to the number of observations per unit interval, but whose area is proportional to the counts in each interval. One caveat about `area' here: by area I mean width as measured on the x axis, multiplied by height as measured on the y axis. Since the axes are plotted with different scalings on the page, the bars will not have the same `on the page' area. Note also that the y axis label is changed to `Density', since while the bar heights are proportional to density, they are not any longer proportional to the frequency (count) of observations in the intervals. 
+
+Actually uneven intervals are rarely used when plotting histograms, and it is more usual to use the {\tt breaks} argument  to supply a larger number of evenly spaced breaks, to provide more detail. One problem with histograms is that simply shifting the interval breaks a constant small amount can change the shape of the histogram, as points get moved between intervals. This is one reason for sometimes favouring a direct estimate of the pdf of the data, based on the sample. 
+
+{\em Kernel density estimation} is a way to do this, which makes not too many assumption. The basic idea is to recognise that any data point we observed could equally well have been a bit bigger or a bit smaller than it turned out to be. So we could simulate a much larger sample than the one we have by simulating noisy versions of the data we observed. That much larger sample could be plotted using a histogram with very narrow bars, to get an almost continuous pdf estimate. For example:
+\begin{lstlisting}
+n <- nrow(faithful);set.seed(8)
+erupt <- faithful$eruption + rnorm(n*1000,sd=.2) ## simulate much bigger sample
+hist(erupt,breaks=100,freq=FALSE) ## plot it
+\end{lstlisting}   
+\eps{-90}{.6}{geyser-kernel.eps}
+The plot is the left hand one above. Notice how the recycling rule has been used to produce 1000 slightly perturbed versions of each original eruption duration, and the resulting huge sample then yields a smooth and detailed histogram. It's worth running this code with different \lstinline+sd+ values -- larger values give smoother distributions, and smaller values more wiggly ones. 
+
+But do we really need to simulate at all here? If we simulated an infinite number of perturbed observations around each original datum, we would end up with a sample for each datum that looked just like a normal pdf, centred on the datum. So when we pool the simulated observations we get what looks like the average of all those normal pdfs centred around each original observation. In that case we might as well cut the simulation step, and just average the pdfs. i.e. if $x_i$ denote data points, where $i=1,\ldots,n$, and $\phi(x|\mu,\sigma)$ denotes a normal pdf with mean $\mu$ and standard deviation $\sigma$, then the density estimate is 
+$$
+\hat \pi (x) = \frac{1}{n} \sum_{i=1}^n \phi(x|x_i,h)
+$$     
+where $h$ is our chosen value for the standard deviation. Such an estimate is known as a {\em kernel density estimate}, with {\em bandwidth} $h$. We could use any other valid pdf in place of $\phi$, of course. The {\tt density} function in R will compute such kernel density estimates, choosing the bandwidth parameter automatically. Sometimes the automatic selection appears to over or under smooth the density. For the eruption times it seems to over smooth putting a bit too much probability between the peaks. We can reduce the bandwidth relative to its automatic value by setting the {\tt adjust} parameter to something less than one. Here is code for plotting the density estimate on the right, above.  
+\begin{lstlisting}
+plot(density(faithful$eruptions,adjust=0.6),type="l",xlab="eruption time (mins)",
+     main="kernel denisty estimate")
+\end{lstlisting}
+
+\noindent{\bf Exercise}: overlay a kernel density estimate over a histogram of the eruptions data (hint: used {\tt lines}).
+
+Let's see how the task in the exercise could be done in {\tt ggplot2}.
+\begin{lstlisting}
+ggplot(faithful,aes(x=eruptions,after_stat(density))) + ## data, base mappings etc
+geom_histogram(bins=20,col="green",fill="purple") +     ## garish histogram
+geom_density(adjust=.5,col="red")                       ## added kernel density estimate
+\end{lstlisting}
+\eps{0}{.6}{geyser-gg.eps}
+\begin{enumerate}
+\item The \lstinline+gglot+ call sets up the data and x-axis for the plot. The \lstinline+after_stat+ function is needed to indicate that what is plotted should depend on densities, rather that counts. The documentation for this is not the clearest.
+\item The \lstinline+geom_histogram+ turns the empty plot into a histogram with 20 bins (intervals). The colour of the histogram border and fill is set directly. Note the way that these are supplied as (undocumented) arguments, although described as {\em  aesthetics} in the documentation. This way of supplying options is quite common for modifier functions: it is implemented using the \verb+...+ agument.
+\item The \lstinline+geom_density+ modifier adds a kernel density estimate to the plot. Without the 
+\lstinline+adjust=.5+ argument this estimate is obviously too smooth. Unfortunately {\tt adjust} is not actually documented as an argument of \lstinline+geom_density+, but it works and is documented as an argument of another kernel density related function.    
+\end{enumerate}
+You will by now have noticed that the {\tt ggplot2} help files are not always as useful as the base R help files, and to really get to grips with {\tt ggplot2} requires finding online training materials and often searching online forums such as the programmers site {\tt stackexchange} for queries related to what you want to do. However many people who have spent the time getting to grips with it find it extremely useful and say that it saves them alot of time. 
+
+Why did the automatic bandwidth choice lead to a kernel density estimate that was too smooth? Bandwidth selection methods assume that the original data are independent, and can go wrong when this is not the case. The eruption data are really a time series, and it could be that one eruption's duration influences the duration of subsequent eruptions. A standard check for this is to plot the {\em auto-correlation function} (ACF) of the data series. The ACF plots the correlation between data and the previous data point, and the correlation between data and the data 2 data points before it, and so on. The {\em partial} ACF does the same, except that the correlations are measured conditional on the correlations found at shorter lags - that is they are the differences between the correlation found and the correlation expected given the correlations found at shorter lags\footnote{e.g. if the autocorrelation at lag 1 is $0.7$ then the auto-correlation at lag 2 is expected to be $0.7^2 = 0.49$ purely on the basis of the lag 1 autocorrelation. It's really only the difference between the lag 2 correlation and 0.49 that is then interesting - which is what the PACF measures.}. Here is base R code:
+\begin{lstlisting}
+acf(faithful$eruptions); pacf(faithful$eruptions)
+\end{lstlisting}
+\eps{-90}{.6}{geyser-acf.eps}    
+\ldots the correlations or partial correlations for each lag are plotted. Clearly there is strong negative correlations between the duration of one eruption and the next. Short eruptions follow long eruptions (and the other way around). The PACF suggests that the correlation at lag 2 is close to perfectly explained by the lag 1 correlation, but the negative correlation at lag 3 may be a bit less than would be expected from the lag 1 effect. In both plots the blue lines indicate how large a correlation has to be to be detectably different from zero at the 5\% level.  
+
+\subsubsection{Discrete univariate data}
+
+When the variables of interest are discrete categories, rather than continuous quantities, then a bar chart is often a useful visualization method. The idea is that you count the occurrences of each category and plot bars with height proportional to the count. This is a bit like a constant bar width histogram, except that the ordering of the bars may not matter at all in some cases. As an example of using bar charts, let's visualize the total number of deaths from all causes over the course of the Covid-19 epidemic to August 2021, by calendar age grouping, and compare this to the numbers of Covid deaths. The data are available from the UK Office for National Statistics (ONS). First read in the data\ldots
+
+\begin{lstlisting}
+d <- c(3362,428,290,369,978,1723,2471,3731,5607,7926,12934,20688,29905,40456,53579,
+       84784,106448,136269,150325,178684) ## all deaths
+cd <- c(3,1,3,10,26,65,133,257,438,740,1418,2587,4250,6337,8528,13388,18622,25220,
+        27718,30247)  ## Covid-19 deaths
+names(cd) <- names(d) <- c("0","1-4","5-9","10-14","15-19","20-24","25-29","30-34",
+"35-39","40-44","45-49","50-54","55-59","60-64","65-69","70-74","75-79",
+"80-84","85-89","90+") ## ONS age classes
+\end{lstlisting}     
+Then let's plot the deaths by age, side by side. Notice the use of \lstinline+ylim+ to force the same y axis scale. The \lstinline+las=2+ argument forces the category labels to be written vertically, so they fit. 
+\begin{lstlisting}
+par(mfrow=c(1,2))
+barplot(d,las=2,main="All deaths Mar 20-Aug 21")
+barplot(cd,ylim=c(0,max(d)),las=2,main="Covid deaths Mar 20-Aug 21")
+\end{lstlisting} 
+\eps{-90}{.5}{deaths1.eps}   
+The side by side presentation is interesting, but because of the way death rate increases with age, it does not really allow comparison of the Covid and non-Covid risks for ages below 45. One way to do this might be to plot the Covid and non-Covid deaths stacked on the same bar chart, and then to produce a 'zoomed in' bar chart looking just at the under 45s. Stacked barcharts are easy. Instead of providing a single vector to \lstinline+barplot+ we just need to provide a matrix, where each row contains a set of counts to be plotted. Notice the arguments for including a legend indicating which bar colour is which.
+\begin{lstlisting}
+par(mfrow=c(1,2))
+D <- rbind(cd,d-cd) ## create matrix of counts to plot
+rownames(D) <- c("covid","not covid")
+barplot(D,las=2,main="All deaths Mar 20-Aug 21",legend.text=TRUE,
+args.legend=list(x=7,y=150000)) 
+barplot(D[,1:10],las=2,main="Age 0-44 deaths  Mar 20-Aug 21")
+\end{lstlisting}
+\eps{-90}{.5}{deaths2.eps} 
+This seems better, with the picture for under 45s now much clearer\footnote{If you are surprised by the data, that may be partly down to official messaging. The UK government advisory Scientific Pandemic Influenza Group on Behaviour (SPI-B) wrote in a 22 March 2020 report that: ``\ldots a substantial number of people still do not feel sufficiently personally threatened; it could be that they are reassured by the low death rate in their demographic group\ldots the perceived level of personal threat needs to be increased among those who are complacent, using hard hitting emotional messaging.'' and presumably not using data on the actual risk. }. We can produce a similar plot using {\tt ggplot}. The \lstinline+geom_bar+ function might seem the obvious way to do this, but it is actually designed for data frames in which a variable may take one of several categorical values, and the plotting function should do the counting up of numbers of occurrences of each category. To use it we would need to artificially expand the 20 ONS counts of deaths in each age class to some 0.8 million records of the age category for each death. Rather than do that, we'll need to use \lstinline+geom_col+ which can work with pre-tallied counts in categories.  
+ 
+{\tt ggplot2} requires data in strictly tidy form, and so \lstinline+geom_col+ will not death with multiple rows of data as \lstinline+barplot+ did. Rather it expects counts of {\tt deaths} to be a single variable in a single column, with another variable indicating the {\tt type} of death (covid or non-covid). Similarly the {\tt age} categories should be contained in another variable in its own column.   
+\begin{lstlisting}
+n <- length(d)
+age <- factor(1:n);levels(age) <- names(d) ## age class as a factor
+ggdat <- data.frame(age=c(age,age),deaths=c(cd,d-cd),
+         type=c(rep("covid",n),rep("not covid",n))) ## tidy data frame
+ggplot(ggdat,aes(x=age,y=deaths,fill=type)) + geom_col() +
+       labs(title="All UK deaths Mar 2020 - Aug 2021")
+\end{lstlisting}
+\eps{0}{.5}{deaths3.eps} 
+\begin{itemize}
+\item The {\tt age} factor variable defines the age categories. The obvious code \lstinline+age <- factor(names(d))+, causes R to order the factor levels in way that puts the \verb+5-9+ level just before the \verb+50-54+ level, and {\tt ggplot} orders the bars by the order of the levels, not their order of appearance in the data frame. Since that is not what we want here, it is better to set the factor up first and then change the names assigned to its levels in a way that we control the ordering.
+\item \lstinline+ggdat+ is simply set up in the tidy way that \lstinline+geom_col+ demands.
+\item The plot setup is now straightforward. The mappings of data frame variables to the variables \lstinline+geom_col+ requires is done in \lstinline+ggplot+ here, but could also be done in \lstinline+geom_col+. By default  \lstinline+geom_col+ will stack up the bars corresponding to the same age class on top of each other. \lstinline+fill=type+ specifies that we want those stacked bars coloured according to type of death. The \lstinline+labs+ modifier just changes the title.    
+\end{itemize}
+
+
+\subsection{Boxplots and violin plots}
+
+Statistical analysis is often concerned with how the distribution of some variable changes between different groups. That is with plotting a continuous variable against a categorical variable in a meaningful way. {\em Boxplots} are one useful way of summarizing a distribution. A box is plotted, showing the middle 50\% of the data, with a line across it marking the median. Lines (`whiskers') are drawn from either side of the box to the extremes of the data, after removal of any {\em outliers} more that 1.5 times the width of the box away from the box. The outliers are then plotted individually. To see this in action, consider the \lstinline+ToothGrowth+ data frame in R. This reports data from an experiment in which guinea pigs had their diet supplemented with 0.5, 1 or 2 mg of vitamin C per day, either administered as Orange Juice, or ascorbic acid. The response measured was odontoblast length at the end of the experiment. The following code uses boxplots to visualize the distribution of the lengths against dose, method of delivery ({\tt supp}), and their combination. 
+
+\begin{lstlisting}
+par(mfrow=c(1,3),mar=c(5,5,1,1))
+boxplot(len~supp,data=ToothGrowth,cex.lab=1.5)
+boxplot(len~dose,data=ToothGrowth,cex.lab=1.5)
+boxplot(len~dose+supp,data=ToothGrowth,cex.lab=1.5)
+\end{lstlisting}
+\eps{-90}{.5}{boxplot1.eps} 
+\ldots make sure you relate what is plotted back to the description of what a boxplot is. Clearly length increases with increased dose, and there is a suggestion that orange juice is the better delivery method. Looking at the plot on the right, there is a clear suggestion of an {\em interaction}: the effect of dose appears to change with delivery method (equivalently the effect of delivery method changes with dose). In other words it looks as if we can not simply add the effect of delivery method to the effect of dose. This notion of an interaction between predictor variables ({\tt supp} and {\tt dose}) is very important in statistical modelling --- so take some time to understand what it means here. 
+
+{\tt ggplot2} also provides boxplots. If we want to look at interactions of variables, we need to explicitly construct a variable labelling the combinations of variables for which we require separate box plots. Such labels can be created using {\tt paste}. Note the use of the \lstinline+with+ function, which simply tells R to look for variable names in the given data frame. 
+\begin{lstlisting}
+ToothGrowth$comb <- with(ToothGrowth,paste(supp,dose))
+ggplot(ToothGrowth,aes(y=len,group=comb)) + geom_boxplot()
+\end{lstlisting}
+\eps{0}{.5}{boxplot2.eps} 
+Notice that with this small number of data, base R and {\tt ggplot} do not quite agree! {\tt ggplot} also allows slightly more detailed visualization of the data distribution in the form on {\em violin plots}. Rather than drawing simple boxes and whiskers, these draw a mirrored version of the kernel density estimate in each group, truncated at the maximum and minimum observed data values. Let's try this to visualize the (combined) effect of dose. As dose is numeric, it will need to be turned into a factor (group lable) to get what we want.
+\begin{lstlisting}
+ggplot(ToothGrowth,aes(y=len,x=as.factor(dose))) + geom_violin()
+\end{lstlisting}
+\eps{0}{.5}{violin.eps} 
+so the width of the white shapes at some length value is proportional to the estimated probability density for length having that value.  
+ 
+\subsection{3D plotting}
+
+Sometimes it is useful to be able to plot functions of 2 variables. In statistical work these are often model output, representing, for example $E(z|x,y)$. For now consider the case of visualizing a simple function of two variables. Base R offers 3 approaches - perspective plots, image plots and contour plots. They all require the same input - vectors defining the $x$ and $y$ values against which to plot, and a matrix {\tt z} whose \lstinline+z[i,j]+ value gives the function value at \lstinline+x[i]+, \lstinline+y[i]+. Here is some example code.
+\begin{lstlisting}
+foo <- function(x,y) { ## function to be visualized
+  r <- sqrt(x^2+y^2)
+  exp(-r*2)*cos(r*10)
+} ## foo
+n <- 50; x <- seq(-1,1,length=n); y <- seq(-1,1,length=n)
+xy = expand.grid(x=x,y=y) ## regular x,y grid over 
+xy$z <- foo(xy$x,xy$y)    ## evaluate foo on the grid
+z <- matrix(xy$z,n,n)     ## put evaluated function in a matrix
+par(mfrow=c(1,3),mar=c(4,4,1,1)) ## divide plot devise into 3 columns
+persp(x,y,z,theta=30,phi=30,col="lightblue",shade=.3) 
+image(x,y,z)
+contour(x,y,z,xlab="x",ylab="y")
+\end{lstlisting}
+\eps{-90}{.5}{3d.eps} 
+The \lstinline+persp+ plot is self-explanatory, but it is very difficult to read the actual function values from it. Note that \lstinline+phi+ and \lstinline+theta+ control the orientation of the plot, while \lstinline+shade+ creates shadowing to aid visualization. The \lstinline+image+ plot shows the function as a colour map -- you can choose the colour scheme, but in this case red is high and white is low. The best option for actually displaying the surface numerically is a \lstinline+contour+ plot. This plots contours of equal value as continuous labelled curves. The plot can be read like a topographic map, and the value of the $z$ variable at any $x,y$ can be read approximately from the plot. A nice option is to overlay a contour plot on an image plot, using the \lstinline+add=TRUE+ argument to \lstinline+contour+. Then you get nice visualization and hard quantitative information on the same plot.
+
+
+{\tt ggplot} also offers contouring and image plotting functions. Oddly the contour plot does not allow contours to be labelled, rendering the contours alone rather useless. However a combined plot is more useful.
+\begin{lstlisting}
+ggplot(xy,aes(x=x,y=y)) + geom_raster(aes(fill=z)) + geom_contour(aes(z=z))
+\end{lstlisting}
+\eps{0}{.5}{gg-contour.eps} 
+We need to move on, but hopefully you have now a good enough grasp of base R and {\tt ggplot} graphics to be able to explore further independently.
 %\makeindex
 \printindex
 
