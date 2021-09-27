@@ -165,6 +165,7 @@ For group homework, one person sets up the repo and invites their team mates to 
 \begin{itemize}
 \item Log on to {\tt github}, nagivate to your repo, and click on {\tt Settings}.
 \item Click on {\tt Manage Access} from the left hand menu, and then on {\tt Invite a collaborator} - you will need their github user name. 
+\item Note that collaborators have to accept the invitation before they can save work (push) to the github repo -- this applies whether the repo is private or public. 
 \end{itemize}
 You can add files directly to your repo, via the web interface, but we will shortly cover how to add files to the local copy of your repo, and then {\em push} them to github. 
 
@@ -646,6 +647,20 @@ Levels: bill fred sue
 Levels: a b
 \end{lstlisting}
 
+\noindent {\bf Exercise:} Given the importance of factor variables in statistical modelling, it is worth some effort in understanding exactly how they are represented, as some basic tasks with factors are much easier if you understand this. First set up a simulated factor variable:
+\begin{lstlisting}
+a <- factor(sample(c("fred","george","sue","ann"),20,replace=TRUE)); a
+\end{lstlisting}
+You'll see that the levels of the factor have been ordered alphabetically. Since factors are just groups, and don't usually have a natural order that may be fine. However, plot functions, for example, will often use the level order to decide plotting order, and you might want to change that. Similarly statistical models often treat the first level differently from the others, so again you may want to control which it is. If you want the levels to be ordered differently then you can supply an order like this:\index{factor!levels}
+\begin{lstlisting}
+b <- factor(a, levels = c("ann","sue","fred","george")); b
+\end{lstlisting}
+Examine the underlying numeric values stored in {\tt a} and {\tt b} to make sure you understand exactly what has happened here. Finally, extract the levels of {\tt a} to a vector {\tt al} using the {\tt levels} function, and the numeric representation of {\tt a} to another vector, {\tt an}. Now use just {\tt al} and {\tt an} to reproduce a vector of the level labels for each entry in {\tt a}.
+ 
+
+ 
+
+
 \subsection{Attributes}
 
 As already mentioned, attributes are simply R objects attached to other objects, and carried around with them (a bit like a set of `post it' notes). They can be useful for storing things that are somehow properties of an object. We can find out about an objects attributes using the \lstinline+attributes+ function. For example
@@ -672,7 +687,7 @@ Single attributes can be queried, reset or created using the \lstinline+attr+ fu
 [1] 2 3
 > attr(A,"foo") <- list(1:3,"fred") ## create or reset attribute
 \end{lstlisting}
-Attributes can be quite useful when your programming task requires an object that modifies a standard object (e.g. a matrix) by adding some extra information to it, but you still want all the standard functions that work with the object to function as for the standard object (e.g. matrix decompositions).    
+Attributes can be quite useful when your programming task requires an object that modifies a standard object (e.g. a matrix) by adding some extra information to it, but you still want all the standard functions that work with the object to function as for the standard object (e.g. matrix decompositions).  \index{attributes}\index{attr}  
 
 \subsubsection{str and object structure}
 
@@ -707,7 +722,9 @@ Operator & Description& Operator & Description & Operator & Description\\ \hline
 
 For example suppose we want to set all elements of vector {\tt x} to zero, for which $x[i]$ is between 1 and 2, or less than -2. \lstinline+x[(x < 2 & x > 1) | x < -2] <- 0+ does it. 
 
-\subsection{Loops and conditional execution}
+\noindent {\bf Exercise:} Suppose you have vectors \lstinline+x <- rnorm(20); z <- rnorm(20); y <- rnorm(20)+. Write (2 lines of) code to replace $x_i$ by $x_i^2$ if $z_i \ne 0$ and the following condition holds: $z_i$ is less than one or $y_i/z_i$ is negative. Note that R evaluates from left to right and stops evaluating logical expressions once their state is known unambiguously (i.e. if the statement is {\tt TRUE} or {\tt FALSE} irrespective of what comes next). Why might that matter here?
+
+\subsection{Loops and conditional execution \label{sec:loops}}
 
 Many programming tasks require that some operation is repeated many times for different values of some index, or require that the choice of which operation to carry out should depend on some conditions.
 
@@ -792,6 +809,10 @@ Note that for a vector oriented language like R, these sorts of tasks can often 
 \end{lstlisting}
 In an interpreted language like R, there is more interpreting what to do than actual doing in the loop case. 
 \index{vectorized code}
+
+\noindent {\bf Exercise:} Suppose you want to find the solution to the equation $f(x)=0$ where $f(x) = \log(x)-1/x$. A reasonable approach is bisection search. Start with an interval $[x_0,x_1]$ such that $f(x_0)<0$ and $f(x_1)>0$.\footnote{These inequalities would be reversed for a decreasing function, of course} Defining $x_t = (x_1+x_0)/2$, set $x_1 = x_t$ if $f(x_t)>0$ and $x_0=x_t$ otherwise. This process can be repeated until $f(x_t)$ is close enough to zero (or until $x_1-x_0$ is small enough). Write code to find the solution to $f(x)=0$ by bisection search, given that the solution (root) is somewhere in $[.1,10]$ . Function {\tt abs} finds the absolute  
+value of a function, by the way.\index{bisection search}\index{root finding}\index{absolute value}
+
 \subsection{Functions}
 
 Functions were introduced in Section \ref{firstR}, but some more detail is required to write them effectively.  Formally a function consists of an argument list, a body (the code defining what it does), and an environment (which is the environment where it was created). Generally, functions take objects as arguments and manipulate them to produce an object, which is returned. There are two caveats to this general principle. \index{functions}
@@ -883,6 +904,8 @@ will return the answer 2 as a result of partial matching of argument names, even
 ff <- function(...,res=1) res;f(r=2)
 \end{lstlisting}
 
+\noindent {\bf Exercise:} turn your code from the section \ref{sec:loops} exercise into a general root finding function that takes an initial interval, a function (which may depend on some extra constants) the root of which is to be found (that is the value of its argument at which the function is zero). Try your function out with the function from the previous exercise, and with $g(x) = x^b - e^{ax} + 2$ where $b \ge 1$ and $a>0$. Make sure that your function checks that the initial supplied interval brackets the solution, and can deal with increasing or decreasing functions. Function {\tt stop} can be used to jump out of a function and print an error message if a problem is detected. \index{error}\index{stop} If your function does not work as expected, try stepping through it using the {\tt mtrace} from the {\tt debug} package to figure out where the error is.   
+
 \subsection{Planning and coding example: plotting an empirical CDF}
 
 The cumulative distribution function, $F$, of a random variable $X$ is defined as $F(x) = \text{Pr}(X\le x)$. Hence if we have a random sample $x_1, x_2, \ldots, x_n$ of observations of $X$ we can define an {\em empirical} cumulative distribution function
@@ -935,6 +958,9 @@ lines(x1,p1)
 \end{lstlisting}\index{vectorized code}
 Notice how this code is entirely vectorized --- no repeating of code $n$ times in a loop. It is therefore faster to run. But also notice that it is slower to read and understand. Also, with 500 data points the vectorized version of {\tt ecdf} is about 50 times faster than the original version. But it still takes only 0.7 seconds to run on my machine. So was it worth the effort of speeding up? That really depends on how often the function will be used and on what size data set. These are common trade-offs, which mean that you should beware of making a fetish out of vectorizing your code. Always vectorize if it is easy to write and understand the vectorized code, but otherwise think about whether the computer time savings will justify the effort.  
 
+\noindent {\bf Exercise:} One approach to getting a smoother approximation to the CDF is to recognize that we are effectively using the sorted data to approximate the quantiles of the distribution, and that there is uncertainty in these quantile estimates - the quantiles could just as well have been  a bit higher or lower. This suggests that we could generate many replicate datasets in which we add noise to the original data, combine these simulated datasets and plot their CDF, to get a smoothed CDF. Modify the (vectorized) {\tt ecdf} function to do this, by generating 100 replicated datasets, each obtained by adding normal noise ({\tt rnorm}) to the original data, with standard deviation given by $h$ (default 1), an argument of the modified function. You probably want to change the default plot character to \lstinline+"."+.   
+
+
 \subsection{Useful built-in functions}
 
 R has a huge number of useful built in functions. This section is about how to find them.  Recall that R's extensive help system can be accessed by typing {\lstinline+help.start()+} at the command prompt, to obtain help in navigable HTML form, or by typing {\lstinline+?foo+} at the command line, where {\lstinline+foo+} is the function or other topic of interest. \index{functions!built in to R}
@@ -973,7 +999,7 @@ One major class of statistical programming task involves {\em stochastic simulat
 \begin{enumerate}
 \item Simulate from a stochastic model. e.g. a model of disease spread, or a model of football teams competing, or a model of how shoppers will move around a store.
 \item Simulate the process of sampling data from a population, and analysing it using a statistical method, in order to assess how well the statistical method is working. 
-\item Simulate the process of sampling data directly, as part of a statistical analysis moethod.
+\item Simulate the process of sampling data directly, as part of a statistical analysis method.
 \item Simulate from the posterior distribution of the parameters in a Bayesian data analysis.
 \end{enumerate}  
 This section will take a look at examples of the first two. 
@@ -1044,6 +1070,8 @@ It gives the answer p=0.706. Obviously there is some stochastic variability in t
 
 There are two rather appealing features of this way of answering the question. Firstly, it was very easy, in a way that most people do not find the probability calculation based answer. More importantly, it is very easy to generalize to situations for which the exact answer would be very difficult to work out. For example, births are not spread out evenly throughout the year, so the probabilities of the different birthdays are not all equal. Given appropriate data it would be easy to adjust the probabilities in the sampling step, and get an adjusted probability for that case too.  
 
+\noindent {\bf Exercise:} {\em Bootstrapping} is the process of resampling with replacement from a set of data, in order to simulate the process of sampling the data from the population, in order to assess the sampling variability in quantities calculated from the data (statistics). In R \lstinline+morley$Speed+ contains the measured speed of light in km/s above 299000 km/s, in 100 runs of the Michaelson Morley experiment. Sample these data with replacement to generate 1000 bootstrap replicate datasets. Find the mean of each replicate, and then use the {\tt quantile} function to find the range of the middle 95\% of the bootstrap means. This range is sometimes known as a {\em bootstrap percentile confidence interval}. You may find {\tt colMeans} or {\tt rowMeans} useful. \index{rowMeans}\index{colMeans} \index{bootstrap}
+
 \subsubsection{Sampling from distributions}
 
 R has functions for simulating random variables from a wide variety of basic distributions: see {\tt ?distributions} for an overview. The functions all start with an {\tt r} followed by the distribution name. Their first argument is the number of values to simulate, and remaining arguments are vectors of distribution parameters. For example, if I would like 3 normal random deviates, with means 1, 3.2 and -0.5 and standard deviations 1, 1 and 2.5 then the following produces them\index{random numbers}
@@ -1056,12 +1084,16 @@ An immediate use for simulation is to quickly get approximate probabilities that
 For example the time from infection to onset of Covid-19 symptoms follows a log normal distribution with log scale mean and sd of 1.63 and 0.50. Meanwhile one estimate has the distribution of time from symptom onset to death estimated to be a gamma distribution with shape parameter 4 and scale parameter 4.2. Assuming independence of the 2 durations, what does the distribution of time from infection to death look like, and what is the probability that it is less than one week? 
 \begin{lstlisting}
 > n <- 100000
-> d <- rlnorm(n,1.63,.5) + rgamma(n,shape=4,scale=4.2)
+> d <- rlnorm(n,1.63,.5) + rgamma(n,shape=4.45,scale=4)
 > mean(d<7)
-[1] 0.00646
+[1] 0.00389
 > hist(d,breaks=0:100) ## plots a histogram with bar breaks as given
 \end{lstlisting}
 \eps{-90}{.5}{i2d.eps}\index{histogram}
+
+\noindent {\bf Exercise:} The {\em Central Limit Theorem} states that the distribution of the sum or mean of a set of $n$ independent identically distributed finite variance random variables tends to a normal distribution as $n \to \infty$. Produce an illustration of this by simulating random variables $X_n = n^{-1} \sum_{i}^n U_i$ where the $U_i$ are i.i.d. exponential random variables, with rate parameter 1 (see {\tt ?rexp}). For $n=2^1,,2^2,\ldots,2^9$ produce histograms illustrating the distribution of 10000 simulated values of each $X_n$. \lstinline+par(mfrow=c(3,3))+ will set up a graphics window to show all the histograms on the same page.   
+
+
 
 \subsection{Simulation from a simple epidemic model}
 
@@ -1114,6 +1146,9 @@ points(epi$E,col=4);points(epi$I,col=2) ## E (blue) and I (red)
 \eps{-90}{.6}{seir.eps}
 Comparing the left two columns we see that neglecting the variability in $\beta$ means that the severity of the epidemic will be overestimated by the model. Comparing the right two columns we see that social distancing slows the epidemic down, but can make it larger in the long run, by suppressing the variability in $\beta$ (as everyone has to follow the same rules). Perhaps most surprising of all, scientists who tried to point out the problems with neglecting variability in $\beta$ had extreme difficulty getting published, and were often vilified on social media. Some models used for policy did represent the differences in contact rates between different age groups. But the main survey used to do this was based on one day diaries kept by survey participants of whom 7 were over 75 and none over 80. This is quite limited data for the age groups that make up 3/4 of Covid deaths to date. 
 
+\noindent {\bf Exercise:} Try stepping through the {\tt seir} code line-by line using the {\tt debug} package (\lstinline+library(debug)+ loads it). \lstinline+mtrace(seir)+ indicates that you want to step into this function. Then call {\tt seir} as usual, and you will execute it in the debugger. Pressing the return key steps forward. {\tt bp} is used to set breakpoints. {\tt go()} runs until completion, or the next breakpoint. 
+\lstinline+https://www.maths.ed.ac.uk/~swood34/RCdebug/RCdebug.html+ has more information on debugging. \lstinline+mtrace(seir, FALSE)+ to stop debugging {\tt seir}. Or \lstinline+mtrace.off()+ to stop all debugging.\index{debug}\index{debug!mtrace}\index{debug!go}\index{debug!bp}\index{breakpoint}
+
 \subsection{Simple simulation study: testing an approximate confidence interval}
 
 Suppose we observe a binomial random variable $X \sim \text{binom}(n,p)$ (number of successes in $n$ independent trials, each with probability of success $p$). $\hat p = X/n$ is an obvious estimator, of $p$, and a simple plug in estimate of its variance is then $\hat \sigma^2_p = \hat p (1-\hat p)/n$, suggesting approximate 95\% confidence interval $\hat p \pm 1.96 \hat \sigma_p$. The central limit theorem implies that this interval will have the correct coverage probability in the $n \to \infty$ limit, but how will it behave when $n=20$, for example? Let's investigate this question for the case $p=.2$. 
@@ -1134,7 +1169,7 @@ n.ci/n.rep ## proportion of intervals including the truth
 \end{lstlisting}
 The result is about 0.92 --- so when $n=20$, 8\% of intervals fail to include the true value, instead of the 5\% that should. Many statistical methods rely on infinite sample size approximations, and this sort of simulation study is an essential way of checking out their performance at finite sample sizes.
 
-{\bf Exercise:} write vectorized code to do the preceding calculation without a loop, and investigate how the coverage probability changes as you increase the sample size to 200, 2000 etc.
+\noindent {\bf Exercise:} write vectorized code to do the preceding calculation without a loop, and investigate how the coverage probability changes as you increase the sample size to 200, 2000 etc.
 
 
 \section{Reading and storing data in files}
@@ -1222,6 +1257,8 @@ write.table(d,file="data1.txt")
 On occasion it is necessary to read lines of text into a character vector, for further processing. The {\tt readLines} function will do this, and there is an equivalent {\tt writeLines} function as well.\index{readLines}\index{writeLines}
 
 To write data other than a data frame or character vector to a text file you can use the {\tt cat} or {\tt write} functions: both take a {\tt file} argument specifying the file name to write to. {\tt dump} is another option covered in the previous section.\index{file!write text}
+
+\noindent {\bf Exercise:} create a version of text file {\tt data.txt} outside R yourself, and read it into R as described above.
 
 \subsection{Reading and writing binary files}
 
@@ -1360,7 +1397,7 @@ dev.off()
 \end{lstlisting}
 This was actually the command I used to produce the first plot in the previous section. The first argument to {\tt postscript} is the filename. You either need to change to the directory where you want the file to go using \lstinline+setwd+ before calling \lstinline+postscript+, or give a full path in the filename. {\tt width} and {\tt height} give the width and height of the plot in inches. See {\tt ?postscript} for how to use other units. It is essential to close the postscript file using \lstinline+dev.off()+ when done --- you won't get a properly formed file otherwise. Other commonly use devises are {\tt pdf}, {\tt png}, {\tt jpeg} and {\tt tiff}. \index{graphics file} \index{graphic device}
 
-A very common adjustment needed when printing to file is to change the size of the axis lables and axis titles. In base R the arguments \lstinline+cex.axis+ and \lstinline+cex.lab+ can provided to most high level plot functions to change these. Values $>1$ enlarge, while $<1$ shrinks. You may also want to change plot symbols sizes, with \lstinline+cex}, or change the symbol with \lstinline+pch+ (a number or a character, including \lstinline+"."+ for the smallest possible point). Line widths are controlled with \lstinline+lwd+. See \lstinline+?par+ for all the graphical parameters that can be set. Several are high level parameters set at plot device level, but the rest can be supplied to most high level plotting functions. There are so many options that they are not listed for each high level plotting function, but are passed via \lstinline+...+, which makes sense as they often control lower level plotting functions. \index{plot options}\index{par}\index{plot!sizing}  
+A very common adjustment needed when printing to file is to change the size of the axis lables and axis titles. In base R the arguments \lstinline+cex.axis+ and \lstinline+cex.lab+ can provided to most high level plot functions to change these. Values $>1$ enlarge, while $<1$ shrinks. You may also want to change plot symbols sizes, with \lstinline+cex+, or change the symbol with \lstinline+pch+ (a number or a character, including \lstinline+"."+ for the smallest possible point). Line widths are controlled with \lstinline+lwd+. See \lstinline+?par+ for all the graphical parameters that can be set. Several are high level parameters set at plot device level, but the rest can be supplied to most high level plotting functions. There are so many options that they are not listed for each high level plotting function, but are passed via \lstinline+...+, which makes sense as they often control lower level plotting functions. \index{plot options}\index{par}\index{plot!sizing}  
 
 {\tt ggsave} is an even easier option for plotting {\tt ggplot2} plots to file. For example
 \begin{lstlisting}
@@ -1461,7 +1498,7 @@ barplot(D[,1:10],las=2,main="Age 0-44 deaths  Mar 20-Aug 21")
 \eps{-90}{.5}{deaths2.eps} 
 This seems better, with the picture for under 45s now much clearer\footnote{If you are surprised by the data, that may be partly down to official messaging. The UK government advisory Scientific Pandemic Influenza Group on Behaviour (SPI-B) wrote in a 22 March 2020 report that: ``\ldots a substantial number of people still do not feel sufficiently personally threatened; it could be that they are reassured by the low death rate in their demographic group\ldots the perceived level of personal threat needs to be increased among those who are complacent, using hard hitting emotional messaging.'' and presumably not using data on the actual risk. }. We can produce a similar plot using {\tt ggplot}. The \lstinline+geom_bar+ function might seem the obvious way to do this, but it is actually designed for data frames in which a variable may take one of several categorical values, and the plotting function should do the counting up of numbers of occurrences of each category. To use it we would need to artificially expand the 20 ONS counts of deaths in each age class to some 0.8 million records of the age category for each death. Rather than do that, we'll need to use \lstinline+geom_col+ which can work with pre-tallied counts in categories.  
  
-{\tt ggplot2} requires data in strictly tidy form, and so \lstinline+geom_col+ will not death with multiple rows of data as \lstinline+barplot+ did. Rather it expects counts of {\tt deaths} to be a single variable in a single column, with another variable indicating the {\tt type} of death (covid or non-covid). Similarly the {\tt age} categories should be contained in another variable in its own column.   
+{\tt ggplot2} requires data in strictly tidy form, and so \lstinline+geom_col+ will not deal with multiple rows of data as \lstinline+barplot+ did. Rather it expects counts of {\tt deaths} to be a single variable in a single column, with another variable indicating the {\tt type} of death (covid or non-covid). Similarly the {\tt age} categories should be contained in another variable in its own column.   
 \begin{lstlisting}
 n <- length(d)
 age <- factor(1:n);levels(age) <- names(d) ## age class as a factor
