@@ -81,7 +81,7 @@
 \tableofcontents
 
 
-\section{Software Requirements: R, git, JAGS etc}
+\section{Software Requirements: R, git, JAGS etc \label{sec:software}}
 
 To complete this course you will need to get yourself a free github account and install the following software on your computer: 
 \begin{itemize}
@@ -133,6 +133,8 @@ options(repos=c("https://markbravington.github.io/Rmvb-repo",
         getOption( "repos")))
 install.packages("debug")
 \end{lstlisting}
+{\tt debug} requires the {\tt tcltk} package, which is installed by default in R, but has requirements which are not met by default on all mac installations. If installation fails for this reason you need to read the error message carefully - it will probably tell you to install {\tt Xquartz}.
+
 \item {\tt rmarkdown} requires a latex installation in order to allow you to produce pdf documents. So, {\em only if you do not already have latex installed}, install {\tt tinytex} with
 \lstinline+install.packages("tinytex")+
 then if you are {\em really sure} that you do not already have latex installed run 
@@ -393,7 +395,7 @@ iis <- ii+1:length(ii)-1 ## where should 10s digits go in xs?
 xs[iis] <- x[ii]%/%10 ## insert 10s digits
 xs[-iis] <- x%%10  ## insert the rest (units)
 \end{lstlisting}  
-Anything after \lstinline+#+ on a line is ignored by R, so is a comment. It is a good idea to use lots of these. Here is what the code does in detail, line by line.\index{concatenate}\index{TRUE}\index{FALSE}\index{index vector}
+Anything after \lstinline+#+ on a line is ignored by R, so is a comment. It is a good idea to use lots of these. Here is what the code does in detail, line by line.\index{concatenate}\index{TRUE}\index{FALSE}\index{index vector}\index{code!comments}
 \begin{enumerate}
 \item \lstinline+x <- c(10,2,7,89,43,1)+ creates an example vector to work on. The {\tt c} function takes the individual numbers supplied to it, and concatenates them into a single vector (it can also concatenate vectors). The results are stored in vector \lstinline+x+ using the assignment operator \lstinline+<-+. Notice how {\tt x} is created automatically by this assignment. Unlike in many computer languages, we do not have to declare {\tt x} first. 
 \item \lstinline+ii <- which(x%/%10 > 0)+ creates a vector, {\tt ii}, of the indices of the double digit numbers in \lstinline+x+. It does this by computing the result of integer division by 10, for each element of {\tt x}, using the \lstinline+%/%+ operator, and then testing whether this result is greater than 0. The result of \lstinline+x%/%10 > 0+ will be a vector of {\tt TRUE} or {\tt FALSE} values of the same length as {\tt x}. For the given example it is $({\tt TRUE},{\tt FALSE},{\tt FALSE},{\tt TRUE},{\tt TRUE},{\tt FALSE})$. This vector is supplied directly to the {\tt which} function, which returns the indices for which the vector is {\tt TRUE} (1,4 and 5 for the example given). 
@@ -524,6 +526,7 @@ The most basic type of data structure in R is a vector (a one dimensional array)
 \end{lstlisting}
 Whatever the type of a vector, some of its elements can always be set to {\tt NA} (not available), if required. Also numbers can take the values \verb+Inf+, \verb+-Inf+ and \verb+NaN+ (not a number e.g. $log(-1)$). \index{NA}\index{NaN}
 
+
 Since vectors are the basic data structure, operators and most functions are also vectorized - they operate on whole vectors. For example given two vectors, {\tt a} and {\tt b} of the same length then \lstinline+c <- sin(a) * b+ actually forms \lstinline+c[i] <- sin(a[i]) * b[i]+ for all {\tt i} from 1 to the length of the vector. Similarly \lstinline^c <- a * b + 2^ actually forms \lstinline^c[i] <- a[i] * b[i] + 2^ for the same set of {\tt i} values. \index{vectorized code}
 
 Notice how the scalar {\tt 2} got reused for each {\tt i} in that last example. So is a scalar more than just a length one vector after all? Actually no, {\tt 2} is being treated like any other vector --- R has a {\bf recycling rule} for vector arithmetic. Any operator that combines two vectors will recycle the values in the shorter vector as many times as required to match the length of the longer vector. So if a vector contains only one value, that one value is just recycled as often as needed. Here are a couple of examples  \index{recycling rule} \index{vectors}
@@ -537,6 +540,26 @@ Notice how the scalar {\tt 2} got reused for each {\tt i} in that last example. 
 [1]  5 12 21 20
 Warning message:
 In a * b : longer object length is not a multiple of shorter object length
+\end{lstlisting}
+
+Vectors can be accessed and subsetted using logical vectors in place of indices. The vector should be the same length as the vector being accessed, and will be recycled if not. The elements of vectors can also be named, and can be accessed by name as well. Here are some illustrations (obviously names are not necessary for logical access):
+\begin{lstlisting}
+> x <- 1:5; names(x) <- c("fred","sue","bill","eve","bob") ## named vector
+> x
+fred  sue bill  eve  bob 
+   1    2    3    4    5 
+> x[c(TRUE,FALSE,TRUE,FALSE,FALSE)] ## subset using logical indexing vector
+fred bill 
+   1    3 
+> x[c(TRUE,FALSE)] ## ... logical indexing vector recycled!
+fred bill  bob 
+   1    3    5 
+> x[x>3] ## common case where logical vector generated in situ by a condition 
+eve bob 
+  4   5 
+> x[c("sue","eve")] ## access by name
+sue eve 
+  2   4 
 \end{lstlisting}
 
 \subsubsection{Matrices and arrays}
@@ -813,7 +836,7 @@ In an interpreted language like R, there is more interpreting what to do than ac
 \noindent {\bf Exercise:} Suppose you want to find the solution to the equation $f(x)=0$ where $f(x) = \log(x)-1/x$. A reasonable approach is bisection search. Start with an interval $[x_0,x_1]$ such that $f(x_0)<0$ and $f(x_1)>0$.\footnote{These inequalities would be reversed for a decreasing function, of course} Defining $x_t = (x_1+x_0)/2$, set $x_1 = x_t$ if $f(x_t)>0$ and $x_0=x_t$ otherwise. This process can be repeated until $f(x_t)$ is close enough to zero (or until $x_1-x_0$ is small enough). Write code to find the solution to $f(x)=0$ by bisection search, given that the solution (root) is somewhere in $[.1,10]$ . Function {\tt abs} finds the absolute  
 value of a function, by the way.\index{bisection search}\index{root finding}\index{absolute value}
 
-\subsection{Functions}
+\subsection{Functions \label{sec:function}}
 
 Functions were introduced in Section \ref{firstR}, but some more detail is required to write them effectively.  Formally a function consists of an argument list, a body (the code defining what it does), and an environment (which is the environment where it was created). Generally, functions take objects as arguments and manipulate them to produce an object, which is returned. There are two caveats to this general principle. \index{functions}
 \begin{enumerate}
@@ -1249,7 +1272,7 @@ Reading columns of data into a data frame in R is such a common task that a numb
 \begin{lstlisting}
 d <- read.table("data.txt",header=TRUE) 
 \end{lstlisting}
-where \lstinline+header=TRUE+ simply indicates that the first line gives the variable names. {\tt sep} and {\tt skip} can also be used with {\tt read.table}. Unsurprisingly, the opposite task of writing a data frame out to a text file has it's own function {\tt write.table}. For example:\index{write.table}
+where \lstinline+header=TRUE+ simply indicates that the first line gives the variable names. {\tt sep} and {\tt skip} can also be used with {\tt read.table}. Unsurprisingly, the opposite task of writing a data frame out to a text file has its own function {\tt write.table}. For example:\index{write.table}
 \begin{lstlisting}
 write.table(d,file="data1.txt") 
 \end{lstlisting}
@@ -1264,7 +1287,7 @@ To write data other than a data frame or character vector to a text file you can
 
 To save large R objects or data frames to file, it is more efficient to use a binary format and compression. {\tt save} can do this. It takes a sequence of R objects, and writes them to the file specified in its {\tt file} argument. {\tt  load} will read the objects back in from the file. Here is a simple example:
 \begin{lstlisting}
-A <- matrix(1:6,3,2); y <- rnorm(100) ## creat some objects
+A <- matrix(1:6,3,2); y <- rnorm(100) ## create some objects
 save(A,y,file="stuff.Rd")  ## save them to a binary file
 rm(y,A)          ## delete the original objects
 load("stuff.Rd") ## load them back in again from the file
@@ -1281,7 +1304,7 @@ in this case lines of data are read into a character vector. \index{readLines} \
 
 \section{Data re-arrangement and tidy data}
 
-In raw form many data sets are messy and have to be tidied up for statistical analysis. By tidying is meant that the data are re-arranged conveniently for analysis, not that the information in the data is in anyway modified unless an actual error is identified (no removal of outliers, for example). Since `data tidying' or `data re-arrangement' sound too boring and clerical for many enthusiasts for Modern Data Science, you will often hear terms like `data wrangling' and `data munging' used instead. These sound suitably rugged, as if the types engaged in them return home aching and covered in dust and mud after a day engaged in the honest toil of these muscular pursuits.
+In raw form many data sets are messy and have to be tidied up for statistical analysis. By tidying is meant that the data are re-arranged conveniently for analysis, not that the information in the data is in anyway modified unless an actual error is identified (no removal of outliers, for example). Since `data tidying' or `data re-arrangement' sound too boring and clerical for many enthusiasts for Modern Data Science, you will often hear terms like `data wrangling' and `data munging\footnote{a term that started out as the derogatory `mash until no good'.}' used instead. These sound suitably rugged, as if the types engaged in them return home aching and covered in dust and mud after a day engaged in the honest toil of these muscular pursuits.
 
 By tidy data is meant that data are arranged in a matrix so that:\index{tidy data}\index{data frame}
 \begin{enumerate}
@@ -1319,11 +1342,988 @@ ind <- attr(student,"index")
 ## ... ind[i] is row of 'student' corresponding to row i of 'marks'
 \end{lstlisting}
 
-At this point, you are hopefully wondering about replicate data, and the definition of `observation' as `unique combination of variables'? If I repeat an experiment under identical conditions, could I not occasionally get identical results, and hence two identical rows in a data frame that are different observations? Well yes, but only if you do not include a variable recording the `replicate number'. If you don't record the replicate number then you do not really have tidy data, as it is not possible to distinguish the common error of accidental replication of some recorded data, from genuine replicates.
+At this point, you are hopefully wondering about replicate data, and the definition of `observation' as `unique combination of variables'? If I repeat an experiment under identical conditions, could I not occasionally get identical results, and hence two identical rows in a data frame that are different observations? Well yes, but only if you do not include a variable recording the `replicate number'. If you don't record the replicate number then you do not really have tidy data, as it is not possible to distinguish the common error of accidental replication of some recorded data, from genuine replicates. 
+
+The R add on packages collectively known as the {\em tidyverse} provide a large number of functions for data tidying -- we won't cover these here, as it takes us too far from fundamentals of statistical programming: but see the {\em Research Skills} course next semester.
+ 
+\subsection{Baltimore homicides: data tidying and regular expressions}
+
+Let's look at re-arranging a fairly messy data set on homicides in Baltimore. The raw data can be obtained using
+\begin{lstlisting}
+raw <- readLines("https://michaelgastner.com/DAVisR_data/homicides.txt")
+raw[1] ## examine first record
+[1] "39.311024, -76.674227, iconHomicideShooting, 'p2', '<dl><dt>Leon Nelson</dt>
+<dd class=\"address\">3400 Clifton Ave.<br />Baltimore, MD 21216</dd><dd>black male,
+ 17 years old</dd><dd>Found on January 1, 2007</dd><dd>Victim died at Shock Trauma
+ </dd><dd>Cause: shooting</dd></dl>'"
+\end{lstlisting}
+The subsequent entries in {\tt raw} look similar, but they are not completely standardized, as we will see.
+For analysis, we need to extract the information that has been read into {\tt raw} in standardized form. For example, we might want to extract the longitude and latitude location information (the first 2 numbers), the victim name, the race information (black, white, hispanic etc), age etc. To do this requires some effort, first trawling through the data to check how the information is stored, and whether it is consistent across records.   
+
+To start consider a relatively easy task - the location information. This is always first, with latitude and longitude separated by a comma. So we could simply split up each record wherever there is a comma, and read off the first two elements from each resulting split record. \lstinline+strsplit+ can be used to do this, as follows: 
+\begin{lstlisting}
+rl <- strsplit(raw,",")
+lat <- as.numeric(sapply(rl,function(x) x[1]))
+lon <- as.numeric(sapply(rl,function(x) x[2]))
+\end{lstlisting}
+\begin{itemize}
+\item \lstinline+strsplit(raw,",")+ splits each character string in text vector {\tt raw} into a vector of character strings, with the splits occurring wherever there is a comma (the commas are dropped). {\tt strsplit} returns a list of character vectors, with an element for each element of {\tt raw}: this is stored in {\tt rl}.
+\item Now we just need to extract the first and second element of each character vector in {\tt rl}. {\tt sapply} applies a function to each element of a list, returning the result as a vector. So \lstinline+sapply(rl,function(x) x[1])+ applies a function that simply extracts the first element of a vector to {\tt rl}. The result is a vector of latitudes, as text, which are then converted to numeric and stored in {\tt lat}. 
+\item Longitudes are extracted in the same way.  
+\end{itemize}
+
+Extracting names is not so easy. A consistent pattern is that the name record starts \lstinline+<dt>+ and ends \lstinline+</dt>+, although the record may also include a web address pointing to a further record. I therefore first tried to split on the occurrence of \lstinline+dt+, but even after trying to clean out the web addresses one of the resulting names was 86 characters long, and still contained a web address. The problem turned out to be that the victims names was Nancy Schmi{\bf dt}. 
+
+So it is better to use \lstinline+<dt>+ and \lstinline+</dt>+ in some way. Indeed if you look at record 1 above, you'll see that I ought to be able to snip out the name very neatly using these. However the data turn out to be messier than that. e.g.
+\begin{lstlisting}
+> raw[300]
+[1] "39.28957200000, -76.57039400000, icon_homicide_shooting, 'p489', '<dl><dt><a 
+href=\"http://essentials.baltimoresun.com/micro_sun/homicides/victim/489/alton-alston
+\">Alton Alston</a></dt><dd class=\"address\">200 S. Clinton St.<br />Baltimore,
+ MD 21224</dd><dd>Race: Unknown<br />Gender: male<br />Age: 18 years old</dd><dd>
+ Found on December  1, 2008</dd><dd>Victim died at Unknown</dd><dd>Cause: Shooting
+ </dd><dd><a href=\"http://www.baltimoresun.com/news/local/baltimore_city/bal-
+ eastside1201,0,5413416.story\">Read the article</a></dd></dl>'"
+\end{lstlisting}
+The web address in the name record needs stripping out. This sort of problem needs a bit more than the simple splitting on a pattern met so far: it needs {\em regular expressions}. 
+
+\subsubsection{Regular Expressions}
+
+Regular expressions provide a way of matching patterns in text that are more flexibly defined than simple fixed strings. For example, suppose I wanted to find all words in a which at some point an `i' occurs two characters after a `c' (as in `clip' or `skittle'), or I want to find all words starting with `f' and ending with `k' (as in `fork' or `flunk'). We can accomplish such tasks by constructing strings which contain special characters interpreted as matching particular patterns. Functions such as {\tt grep} and {\tt gsub} can understand these {\em regular expressions} (unless we turn off this ability, with argument \lstinline+fixed=TRUE+). You can get a full description of the available regular expressions by typing \lstinline+?regex+ in R. \index{regular expression}\index{regex} Note the slight irritation that control characters referred to as e.g. \verb+\b+ in the help file actually have to be used as \verb+\\b+ in regular expressions.
+
+Within regular expressions the characters  \verb-. \ | ( ) [ { ^ $ * + ?- have special meanings. If you want them treated  as regular characters instead, you have to precede them by \verb+\\+ (or if you don't need any of them to have their special meaning, use argument \lstinline+fixed=TRUE+). Here we will use a couple of these: `\verb+.+' can be used to represent any single character. This could accomplish the first task above:
+\begin{lstlisting}
+> txt <- 
+"He scribbled a note on his clipboard and clicked his heels as he clinched the deal."
+> grep("c.i",strsplit(txt," ")[[1]])
+[1]  7  9 14
+\end{lstlisting}
+For the second example we want to allow an arbitrary number of letters between the letters at the start and end of the word. `\verb+?+'  `\verb+*+' and `\verb-+-' all modify the character preceding them: `\verb+?+' indicates that it's optional, and will be matched at most once; `\verb+*+' indicates that it should be matched zero of more times, and `\verb-+-' that it should be matched 1 or more times. We want to match any number of characters between `f' and `k', and `\verb+.*+' is how to do that:
+\begin{lstlisting}
+> txt1 <- 
+"To flunk this exam would be disaster, thought Phil, picking up his fork to eat "
+> grep("f.*k",strsplit(txt1," ")[[1]])
+[1]  2 13
+\end{lstlisting}
+But actually this is not general enough. Consider 
+\begin{lstlisting}
+> txt2 <- 
+"Flunk this exam and I'll be toast, thought Farouk, forking beans into his mouth."
+> grep("f.*k",strsplit(txt2," ")[[1]])
+[1] 10
+\end{lstlisting}
+\ldots the wrong answer - the two words we wanted have been missed, and `forking' has been wrongly matched. Consulting {\tt ?regex} again, it turns out that we can specify sets of characters to match, by enclosing them in square brackets, for example \verb+[Ff]+. We can also specify the end of a word by \verb+\\b+. Putting these together:
+\begin{lstlisting}
+> grep("\\b[Ff].*k\\b",strsplit(txt2," ")[[1]])
+[1] 1 9 ## success
+\end{lstlisting}
+
+\subsubsection*{Back to the homicide data}
+
+With regular expressions it is now possible to extract the names automatically, as follows
+\begin{lstlisting}
+get.name <- function(x) {
+  x1 <- gsub(".*<dt>","",x) ## strip out everything to <dt>
+  x1 <- gsub("</dt>.*","",x1) ## strip out everything after </dt>
+  x1 <- gsub("<a.*\">","",x1) ## strip out any web addresses
+  sub("</.*","",x1) ## strip out any further tags
+}
+name <- sapply(raw,get.name,USE.NAMES=FALSE)
+\end{lstlisting}
+\begin{enumerate}
+\item Notice how I have broken the task down into parts in \lstinline+get.name+, with each intermediate result stored before it is updated. This `defensive coding' facilitates debugging if something goes wrong. I can then use a debugger to step through \lstinline+get.name+ line by line, checking that each intermediate step is what I expected. If I had written the whole operation as a set of nested function calls, it would have been much harder to debug. Styles of programming that involve `piping' the output of one function directly to the input of another, suffer from the same code maintenance and debugging problems.  \index{defensive coding} \index{piping}   
+\item {\tt sapply } applies the functions specified as its second argument to each element of its first argument, returning the result in a vector. The \lstinline+USE.NAMES=FALSE+ argument avoids {\tt sapply} attaching names to the vector it creates: by default it uses the entire original string in \verb+raw[i]+ as the label for \verb+name[i]+. This would be inconvenient.
+\end{enumerate}
+
+Finally let's extract race. More data inspection reveals that the information comes immediately after the first \verb+<dd>+ tag, but there are two forms: either the race qualifier is the first word in a longer phrase, or it comes after the text `Race:'. So one way of extracting something appropriate is 
+\begin{lstlisting}
+rl <- strsplit(raw,"<dd>") ## split so race info second element of each record
+race <- sapply(rl,function(x) sub("<.*","",x[2]) ) ## strip trailing tags
+ii <- grep("Race:",race) ## locate 'Race:' cases
+race[ii] <- gsub("Race: ","",race[ii]) ## extract race info for 'Race:' cases
+race[-ii] <- gsub(" .*","",race[-ii]) ## drop rest of text in other cases
+\end{lstlisting}
+
+Putting the information extracted into a data frame gives
+{\small \begin{verbatim}
+> dat <- data.frame(lon=lon,lat=lat,name=name,race=tolower(race))
+> head(dat)
+        lon      lat               name  race
+1 -76.67423 39.31102        Leon Nelson black
+2 -76.69895 39.31264         Eddie Golf black
+3 -76.64988 39.30978   Nelsene Burnette black
+.    .        .                        .    .
+\end{verbatim}}
+We might immediately want to plot the locations of the homicides, coded by race. The following does this for main racial groups of black (64\% of population of Baltimore), white (28\%) and hispanic (4\%), other races and unknown are lumped together (the vast majority of these are unknown or not recorded). 
+\begin{lstlisting}
+with(dat,plot(lon,lat,pch=19,cex=.5))
+ii <- dat$race=="white"
+points(dat$lon[ii],dat$lat[ii],col="pink",pch=19,cex=.6)
+ii <- dat$race=="hispanic"
+points(dat$lon[ii],dat$lat[ii],col="brown",pch=19,cex=.6)
+ii <- !(dat$race=="black"|dat$race=="white"|dat$race=="hispanic")
+points(dat$lon[ii],dat$lat[ii],pch=19,cex=.5,col="green")
+\end{lstlisting}
+
+\eps{-90}{.5}{baltimore.eps}
+
+\noindent {\bf Exercise:} Write code to extract the cause of death. In this case you'll see that most records have a cause field starting \lstinline+<dd>Cause:+. Use {\tt grep} to create an index of the entries in {\tt raw} containing this sequence, and hence check the entries that do not have this field to see if cause is coded differently there, or is simply missing. Then write code to extract the cause data, doing something sensible about the records without the \lstinline+<dd>Cause:+ entry. Find the proportion of homicides that are by shooting.
+
+\section{Statistical Modelling: linear models \label{sec:lm}}
+
+So far we have looked at programming data manipulation tasks, and at some simulation from stochastic models. What about statistical modelling? That is the process of using models of the data generating process to help us learn about the population from which the data were generated (or, if you prefer, the {\em system} that generated the data). {\em Linear models} are a good place to start, since such models introduce many of the concepts used in statistical modelling more generally. 
+
+The general setup is that we have observations of a random {\em response} variable, $y_i$, accompanied by (fixed or random) {\em predictor} variables (a.k.a. {\em covariates}), $x_{ij}$. Here observations are indexed by $i = 1,\ldots,n $ and predictor variables by $j=1, \ldots, p$, and $p \le n$. Predictor variables come in two basic varieties:
+\begin{enumerate}
+\item {\em Metric variables} are numerical measurements of something. e.g. height, weight, litres of fuel used per 100km, temperature etc. \index{predictor!metric}
+\item {\em Factor variables} are labels indicating membership of some group (the groups are known as {\em levels} of the factor, although they are not treated as having any particular ordering). For example, nationality, sex, variety of wheat, species of bird.  \index{predictor!factor} \index{factor}
+\end{enumerate}  
+Obviously on occasion factors and metric variables may play rather similar roles - for example when we categorize people into age groups.\index{linear model}
+
+Considering all metric predictors first, the generic linear model structure is 
+$$
+y_i = \beta_0 + x_{i1} \beta_1 + x_{i2} \beta_2 + \cdots + x_{ip} \beta_p + \epsilon_i 
+$$
+where the $\beta_j$ are unknown parameters to be estimated from data, and the $\epsilon_i$ are independent random variables, with zero expected value, and variance $\sigma^2$. For some purposes, we will also assume that they are normally distributed. Notice that if we take expectations of both sides of the model we get $E(y_i) =  \beta_0 + x_{i1} \beta_1 + x_{i2} \beta_2 + \cdots + x_{ip}\beta_p $. 
+
+The model is {\em linear} in the parameters, $\beta_j$, and noise, $\epsilon_i$. It can be non-linear in the predictors. For example:
+$$
+y_i = \beta_0 + x_{i1} \beta_1 + x_{i1}^2 \beta_2 + x_{i2} \beta_3 + x_{i1} x_{i2} \beta_4 \cdots + \epsilon_i 
+$$
+In a way it is obvious that this must be possible: we put no restrictions on the predictors, so $x_{i1}^2$ or $x_{i1} x_{i2}$ must be as valid as predictors as $x_{i1}$ and $x_{i2}$ themselves.  
+
+This observation leads us on to linear models involving factor variables. The key idea is best seen by example. Suppose $x_{i1} $ is a factor variable that can take values {\tt a}, {\tt b} or {\tt c}. The idea is then that a parameter will be added to the model depending on which level the factor takes. Mathematically we have a model something like:
+$$
+y_i = \beta_0 + \mathbb{I}(x_{i1}={\tt a}) \beta_1 + \mathbb{I}(x_{i1}={\tt b})\beta_2 + \mathbb{I}(x_{i1}={\tt c})\beta_3 + x_{i2} \beta_4 + \cdots + \epsilon_i 
+$$
+where $\mathbb{I}()$ is the indicator function, taking the value 1 when its argument is true and 0 otherwise. There is a catch, however. In the preceding model we could add any constant $k$ to $\beta_0$ while subtracting the same constant from $\beta_1$, $\beta_2$ and $\beta_3$ and the numerical values produced by the right hand side of the model would be unchanged. Clearly the model has redundancy - an infinite set of parameter values can produce any given value of the right hand side. Hence the model parameters can not be uniquely estimated from data: the model is not {\em identifiable}. \index{identifiability}\index{linear model!identifiability}\index{identifiability!constraint}
+
+Happily, this lack of identifiability can be rectified by simply dropping one of the parameters from the redundant set. We could drop $\beta_0$, but then we get the same problem again is we add a second factor variable to the model, so a better option is to drop the parameter associated with the first level of each factor. This is what R does automatically. In the preceding case we then get:
+\beq
+y_i = \beta_0  + \mathbb{I}(x_{i1}={\tt b})\beta_1 + \mathbb{I}(x_{i1}={\tt c})\beta_2 + x_{i2} \beta_3 + \cdots + \epsilon_i \label{factor.mod}
+\eeq
+(note the closing up of $\beta$ indices). The new version can predict anything that the old version could, but the redundancy/lack of identifiability has gone. The only price paid is that the interpretation of $\beta_0$ and the parameters for the factor effect now changes: $\beta_0$ is now the `intercept' parameter that applies when ${x}_{i1}$ has value {\tt a}.  $\beta_1$ and $\beta_2$ are now the {\em differences} between the effect of level {\tt b} and level {\tt a} and between level {\tt c} and level {\tt a}, respectively. 
+
+Note that writing models out with indicator functions can get very clumsy, especially for factors with many levels, so alternative ways of expressing the same model can be useful. One approach uses multiple indices, with an index for each level of each factor variable in the model. For example 
+$$
+y_{ij} = \beta_0 + \gamma_j + z_{ij} \beta_1 + \epsilon_{ij} \text{  if }x_{ij}\text{ takes its }j^\text{th}\text{ level}
+$$
+is a structure exactly like that of (\ref{factor.mod}), but to express it clearly, multiple Greek letters have been used for parameters, and multiple Roman letters for variables. Identifiability in this case is imposed with a restriction, such as $\gamma_1=0$. Multiple indices like this can also get messy, so it can be more elegant to deal with factors by simply indexing the associated parameters by levels of a factor. For example if $x_i$ is a factor (perhaps taking levels {\tt a}, {\tt b} or {\tt c}) then a model might be expressed as
+$$
+y_i = \beta_0 + \gamma_{x_i} + z_i \beta_1 + \epsilon_i
+$$ 
+\ldots the idea being that there is a different $\gamma$ parameter for each level of the factor (e.g. $\gamma_{\tt a}$, $\gamma_{\tt b}$, $\gamma_{\tt c}$, or whatever). Again identifiability constraints are written as restrictions on the parameters, such as $\gamma_{\tt a}=0$. 
+
+The point here is to recognise that there are different ways to express exactly the same model structure - which is most convenient depends on the context. 
+
+
+\subsection{Statistical interactions}
+
+Clearly linear models allow us to include the effects of several predictors of mixed type (metric and/or factor) in an additive way --- with the effects of the variables simply added to each other. But what about the case in which the effects of variables do not simply add up, but rather the effect of one variable is to modify the effect of another variable. In statistical modelling this is known as an {\bf interaction}. It is one of those simple key concepts that it is essential to understand, so read the following very carefully, even if you already know about interactions.
+
+What does {\em  the effect of one predictor modifies the effect of another predictor} mean in concrete model terms? Consider an example. Suppose a model contains the effect of predictor $x_i$ in a simple linear way:
+$$
+y_i = \beta_0 + x_i \beta_1 + \epsilon_i
+$$    
+i.e. $E(y_i)$ has a straight line relationship to $x_i$, with slope parameter $\beta_1$. But now suppose that the parameters of this straight line relationship themselves change according to a second predictor variable, $z_i$. How? Perhaps the effect of $z_i$ is also linear, so that $\beta_0 = \gamma_0 + z_i \gamma_1$ and $\beta_1 = \gamma_2 + z_i \gamma_3$. Substituting into the original model we get\index{interaction}\index{linear model!interaction}
+$$
+y_i = \gamma_0 + z_i \gamma_1 + x_i \gamma_2  +  x_i z_i \gamma_3 + \epsilon_i
+$$  
+We are not limited to producing interactions of effects that are linear in the covariates. Interactions of any sort of effect can be produced in the same way. Suppose, for example, that the effect of $x_i$ is quadratic so that 
+$$
+y_i = \beta_0 + x_i \beta_1 +  x_i^2 \beta_2  + \epsilon_i
+$$
+and that this effect should vary linearly with $z_i$. Then $\beta_0$ and $\beta_1$ are as before, while $\beta_2 = \gamma_4 + z_i \gamma_5$, so
+$$
+y_i = \gamma_0 + z_i \gamma_1 + x_i \gamma_2  +  x_i z_i \gamma_3 + x_i^2 \gamma_4 + x_i^2 z_i \gamma_5 + \epsilon_i.
+$$
+Notice how in both the preceding examples the model includes some terms that would have been there if the effects had been purely additive: these are known as the {\bf main effects}, while the extra terms are referred to as {\bf interaction terms}. For the last model the main effects are $z_i \gamma_1$ and $ x_i \gamma_2+ x_i^2 \gamma_4$, while the interaction term is $x_i z_i \gamma_3 + x_i^2 z_i \gamma_5$.
+
+Exactly the same idea applies to factor variables. For example we might want the effects of $x_{i1}$ and $x_{i2}$ from model (\ref{factor.mod}) to interact. Whether we allow the parameters for the  $x_{i1}$ effect to change linearly with $x_{i2}$, just like the main effect of  $x_{i2}$, or we allow the parameter for the $x_{i2}$ effect to depend on $x_{i1}$ according to the $x_{i1}$ model, we end up with the same model\ldots
+$$
+y_i = \beta_0  + \mathbb{I}(x_{i1}={\tt b})\beta_1 + \mathbb{I}(x_{i1}={\tt c})\beta_2 + x_{i2} \beta_3 
++ \mathbb{I}(x_{i1}={\tt b})x_{i2} \beta_4 + \mathbb{I}(x_{i1}={\tt c})x_{i2}  \beta_5 +
+ \cdots + \epsilon_i
+$$  
+The pattern is similar for interactions between factor variable effects. For the above example, suppose $x_{i2}$ was actually a factor variable, with levels \verb+g1+ and \verb+g2+. The first level, \verb+g1+, would get dropped of course, to ensure identifiability. Allowing the parameters for the  $x_{i1}$ main effect to vary according to the $x_{i2}$ main effect (or vice-versa) we get (ignoring any other model components)
+$$
+y_i = \beta_0  + \mathbb{I}(x_{i1}={\tt b})\beta_1 + \mathbb{I}(x_{i1}={\tt c})\beta_2 + \mathbb{I}(x_{i2}={\tt g2}) \beta_3 
++ \mathbb{I}(x_{i1}={\tt b})\mathbb{I}(x_{i2}={\tt g2}) \beta_4 + \mathbb{I}(x_{i1}={\tt c})\mathbb{I}(x_{i2}={\tt g2})  \beta_5 + \epsilon_i
+$$ 
+Given the model identifiability problems when first introducing factors, is it necessary to worry about identifiability in interactions? Not if the main effects are made identifiable first, and the interaction terms are constructed from these identifiable main effects: the identifiability is `inherited' from the main effects. \index{identifiability!interactions}  
+
+Pay careful attention to what a statistical interaction is not. It {\em is not} about the relationship of one predictor to another. It {\em is} about their combined effect on the response.\index{factor!interaction}
+
+
+\subsection{Computing with linear models: model matrices and model formulae \label{sec:model.matrix}}
+
+To compute with linear models it is very helpful to write the model in the general matrix vector form
+$$
+{\bf y} = {\bf X}{\bm \beta} + {\bm \epsilon}
+$$
+where ${\bf y}$ is an $n$ vector of response variable values, $\bf X$, the {\bf model matrix}, is an $n \times p$ matrix determined by the model structure and predictor variables, $\bm \beta$ is a parameter vector and ${\bm \epsilon}$ is a vector of independent zero mean, constant variance random variables (possibly normally distributed). How do the models we have seen so far fit into this form?
+
+This is easiest to see by example, so consider model (\ref{factor.mod}) again, and assume it only has the 4 parameters shown. As written there is an index $i$ which runs from 1 to $n$, so the model is really the system of equations
+\begin{align*}
+y_1 &= \beta_0  + \mathbb{I}(x_{11}={\tt b})\beta_1 + \mathbb{I}(x_{11}={\tt c})\beta_2 + x_{12} \beta_3 + \epsilon_1\\
+y_2 &= \beta_0  + \mathbb{I}(x_{21}={\tt b})\beta_1 + \mathbb{I}(x_{21}={\tt c})\beta_2 + x_{22} \beta_3 + \epsilon_2\\
+. ~ & ~~.  ~~~~~~~~~~~~ .\\
+. ~ & ~~.  ~~~~~~~~~~~~ .\\
+y_n &= \beta_0  + \mathbb{I}(x_{n1}={\tt b})\beta_1 + \mathbb{I}(x_{n1}={\tt c})\beta_2 + x_{n2} \beta_3 + \epsilon_n
+\end{align*}
+Obviously this can be written as 
+$$
+\bmat{c} y_1 \\ y_2 \\ \cdot \\ \cdot \\ y_n \emat = 
+\bmat{cccc}
+1 & \mathbb{I}(x_{11}={\tt b}) &  \mathbb{I}(x_{11}={\tt c}) & x_{12} \\
+1 & \mathbb{I}(x_{21}={\tt b}) &  \mathbb{I}(x_{21}={\tt c}) & x_{22} \\
+. & . & . & . \\. & . & . & . \\
+1 & \mathbb{I}(x_{n1}={\tt b}) &  \mathbb{I}(x_{n1}={\tt c}) & x_{n2}
+\emat \bmat{c} \beta_0 \\ \beta_1 \\ \beta_2 \\ \beta_3 \emat + 
+\bmat{c} \epsilon_1 \\ \epsilon_2 \\ \cdot \\ \cdot \\ \epsilon_n \emat,
+$$
+which is clearly in the form $ {\bf y} = {\bf X}{\bm \beta} + {\bm \epsilon} $.\footnote{Obviously we do not require that every linear model we write down has parameters called $\beta_0,\beta_1,\beta_2$ etc. The point is simply that  whatever parameters the model has, they can be stacked up into one parameter vector, here called $\bp$. } To make this more concrete still, suppose that $x_{\cdot1} = ({\tt c},{\tt b},{\tt b},{\tt c}, \ldots, {\tt b})\ts$, and $x_{\cdot2} = (0.3,-2,27,3.4, \ldots, 10 )\ts $. Then the model is 
+$$
+\bmat{c} y_1 \\ y_2 \\ y_3 \\ y_4 \\ \cdot \\ \cdot \\ y_n \emat = 
+\bmat{cccc}
+1 & 0 &  1 & 0.3 \\
+1 & 1 &  0 & -2 \\
+1 & 1 &  0 & 27 \\
+1 & 0 &  1 & 3.4 \\
+. & . & . & . \\. & . & . & . \\
+1 & 1 & 0  & 10
+\emat \bmat{c} \beta_0 \\ \beta_1 \\ \beta_2 \\ \beta_3 \emat + 
+\bmat{c} \epsilon_1 \\ \epsilon_2 \\ \epsilon_3 \\ \epsilon_4 \\ \cdot \\ \cdot \\ \epsilon_n \emat.
+$$
+To understand linear models it is essential to understand how model matrices relate to the models as they are usually written down, especially how factor variables expand to several columns of binary indicators. The other key concepts to understand to the point that they are second nature are: factors, identifiability and interactions. 
+
+So how do we actually compute with these modelling concepts? R has functionality designed to make the setting up of model matrices very straightforward, based on the notion of a {\bf model formula}. \index{model formula}\index{linear model!formula} An R model formula is a compact description of a model structure in terms of the names of the variables in the model. For example:
+$$
+\verb^y ~ x + z^
+$$
+specifies a model $y_i = \beta_0 + x_i\beta_1 + z_i \beta_2 + \epsilon_i$, if $x$ and $z$ are metric variables (an intercept is included by default). Whatever is to the left of \verb+~+ is the response variable, while what is to the right specifies how the model depends on predictor variables. \verb^x + z^ implies that we want a main effect of {\tt x} and a main effect of {\tt z}. The exact form of these main effects depends on whether each predictor is a factor or a metric variable. Notice how \verb-+- has a special meaning in the formula. It basically means {\em and}. It does not mean addition. 
+
+Operators \verb-+-, \verb+-+, \verb+^+, \verb+*+ and \verb+:+ all have special meanings when used in a formula, {\em except} when they are using in arguments of a function inside a formula. So while 
+$
+\verb^y ~ x + z^
+$
+indicates to include effects of {\tt x} and of {\tt z}, not include and effect of $x+z$, the formula
+$$
+\verb^y ~ log(x + z)^
+$$
+does imply the addition of $x$ and $z$ before the log is taken. This means that it is easy to restore the usual arithmetic meaning of operators, by including the terms as arguments of the identity function \verb+I()+ in model formulae. For example, to implement $y_i = \beta_0 + x_i\beta_1 + x_i^2 \beta_2 + \epsilon_i$, use
+$$
+\verb%y ~ x + I(x^2)%
+$$
+Model formula operators {\tt *} and {\tt :} implement interactions. \verb+a*b+ indicates that the main effect terms and the terms for the interaction of {\tt a} and {\tt b} are to be included in a model. \verb+a:b+ just includes the interaction terms, but not the main effects. So  \verb+a*b+ and \verb@a + b + a:b@ are equivalent. Higher order interaction operate the same way. For example \verb+a*b*c+ is equivalent to \verb@a + b + c + a:b + a:c + b:c + a:b:c@
+
+Of course you might want to include interactions of several variables, only up to a certain order. This is where the \verb+^+ operator comes in. Suppose we want the ineractions of {\tt a}, {\tt b}, {\tt c} and {\tt d} up to order 2 (and not up to order 4 as \verb+a*b*c*d+ would generate). \verb%(a+b+c+d)^2% will do just that, being equivalent to 
+$$
+\verb&a + b + c + d + a:b + a:c + a:d + b:c + b:d + c:d&    
+$$
+Similarly \verb%(a+b+c+d)^3% will generate all interactions up to order 3. Notice how there is no interaction of a variable with itself. You could argue that there should be, but actually if you try and make a factor variable interact with itself you get back the original factor, so it is cleaner to simply define metric self-interactions in the same way, which is what is done. 
+
+It is also helpful to be able to specify that some terms otherwise included should be excluded and the \verb+-+ operator allows this to happen. For example, suppose be wanted to exclude the last two interactions in the previous example. \verb%(a+b+c+d)^2-c:d-b:d% would do this. But actually the most common use of \verb+-+ is to exclude the intercept term, by including `\verb+-1+' in the formula.
+
+R function {\tt model.matrix}\index{model.matrix} takes a model formula and a data frame containing the variables referred to by the formula, and constructs the specified model matrix. Here it is in action. First consider the {\tt PlantGrowth} data frame in R, which contains {\tt weight}s of plants grown under 3 alternative treatment {\tt group}s. Suppose we want a simple linear model in which {\tt weight} depends on {\tt group}.
+\begin{lstlisting}
+> X <- model.matrix(weight~group,PlantGrowth)
+> X
+   (Intercept) grouptrt1 grouptrt2
+1            1         0         0
+2            1         0         0
+.            .         .         .
+10           1         0         0
+11           1         1         0
+12           1         1         0
+.            .         .         .
+20           1         1         0
+21           1         0         1
+22           1         0         1
+.            .         .         .
+\end{lstlisting}
+As a further example, consider the {\tt mpg} data frame provided with {\tt ggplot2}. Actually {\tt mpg} is provided as a modified data frame given the obscure name of a `tibble'\footnote{the documentation for tibbles says that they help with  coding expressively, how inventing new meaningless names helps that is unclear.}. The features of a tibble are not any help here, so we may as well convert back to a regular data frame. Then let's consider a linear model which attempts to model fuel efficiency ({\tt cty} miles per US gallon) using predictors {\tt trans} and {\tt displ}. {\tt trans} is the type of transmission - manual or automatic + other information such as number of gears. For now let's strip out the other information and just consider the two levels . {\tt displ} is total cylinder volume in litres.  
+{\small \begin{verbatim}
+> mpg1 <- data.frame(mpg) ## convert to regular data frame
+> head(mpg1) ## fl is fuel, but levels undocumented, so unusable
+  manufacturer model displ year cyl      trans drv cty hwy fl   class
+1         audi    a4   1.8 1999   4   auto(l5)   f  18  29  p compact
+2         audi    a4   1.8 1999   4 manual(m5)   f  21  29  p compact
+3         audi    a4   2.0 2008   4 manual(m6)   f  20  31  p compact
+4         audi    a4   2.0 2008   4   auto(av)   f  21  30  p compact
+5         audi    a4   2.8 1999   6   auto(l5)   f  16  26  p compact
+6         audi    a4   2.8 1999   6 manual(m5)   f  18  26  p compact
+> mpg1$trans <- factor(gsub("\\(.*\\)","",mpg1$trans)) ## convert to 2 level
+> head(model.matrix(cty~trans+displ,mpg1)) ## get model matrix
+  (Intercept) transmanual displ
+1           1           0   1.8
+2           1           1   1.8
+3           1           1   2.0
+4           1           0   2.0
+5           1           0   2.8
+6           1           1   2.8
+\end{verbatim}}
+\noindent \ldots make sure that this is what you were expecting!
+
+As another example, suppose we want an interaction between {\tt displ} and {\tt trans}
+{\small \begin{verbatim}
+> head(model.matrix(cty~trans*displ,mpg1))
+  (Intercept) transmanual displ transmanual:displ
+1           1           0   1.8               0.0
+2           1           1   1.8               1.8
+3           1           1   2.0               2.0
+4           1           0   2.0               0.0
+5           1           0   2.8               0.0
+6           1           1   2.8               2.8
+\end{verbatim}}
+\noindent \ldots make sure you can interpret this model. There is a straight line relationship between {\tt cty} and {\tt displ} for automatic transmission cars, given by columns 1 and 3. There is then a second straight line dependence on {\tt displ} for the difference in city miles per gallon between manual and automatic cars. 
+
+\noindent {\bf Exercises:}
+\begin{enumerate}
+\item Suppose you have a response variable $y_i$ a metric predictor variable ${\bf x} = (0.1, 1.3, 0.4, 1.4, 2.0 , 1.6)\ts$ and a factor variable ${\bf z} = ({\tt a}, {\tt a},{\tt fred},{\tt a},{\tt c},{\tt c})$. Write out the model matrix for the model $y_i = \beta_0 + x_i \beta_1 + \gamma_{z_i}$, making sure that it is identifiable.
+\item Consider factor variables ${\bf x} = ({\tt a}, {\tt a}, {\tt b},{\tt a}, {\tt b},{\tt a})\ts$ and ${\bf z} = ({\tt ctrl},{\tt trt},{\tt trt},{\tt trt},{\tt ctrl},{\tt ctrl})\ts$. Write out an identifiable model matrix for the linear model which includes main effects and an interaction of {\bf x} and {\bf z}. 
+\item Now suppose that {\bf x} is as in the previous exercise, but ${\bf z}=(1,2,1,3,4,2)$. Write out the model matrix for a model containing main effects of ${\bf x} $ and ${\bf z}$ and their interaction. 
+\end{enumerate}
+
+\subsection{Fitting linear models}
+
+The parameters of linear models are estimated by {\em least squares}. Defining $\mu_i = E(y_i)$ (so vector ${\bm \mu} = \X\bp$), we seek parameter estimates $\hat \bp$ that minimise 
+$$
+\sum_{i=1}^n (y_i -\mu_i)^2 = \|{\bf y} - \X \bp\|^2.
+$$  
+How that is done mathematically will be covered as an example of matrix computation. For the moment, consider the built in R functions for linear modelling. The main function is {\tt lm}. Here it is in use fitting a basic model for {\tt cty} miles per gallon, in which $E({\tt cty})$ depends linearly on {\tt trans} and {\tt displ}.
+\begin{lstlisting}
+> m1 <- lm(cty ~ trans + displ, mpg1)
+> m1
+
+Call:
+lm(formula = cty ~ trans + displ, data = mpg1)
+
+Coefficients:
+(Intercept)  transmanual        displ  
+    25.4609       0.7842      -2.5520 
+\end{lstlisting}    
+{\tt lm} takes a model formula, sets up the model matrix and estimates the parameters. Typing the names of the returned model object, causes it to be printed, giving the {\tt lm} function call and reporting the fitted parameter values. Notice how the parameters are identified by the name of the predictor variable they relate to. For factor variables, where there may be several parameters, parameters are referred to by the name of the factor, and the relevant level. 
+
+The first thing to do with a linear model is to check its assumptions. These are essentially that the $\epsilon_i$ are independent with zero mean and constant variance, and less importantly, that they are normally distributed. The usual way to check this is with residual plots. The {\em residuals} are define as 
+$$
+\hat \epsilon_i = y_i - \hat \mu_i
+$$
+where $\hat {\bm \mu} = \X \hat \bp$ - they are effectively the estimates of the $\epsilon_i$ . They are plotted in ways that should show up problems with the assumptions. In fact simply calling the {\tt plot} function with a linear model object as argument generates four default residual plots. 
+\begin{lstlisting}
+> plot(m1)
+\end{lstlisting}
+\eps{-90}{.5}{mpg-check1.eps}  
+The top left plot immediately shows a problem here - the residuals do not look like zero mean independent random deviates. There is a clear pattern in the mean of the residuals (the red curve is a running smoother, helping to visualize that trend). Interpreting the remaining plots is pointless given this problem, but here is what they show, anyway. The top right plot is a normal quantile-quantile plot - sorted residuals are plotted against quantiles of a standard normal distribution: close to a straight line is expected for normal data (but normality is not the most important assumption). The lower left plot standardizes the residuals so that any trend in the mean indicates violation of the constant variance assumption. The final plot indicates whether some points have a combination of high residual and unusual predictor values that makes them particularly influential on the whole model fit --- see the generalized regression models course for more on these. 
+
+What might cause the systematic pattern in the residuals? One possibility is that the model for the relationship between {\tt cty} and {\tt displ} is wrong. To check, plot the residuals against displacement.
+\begin{lstlisting}
+> plot(mpg1$displ,residuals(m1))
+\end{lstlisting}
+\eps{-90}{.5}{mpg-resid1.eps}  
+\ldots clearly there is a pattern suggesting that the relationship should at least have been quadratic.
+\begin{lstlisting}
+m2 <- lm(cty~trans+displ+I(displ^2),mpg1)
+\end{lstlisting}
+\ldots results in a much less problematic set of residual plots, so we can interrogate the model further. For example the {\tt summary} function can be used to report the parameter estimates, their standard deviations (standard errors), and the p-values associated with the hypothesis test that each true parameter value in turn is zero (the `t values' are the test statistic used for this).  
+{\small
+\begin{verbatim}
+> summary(m2)
+
+Call:
+lm(formula = cty ~ trans + displ + I(displ^2), data = mpg1)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-6.5988 -1.4620 -0.0174  1.1067 12.4922 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept) 34.98583    1.27874  27.360   <2e-16 ***
+transmanual  0.45431    0.32911   1.380    0.169    
+displ       -8.23552    0.71766 -11.475   <2e-16 ***
+I(displ^2)   0.75213    0.09366   8.031    5e-14 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 2.257 on 230 degrees of freedom
+Multiple R-squared:  0.7224,	Adjusted R-squared:  0.7188 
+F-statistic: 199.5 on 3 and 230 DF,  p-value: < 2.2e-16
+\end{verbatim}}
+Clearly there is strong evidence for the {\tt displ}acement effect, but no real evidence of an additional effect of {\tt trans}mission. Let's check whether that conclusion might result from being too simplistic about the {\tt trans} effect, by allowing an interaction. And let's then test the null hypothesis that a model with no {\tt trans} effect is correct, against the alternative that the full interaction model is needed, as follows:
+{\small
+\begin{verbatim}
+> m3 <- lm(cty~(trans+displ+I(displ^2))^2,mpg1)
+> m0 <- lm(cty~displ+I(displ^2),mpg1)
+> anova(m0,m3) ## F ratio test of H_0: m0 is correct vs H_1: we need m3
+Analysis of Variance Table
+
+Model 1: cty ~ displ + I(displ^2)
+Model 2: cty ~ (trans + displ + I(displ^2))^2
+  Res.Df    RSS Df Sum of Sq      F Pr(>F)
+1    231 1181.1                           
+2    227 1147.0  4    34.092 1.6867 0.1539
+\end{verbatim}}
+So no evidence for a {\tt trans} effect of any sort. But what about this?
+{\small
+\begin{verbatim}
+> summary(lm(cty~trans,mpg1))
+
+Call:
+lm(formula = cty ~ trans, data = mpg1)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-9.6753 -2.9682  0.0318  2.3247 16.3247 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  15.9682     0.3248  49.168  < 2e-16 ***
+transmanual   2.7072     0.5662   4.782 3.09e-06 ***
+...
+\end{verbatim}}
+If we don't consider {\tt displ} then there appears to be a strong and significant effect of {\tt trans}. Why? Well, on examination of the data, it appears that manual cars tend to have smaller engines than automatic ones. And because smaller engines have lower fuel consumption, manual cars therefore appear to be more efficient. But if you control for engine size ({\tt displ}) then there is no additional effect of transmission. 
+
+So are manual cars more efficient or not? That's not so easy to answer. For a given engine size it appears not, but for a given performance level the answer might well be yes: the automatics need a larger engine for the same performance, and therefore are less efficient for a given performance level. Clearly the interpretation of statistical model analyses require care. It requires particular care not to interpret effects as casual without alot more evidence than a statistical model of observational data can provide. In this example the {\tt displ} variable that probably drives the apparent {\tt trans} effect is one of the measured predictors. But in many cases it's quite possible that a variable we have not measured is driving both the response variable and the predictor, with no causal relationship between the response and the predictor at all.   
+
+This can really matter. For example there has been a good deal of work attempting to prove that lock down measures, and only lock down measures, are what controlled Covid-19 in various places at various times in the pandemic. But ultimately almost all that these studies show is an {\em association} between lockdown and reduced Covid transmission. It is impossible to rule out that the spontaneous changes in people's behaviour, which included clamouring for lockdowns on social media, were enough both to stop transmission increasing and to push governments into action. Nor to rule out that measures short of full lockdown, which were invariably associated with, but preceded, full lockdown, were what caused infections to start to decline.        
+
+\noindent {\bf Exercise:} Use {\tt lm} to fit the simple linear model for the {\tt PlantGrowth} data in which {\tt weight} depends on experimental treatment {\tt group}. Check the residual plots for the model, and then test whether {\tt weight} depends on {\tt group}. If it does, interpret the model parameters. If the results are not clear cut, consider resetting the levels of the {\tt group} factor to help. 
+
+\section{R classes}
+
+The linear modelling routines provide a good introduction to {\em classes} in R. The {\tt lm} function
+returns an object of class \verb+"lm"+, and typing the name of such an object produces the short summary of the model we saw above. What it doesn't do is to print the entire contents of the object. You can check that by looking at \lstinline+str(m1)+, for example: {\tt m1} is packed full of stuff. So what is happening when {\tt m1} gets printed?
+
+R provides a simple form of object orientation, where some functions are defined as {\em generic} functions, with {\em methods} specific to the class of their first argument. So the {\tt print} function has a default method, but also several hundred other methods (type \lstinline+methods(print)+ to see them), including one for objects of class \lstinline+"lm"+, called \lstinline+print.lm()+. It is this latter method that is invoked when you type \lstinline+print(m1)+, or just \lstinline+m1+ at the R command prompt. Similarly \lstinline+plot(m1)+ actually uses the method function \lstinline+plot.lm()+, and \lstinline+summary(m1)+ really calls \lstinline+summary.lm+. The function {\tt residuals} is also generic, and again it is the method function \lstinline+residuals.lm+ that is invoked by \lstinline+residuals(m1)+.  \index{object orientation}
+
+As a simple example, suppose we want to create a class, \lstinline+"foo"+, of objects whose structure is a list, with elements {\tt a} and {\tt sd} representing some estimates and their standard deviations, and we want the print method for such objects to print a simple approximate confidence interval for the estimate and its standard deviation. Here is an appropriate print method function.
+\begin{lstlisting}
+print.foo <- function(x) {
+  cat(x$a-1.96*x$sd,"\n")
+  cat(x$a+1.96*x$sd,"\n")
+}
+\end{lstlisting}
+And here is an example of it in action
+\begin{lstlisting}
+> a <- list(a = 1:3, sd = c(.1,.2,.1))
+> class(a) <- "foo"
+> print(a)
+0.8 1.6 2.8 
+1.2 2.4 3.2
+\end{lstlisting}
+Note that an object can have several classes arranged in a hierarchy, usually when an object somehow extends or generalizes an existing class, and can therefore re-use some of the methods from that original class. This is referred to as {\em inheriting} from an existing class. For example R has a {\tt glm} function for fitting {\em generalized linear models}. It returns objects of class \lstinline+"glm"+ {\em inheriting} from class \lstinline+"lm"+. e.g.\index{glm}
+\begin{lstlisting}
+> x <- runif(20); y <- rpois(20,exp(2*x))
+> m <- glm(y~x,family=poisson)
+> class(m)
+[1] "glm" "lm"
+\end{lstlisting}
+When a method function is called with an argument of class \lstinline+"glm"+, R first looks to see if there is a method function for class  \lstinline+"glm"+ objects. If not then it looks for the method function for class \lstinline+"lm"+ objects, only resorting to the default method function if it finds neither of these. So, for example, \lstinline+summary(m)+ would invoke method function \lstinline+summary.glm+, but \lstinline+plot(m1)+ invokes method function \lstinline+plot.lm+, while \lstinline+AIC(m1)+ invokes method function \lstinline+AIC.default+. \index{function!method}\index{function!generic}\index{class}\index{class!inherits}
+
+The fact that objects can inherit from several classes means that you should not test for class membership using code like \lstinline+if (class(a)=="foo")+ but rather use \lstinline+if inherits(a,"foo")+. 
+
+\section{Matrix computation \label{sec:matrix}}
+
+Both the linear model and the notion of tidy data rely on matrices, and in fact matrix computation is fundamental to many statistical modelling and statistical learning methods. You need to know some basics, starting with multiplication. You might think there is not much to say about this, but consider the following example:\index{matrix!efficiency}\index{matrix!multiplication}
+\begin{lstlisting}
+> n <- 2000; y <- runif(n) ## example vector
+> A <- matrix(runif(n*n),n,n) ## example matrix
+> B <- matrix(runif(n*n),n,n) ## example matrix
+> system.time(a1 <- A %*% B %*% y)
+   user  system elapsed 
+  1.435   0.003   1.629 
+> system.time(a2 <- A %*% (B %*% y))
+   user  system elapsed 
+  0.018   0.000   0.018 
+> range(a1-a2) ## results the same
+[1] -2.852175e-09  3.026798e-09
+\end{lstlisting}
+Why is \lstinline+A %*% B %*% y+ so much slower than \lstinline+A %*% (B %*% y)+? Consider the definition of matrix multiplication\footnote{you should have a mental picture of this, going across the rows of $\bf A$ and down the columns of $\bf B$.  }:
+$$
+C_{ij} = \sum_{k=1}^n A_{ik}B_{kj}. 
+$$
+Each element $C_{ij}$ involves $n$ multiplications and $n$ additions, and for the above case there are $n^2$ elements $C_{ij}$. So there are $2n^3$ computations to perform. Often we are not much concerned about constants such as 2, and simply write that the cost is $O(n^3)$ (`order $n^3$'). What about the matrix vector product?
+$$
+a_i = \sum_{k=1}^n B_{ik} y_k,
+$$
+so each of the $n$ elements of $\bf a$ also costs $n$ multiplications and $n $ additions. So the cost is now $O(n^2)$. The origin of the difference in timings should be clear. When forming {\tt a1}, R worked from left to right, first forming the product of $\bf A$ and $\bf B$, and only then the product of the result with $\bf y$, so the dominant  cost is $O(n^3)$. When forming {\tt a2} the brackets force the vector ${\bf By}$ to be formed first, and then the product of $\bf A $ with the resulting matrix is formed. The cost of both steps is $O(n^2)$. This accounts for the speed up, but you will notice that the speed up was not by a factor of 2000. That's because of other overheads in the process, which are not affected by the reduction in the operations count.  
+
+In addition to matrix multiplication (\lstinline+%*%+) there are several other basic operations:
+\begin{trivlist}
+\item \verb+t()+ transposes a matrix. So \verb+t(A)+ forms ${\bf A}\ts$.
+\item \verb+crossprod(A)+ forms the crossproduct ${\bf A}\ts{\bf A}$ as efficiently as possible
+\footnote{{\tt t(A)\%*\%A} has about twice the computational cost. Why?}.
+\item \verb+diag()+ allows the leading diagonal of a matrix to be be extracted or set. e.g. \lstinline+diag(A) <- 1:3+
+sets the leading diagonal of $3 \times 3 $ matrix $\bf A$ to the integers 1 to 3. {\tt sdiag} in package {\tt mgcv} does the same for sub- or super- diagonals.
+\item Operators such as \verb%+ - * /% operate element wise on matrices. 
+\item \verb+drop(x)+ drops dimensions of an array having only one level. e.g. if {\tt x} is an $n \times 1$ matrix, \verb+drop(x)+ is an $n$ vector. 
+\end{trivlist}\index{matrix!transpose}\index{matrix!cross product}\index{matrix!diagonal}\index{drop}\index{matrix!trace}
+
+\noindent {\bf Exercise:} The {\em  trace} of a matrix is the sum of its leading diagonal elements. i.e. $\text{tr}({\bf A}) = \sum_i A_{ii}$. Suppose you have two (compatible) matrices $\bf A$ and $\bf B$ and want to evaluated $\text{tr}({\bf AB})$. Clearly forming $\bf AB$ for this purpose is wasteful, as the off diagonal elements of the product contribute nothing. By considering the summation that defines $\text{tr}({\bf AB})$, find a way to evaluate it efficiently using regular multiplication, transposition and summation.  
+
+
+
+\subsection{General solution of linear systems}
+
+Suppose we want to solve ${\bf Ab} = {\bf c}$ for $\bf b$, where $\bf A$ is an $n \times n$ full rank matrix, and $\bf c$ is an $n $ vector, or an $n \times m$ matrix ({\bf b} is obviously of the same dimension).
+\begin{lstlisting}
+c <- solve(A,b)
+\end{lstlisting} 
+will do this. Formally the solution is ${\bf c}={\bf A}^{-1}{\bf b}$, but we almost never form ${\bf A}^{-1}$ explicitly, as it is less efficient computationally, and the resulting {\bf c} typically has higher numerical error. However, given a routine for solving linear systems, it is obviously possible to use it to solve ${\bf AA}^{-1} = {\bf I} $ for ${\bf A}^{-1}$, and \lstinline+Ai <- solve(A)+ will do just that. For most statistical work {\tt solve} is suboptimal in various ways, so let's consider the matrix methods that do tend to be more useful. \index{solve}\index{linear equations} \index{matrix!inverse}
+
+\subsection{Cholesky decomposition}
+
+A symmetric $n \times n$ matrix, $\bf A$, is {\em positive definite} if ${\bf x}\ts {\bf Ax} > 0$ for any non-zero $\bf x$. This is exactly equivalent to it having only positive eigenvalues. {\bf A} is {\em positive semi-definite} if  ${\bf x}\ts {\bf Ax} \ge 0$ for any non-zero $\bf x$ (equivalently all eigenvalues are $\ge 0$). Positive (semi) definite matrices are important in statistics because all covariance matrices are in this class. Recall that a covariance matrix, $\Sigma$, of a random vector $\bf X$ is the matrix containing the covariance of $X_i$ and $X_j$ as its element $\Sigma_{ij}$. That is $\Sigma_{ij} = E[\{X_i - E(X_i)\}\{X_j - E(X_j)\}]$, or equivalently \index{matrix!positive definite}\index{covariance}\index{covariance!matrix}
+$$
+{\bm \Sigma} = E[\{\X - E(\X)\}\{\X-E(\X)\}\ts].
+$$
+Various tasks are especially easy and efficient with positive definite matrices. This is largely because a positive definite matrix can be decomposed into the crossproduct of an upper triangular matrix with itself. That is we can write ${\bm \Sigma} = {\bf R}\ts{\bf R}$, where $\bf R$ is upper triangular, meaning that $R_{ij}=0$ if $i>j$. It's easy to see how this works on a small example\index{Cholesky decomposition}\index{matrix!Cholesky decomposition}
+$$
+\bmat{ccc} 
+R_{11} & 0 & 0 \\ R_{12} & R_{22} & 0 \\ R_{13} & R_{23} & R_{33}  
+\emat \bmat{ccc} 
+R_{11} & R_{12} & R_{13} \\
+0 & R_{22} & R_{23} \\
+0 & 0 & R_{33}
+\emat = \bmat{ccc} 
+\Sigma_{11} & \Sigma_{12} & \Sigma_{13} \\
+\Sigma_{12} & \Sigma_{22} & \Sigma_{23} \\
+\Sigma_{13} & \Sigma_{23} & \Sigma_{33}
+\emat
+$$
+Starting at top left, and working across the columns and down the rows we have
+\begin{align*}
+{\bf R}_{11}^2 &= \Sigma_{11}\\
+R_{11}{\bf R}_{12} &= \Sigma_{12}\\
+R_{11}{\bf R}_{13} &= \Sigma_{13}\\
+R_{12}^2 + {\bf R}_{22}^2 &= \Sigma_{22}\\
+R_{12} R_{13} + R_{22}{\bf R}_{23} &= \Sigma_{23}\\
+R_{13}^2 + R_{23}^2 + {\bf R}_{33}^2 &= \Sigma_{33} 
+\end{align*}
+where at each row the only unknown is shown in bold. For an $n\times n$ matrix this becomes (defining $\sum_{i=1}^0 x_i \equiv 0$)
+$$
+R_{ii} = \sqrt{\Sigma_{ii} - \sum_{k=1}^{i-1} R_{ki}^2} \text{    and    }
+R_{ij} = \frac{\Sigma_{ij} - \sum_{k=1}^{i-1} R_{ki}R_{kj}}{R_{ii}}.
+$$
+An immediate use is to compute the determinant 
+$$
+|{\bf \Sigma}| = |{\bf R}\ts{\bf R}| = |{\bf R}|^2 = \left ( \prod_{i=1}^n R_{ii} \right )^2.
+$$
+or better the log determinant $\log |{\bf \Sigma}| = 2 \sum_{i=1}^n \log R_{ii}$. \index{determinant}
+
+Solving is also easy once we are dealing with triangular factors. To solve ${\bm \Sigma} {\bf x} = {\bf y}$ for {\bf x}, we just need to solve ${\bf R}\ts {\bf Rx} = {\bf y} $. That is done by solving ${\bf R}\ts {\bf z} = {\bf y}$ for {\bf z} and then ${\bf Rx} = {\bf z}$ for $\bf x$. Again a small example makes it clear how easy this is:
+$$
+\bmat{ccc} 
+R_{11} & 0 & 0 \\ R_{12} & R_{22} & 0 \\ R_{13} & R_{23} & R_{33}  
+\emat \bmat{c} z_1 \\ z_2 \\ z_3 \emat = \bmat{c} y_1 \\ y_2 \\ y_3 \emat.
+$$ \index{forward solve}
+Obviously working from the top we have the following system, with one unknown (in bold) at each line
+\begin{align*}
+R_{11} {\bf z}_1 &= y_1\\
+R_{12} z_1 + R_{22} {\bf z}_2 & = y_2\\
+R_{13} z_1 + R_{23} z_2 + R_{33} {\bf z}_3 &= y_3 
+\end{align*}
+The generalization of this {\em forward solve} is obvious, as is the equivalent {\em  back solve}, where we start from the last line and work back solving for $x_j$\ldots
+$$
+\bmat{ccc} 
+R_{11} & R_{12} & R_{13} \\
+0 & R_{22} & R_{23} \\
+0 & 0 & R_{33}
+\emat \bmat{c} x_1 \\ x_2 \\ x_3 \emat = \bmat{c} z_1 \\ z_2 \\ z_3 \emat.
+$$ \index{backward solve} \index{matrix!triangular solve}
+In R, function {\tt chol} computes the Cholesky factor, while {\tt backsolve} and {\tt forwardsolve} solve with triangular factors. One advantage of the Cholesky factorization is speed. Solving linear systems of dimension $n$ costs $O(n^3)$ operations whether we use {\tt chol} or {\tt solve}, but the constant of proportionality is smaller for Cholesky. For example.
+\begin{lstlisting}
+> n <- 2000
+> A <- crossprod(matrix(runif(n*n),n,n)) ## example +ve def matrix
+> b <- runif(n)  ## example n vector
+> system.time(c0 <- solve(A,b)) ## solve 
+   user  system elapsed 
+  0.577   0.000   0.577 
+> system.time({R <- chol(A);    ## solve with cholesky
++ c1 <- backsolve(R,forwardsolve(t(R),b))})
+   user  system elapsed 
+  0.312   0.000   0.313 
+> range(c0-c1)/norm(A) ## confirm same result
+[1] -3.673905e-12  3.970016e-12
+\end{lstlisting}
+
+As an example, consider evaluating the log of the multivariate normal p.d.f.
+$$
+- \frac{1}{2}({\bf y} - {\bm \mu})\ts {\bm \Sigma}^{-1} ({\bf y} - {\bm \mu}) - \frac{1}{2} \log |{\bm \Sigma}| - \frac{n}{2}\log(2 \pi)
+$$ 
+Doing this by using R functions {\tt solve} and {\tt determinant} is much slower than is necessary. In particular {\tt determinant} requires $O(n^3)$ operations, whereas once we have the Cholesky factor, determinant calculation is $O(n)$. Notice also how 
+$$
+({\bf y} - {\bm \mu})\ts {\bm \Sigma}^{-1} ({\bf y} - {\bm \mu}) = {\bf z}\ts {\bf z} \text{   where  } {\bf z} = {\bf R}\its ({\bf y} - {\bm \mu})
+$$
+This suggests the following function (recall $|{\bf AB}| = |{\bf A}||{\bf B}|$, so $|{\bm \Sigma}|=|{\bf R}|^2$)\index{determinant}
+\begin{lstlisting}
+ldmvn <- function(y,m,S) { 
+## Cholesky based evaluation of log density of MVN at y. 
+## m is mean and S the covariance matrix.
+  R <- chol(S) ## Get Cholesky factorization R'R = S
+  z <- forwardsolve(t(R),y-m) ## R^{-T}(y-m)
+  -sum(z^2)/2 - sum(log(diag(R))) - length(m)*log(2*pi)/2
+} ## ldmvn
+\end{lstlisting}
+Here is a small example using it
+\begin{lstlisting}
+> y <- c(3,4.5,2); m <- c(.6,.8,1.2)
+> S <- matrix(c(1,.5,.3,.5,2,1,.3,1,1.5),3,3)
+> ldmvn(y,m,S)
+[1] -8.346052
+\end{lstlisting}
+
+\noindent {\bf Exercise:} If ${\bf y } = {\bf Ax}$ and $\bf x$ has covariance matrix ${\bm \Sigma}_x$, show that the covariance matrix of $\bf y$ is ${\bm \Sigma}_y = {\bf A}{\bm \Sigma}_x{\bf A}\ts$. This is a basic and fundamental result re-used repeatedly in statistics and data science. \index{covariance matrix!of a linear transform} 
+
+\noindent {\bf Exercise:} A linear transformation of multivariate normal random variables is also multivariate normal. Write a function to generate {\tt n} draws from a multivariate normal distribution with mean {\tt m} and covariance matrix {\tt S}, by transformation of independent $N(0,1)$ deviates, generated by {\tt rnorm}. Also write code to test that it is working (function {\tt cov} might be helpful).  
+
+
+\subsection{QR decomposition \label{sec:qr}}
+
+An orthogonal matrix $\bf Q$ is one with the property that ${\bf Q}\ts {\bf Q} = {\bf QQ}\ts = {\bf I}$. Any full rank square matrix, $\bf A$, can be decomposed into the product of an orthogonal matrix and an upper triangular matrix: ${\bf A} = {\bf QR}$. So the solution to ${\bf A}\bp = {\bf y}$ is the solution to ${\bf R}\bp = {\bf Q}\ts {\bf y}$ --- it involves multiplication be an orthogonal matrix, and a back-solve. 
+
+But suppose that instead of full rank square matrix $\bf A$ defining the l.h.s. of the system we want to solve, we have $n \times p$, rank $p$, matrix $\X$, where $n > p$. Clearly we can not expect to find a solution to $\X\bp={\bf y}$ in general, since we have more equations to satisfy than there are elements of $\bp$. But what about $\X\bp \approx {\bf y}$? We can solve that provided we are a little more precise about what `$\approx$' means. In particular consider finding $\bp$ to minimize the  mean square difference between $\X\bp$ and $\bf y$. That is we want to minimize the squared Euclidean length of ${\bf y} - \X \bp$, the sum of squares of differences between ${\bf y} $ and $\X \bp$. i.e. we seek
+$$
+\hat \bp = \underset{\beta}{\text{argmin }} \|{\bf y} - \X \bp \|^2
+$$
+where $\|{\bf v}\|^2 = {\bf v}\ts{\bf v} = \sum_{i=1}^n v_i^2$ is the squared Euclidean norm/Euclidean length of a vector, $\bf v$. 
+
+Solution of this problem involves the fact that we can also decompose $\bf X$ into the product of an $n \times n$ orthogonal matrix, $\bm{{\cal Q}}$, and an upper triangular matrix, so that
+$$
+{\bf X} = \bm{{\cal Q}} \bmat{c} {\bf R} \\ {\bf 0} \emat
+$$ 
+${\bf R}$ is $p \times p$ upper triangular. Defining $\bf Q$ to be the first $p$ columns of $\bm{{\cal Q}}$, we can also write the decomposition as $\X = {\bf QR}$, of course. Now a defining property of orthogonal matrices is that they act as rotations/reflections, that is $\|\bm{{\cal Q}} {\bf v}\|^2 = \|{\bf v}\|^2 $, for any ${\bf v}$. It follows that 
+$$
+\|{\bf y} - \X \bp \|^2 = \|\bm{{\cal Q}}\ts{\bf y} - \bm{{\cal Q}}\ts\X \bp \|^2 = \left \|\bm{{\cal Q}}\ts{\bf y} -  \bmat{c} {\bf R} \\ {\bf 0} \emat \bp  \right \|^2 = \|{\bf Q}\ts {\bf y} - {\bf R}\bp \|^2 + \|{\bf r}\|^2
+$$
+where $\bf r$ is the vector containing the final $n-p $ elements of $\bm{{\cal Q}}\ts{\bf y}$. Since $\bf r$ does not depend on $\bp$, then $\hat \bp$ must be the minimizer of  $\|{\bf Q}\ts {\bf y} - {\bf R}\bp \|^2$. But this can be reduced to zero by setting \index{linear model!least squares}\index{QR decomposition}\index{matrix!QR decomposition}
+$$
+\hat \bp = {\bf R}^{-1} {\bf Q}\ts {\bf y}.
+$$
+$\hat \bp$ is the least squares estimate of the parameters of a linear model, and the given formula is how least squares estimates are computed in practice (obviously using a triangular solve, not explicit formation of ${\bf R}^{-1}$). This approach has much better numerical stability than using the theoretical formula $\hat \bp = (\X\ts \X)^{-1} \X \ts {\bf y}$ that you may have seen previously. It is easy to show that $\hat \bp$ is unbiased (that is $E(\hat \bp) = \bp$). Further, since the covariance matrix of $\bf y$ is ${\bf I}\sigma^2$, the basic result on the covariance matrix of a linear transform shows that the covariance matrix of $\hat \bp$ is 
+$$
+{\bf \Sigma}_{\hat \bp} = {{\bf R}^{-1}{\bf R}\its} \sigma^2. 
+$$ 
+An unbiased estimate of $\sigma^2$ is $\hat \sigma^2 = \|\hat {\bm \epsilon}\|^2/(n-p) = \|{\bf y} - \X \hat \bp \|^2/(n-p) = \|{\bf r}\|^2/(n-p)$.
+
+
+The R function {\tt qr} computes a QR decomposition. It returns an object of class \verb+"qr"+ containing the decomposition stored in a compact form. The components of the decomposition can be accessed using functions \lstinline+qr.R+ and \lstinline+qr.Q+ where the latter has optional argument \lstinline+complete+ which is set to {\tt TRUE} if the full $n \times n$ matrix $\bm{{\cal Q}}$ is required, rather than the default $n \times p$ matrix {\bf Q}. In fact explicitly extracting $\bm{{\cal Q}}$ or ${\bf Q}$ is computationally very inefficient, if all we need is the product of a vector and the orthogonal factor. In that case it is far more efficient to use functions \lstinline+qr.qy+ and \lstinline+qr.qty+ which take the {\tt qr} object as first argument and a vector, {\tt y}, as second argument, and return respectively $\bm{{\cal Q}}{\bf y}$ or  $\bm{{\cal Q}}\ts {\bf y}$. 
+
+Here are the computations for obtaining least squares estimates, applied to the simple {\tt PlantGrowth} model from section \ref{sec:lm}. It uses the fact that ${\bf Q}\ts {\bf y}$ is the first $p$ elements of $\bm{{\cal Q}}\ts {\bf y}$
+\begin{lstlisting}
+> X <- model.matrix(~group,PlantGrowth) ## model matrix (note: response not needed!)
+> qrx <- qr(X)              ## get QR decomposition of model matrix
+> y <- PlantGrowth$weight   ## response
+> p <- ncol(X)              ## number of parameters  
+> beta <- backsolve(qr.R(qrx),qr.qty(qrx,y)[1:p]) ## R^{-1} Q^T y
+> beta                      ## least squares estimates
+[1]  5.032 -0.371  0.494
+\end{lstlisting}  
+This is exactly the computational approach used by {\tt lm}. \index{least squares}
+
+\noindent {\bf Exercise:} Occasionally explicit inverses are needed. Write code that uses {\tt backsolve} to find an explicit inverse of an upper triangular matrix, $\bf R$, and test it.   
+
+\noindent {\bf Exercise:} Using the fact that $|{\bf AB}|=|{\bf A}||{\bf B}|$ and $|{\bf A}| = |{\bf A}\ts|$, show that for an orthogonal matrix, $\bf Q$, $|{\bf Q}|=\pm 1$. Hence run the code \lstinline@set.seed(0);n<-100; A <- matrix(runif(n*n),n,n)@ and use the QR decomposition to evaluate the magnitude\footnote{The sign of the determinant depends on whether $|{\bf Q}|$ is positive or negative. This can also be determined cheaply, but takes us too far afield: basically $\bf Q$ is constructed from the product of $n-1$, rank one orthogonal {\em Householder} matrices, each with determinant -1, so $|{\bf Q}| = (-1)^{n-1}$.} of the determinant of {\tt A}. Compare your answer to \lstinline+determinant(A,log=FALSE)+. Now increase the size of the elements of {\tt A} using \lstinline+A <- A*1000+ and repeat the exercise. This should emphasis the problem with working directly with the determinant, so now use the QR decomposition of {\tt A} to obtain the log of the magnitude of the determinant of {\tt A}. \index{determinant}
+
+\subsection{Pivoting and triangular factorizations}
+ 
+When computing factorizations involving triangular matrices, it turns out that the numerical stability of the factorization is affected by the order in which the rows and/or columns appear in the original matrix. But for all least squares and equation solving tasks the order in which rows and columns are present in the matrix doesn't actually matter - we can always re-order and get the same result (provided we take account of the re-ordering). So rows and/or columns can be re-ordered for maximum numerical stability - that is for minimum numerical error in the final answer. This is known as {\em pivoting}. {\tt chol} and {\tt qr} have options allowing pivoting to be used. Using them requires extra book-keeping, and takes us too far off topic in this course: but for serious computation you should be aware that pivoting is possible, and can be necessary. \index{matrix!pivoting}    
+ 
+\subsection{Symmetric Eigen-decomposition}
+
+Any real symmetric matrix, $\bf A$, has an {\em eigen-decomposition} 
+$$
+{\bf A} = {\bf U}\bm{\Lambda}{\bf U}\ts
+$$
+where {\bf U} is an orthogonal matrix, the columns of which are the (normalized) eigenvectors of $\bf A$, and $\bm \Lambda$ is a diagonal matrix of the eigenvalues of $\bf A$, arranged so that $\Lambda_{ii}\ge\Lambda_{i+1,i+1}$. R function {\tt eigen} computes eigen-decompositions, as we saw in section \ref{sec:function}. Rather than provide further simple examples of the use of {\tt eigen}, let's look at a major application in multivariate statistics: principle components analysis. \index{eigen}
+
+\subsubsection{Eigen-decomposition of a covariance matrix: PCA}
+
+The eigen-decomposition of a covariance matrix is often known as Principle Components Analysis (PCA). Consider a set of observations, ${\bf x}_1, {\bf x}_2, \ldots, {\bf x}_n$ of a $p$ dimensional random vector $\bm{{\cal X}}$, and suppose we create an $n \times p$ matrix ${\bf X}$ whose ith row is ${\bf x}_i$. The estimated variance of ${\cal X}_j$ is $\sum_{i=1}^n (X_{ij} - \bar X_j)^2/(n-1)$, and the estimated covariance of ${\cal X}_j$ and ${\cal X}_k$ is $\sum_{i=1}^n (X_{ij} - \bar X_j)(X_{ik} - \bar X_k)/(n-1)$ where $\bar X_j = n^{-1}\sum_{i=1}^n X_{ij}$. Hence if $\tilde {\bf X}$ is $\bf X$ with the column mean subtracted from each column, then the estimated sample covariance matrix for  $\bm{{\cal X}}$ is simply\index{PCA}\index{eigen}
+$$
+\hat {\bm \Sigma}_{\cal X} = \tilde {\bf X}\ts \tilde {\bf X}/(n-1).
+$$ 
+We can form an eigen decomposition $\hat {\bm \Sigma}_{\cal X} = {\bf U}{\bm \Lambda}{\bf U}\ts$ (${\bm \Lambda} = \text{diag}({\bm \lambda})$ and $\lambda_i>\lambda_{i+1}$), and use this to define a new random vector ${\bf z} = {\bf U}\ts \bm{{\cal X}}$. Now $\bf U$ is orthogonal, so using the standard result for a linear transformation of a covariance matrix, we have that the estimated covariance matrix for $\bf z$ is
+$$
+\hat {\bm \Sigma}_z = {\bf U}\ts \hat {\bm \Sigma}_{\cal X} {\bf U} = 
+{\bf U}\ts{\bf U}{\bm \Lambda}{\bf U}\ts {\bf U} = {\bm \Lambda}.
+$$
+i.e. the elements of $\bf z$ are uncorrelated, and the estimated variance of $z_j$ is $\lambda_j$. By the orthogonality of $\bf U$ we can write ${\bf Uz}=\bm{{\cal X}}$. i.e. $\bm{{\cal X}}$ is a weighted sum of the orthogonal columns of $\bf U$, where the weights are uncorrelated random variables with variances given by the $\lambda_j$. Hence the variability of $\bm{{\cal X}}$ has been decomposed additively into orthogonal {\em principle components}, ${\bf U}_{\cdot j}$ with associated variance $\lambda_j$. The principle component with the largest variance, $\lambda_1$, contributes the most variance, the component with the next largest variance $\lambda_2$ is next, and so on.      
+
+We can of course view $z_j$ as the co-ordinate of $\bm{{\cal X}}$ on the axis defined by ${\bf U}_{\cdot j}$, which suggests computing such co-ordinates for each original observations. That is computing ${\bf Z} = {\bf XU}$ where the ith row of $\bf Z$ gives the co-ordinates of observation ${\bf x}_i$ relative to the axes defined by $\bf U$. Now, by construction these co-ordinates have sample variance $\lambda_1, \lambda_2,\dots, \lambda_p$, with the first co-ordinate having most variability, the next having the second most variability and so on. This implies that we can use the co-ordinates for {\em dimension reduction}. Retaining the first $m$ components will capture $\sum_{i=1}^m \lambda_i/\sum_{i=1}^p \lambda_i$ of the variance in the original data. Often this proportion can be very high for $m \ll p$. This dimension reduction is equivalent to replacing the covariance matrix $ \hat {\bm \Sigma}_{\cal X}$ with ${\bf U}_m {\bm \Lambda}_m {\bf U}_m\ts$ where ${\bf U}_m$ denotes the first $m$ columns of ${\bf U}$ and ${\bm \Lambda}_m$ the first $m$ rows and columns of $\bm \Lambda$.   
+
+The classic dataset for illustrating this is the {\tt iris} data, available in R. This gives 4 measurements for each of 50 iris flowers of 3 species (so $n=150$, $p=4$). Plotting the raw data is is not clear to what extent the measurements can really separate the species:\index{iris data}
+\begin{lstlisting}
+pairs(iris)
+\end{lstlisting}
+\eps{-90}{0.5}{iris.eps}
+Let's see if the principle components do any better. Function {\tt sweep} can be used to column centre the data matrix.
+\begin{lstlisting}
+X <- sweep(as.matrix(iris[,1:4]),2,colMeans(iris[,1:4])) ## col centred data matrix
+ec <- eigen(t(X)%*%X/(nrow(X)-1))    ## eigen decompose the covariance matrix
+U <- ec$vectors;lambda <- ec$values  ## exract eigenvectors and values
+Z <- X %*% U;                        ## the principle co-ordinated 
+plot(Z[,1],Z[,2],col=c(1,2,4)[as.numeric(iris$Species)],main="iris PCA",
+     xlab="PCA 1",ylab="PCA 2")      ## plot first two components  
+\end{lstlisting}
+\eps{-90}{0.5}{iris-pca.eps}
+The three species are quite clearly separated now. Notice how the range of the first component is substantially greater than that of the second component --- as expected, since the components are in decreasing order of variance explained. Here is some code to re-iterate the link between the ${\bf Z}$ column variances and ${\bm \lambda}$, and assess what proportion of the variance is explained by (can be attributed to) the first 2 principle components (columns of {\bf Z}).    
+\begin{lstlisting}
+> apply(Z,2,var);lambda ## compare Z column variances to lambda
+[1] 4.22824171 0.24267075 0.07820950 0.02383509
+[1] 4.22824171 0.24267075 0.07820950 0.02383509
+> sum(lambda[1:2])/sum(lambda) ## proportion variance explained by components 1 and 2
+[1] 0.9776852
+\end{lstlisting}
+
+\noindent {\bf Exercise:} An obvious alternative is to standardize the original variables to have unit variance and then perform PCA. In that case we are really working with the correlation matrix for the variables, rather than the covariance matrix. Try this and compare the separation of the species now. Examining the eigenvalues, suggest a possible partial explanation for any difference.
+
+\subsection{Singular value decomposition}
+
+PCA is an example of {\em dimension reduction}: finding a lower dimensional representation of high dimensional data. In a sense much of statistics and data-science is about dimension reduction: about finding ways of representing complex data using simpler summaries, without the loss of important information. But for the moment, let's stick with finding lower dimensional representations of matrices. One output of PCA was low rank approximations to covariance matrices - but what about low rank approximations to non-square matrices? {\em Singular value decomposition} gives a way to achieve this. Any $n \times p$ matrix, $\bf X$ can be decomposed
+$$
+\X = {\bf U}{\bf DV}\ts
+$$ 
+where $\bf U $ is an $n \times p $ matrix with orthogonal columns, $\bf V$ is an orthogonal matrix, and $\bf D$ is a diagonal matrix of the {\em singular values} of $\bf X$ --- the positive square roots of the eigenvalues of ${\bf X}\ts {\bf X}$. $\bf D$ is arranged so that $D_{ii} \ge D_{i+1,i+1}$ (that is the singular values are in decreasing order on the diagonal). Suppose ${\bf U}_r$ and ${\bf V}_r$ denote the matrices consisting of the first $r$ columns of $\bf U$ and $\bf V$, while ${\bf D}_r$ is the first $r$ rows and columns of $\bf D$. Then
+$$
+{\bf U}_r{\bf D}_r{\bf V}_r\ts
+$$
+is the best rank $r$ approximation to $\X$ (in a sense that is beyond our scope here). The {\tt svd} function in R returns the singular value decomposition of a matrix. \index{singular value decomposition}
+
+\noindent {\bf Exercise:} The formal expression for the least squares estimates of a linear model is $\hat \bp = (\X\ts \X)^{-1} \X \ts {\bf y}$. Find a simplified expression for this in terms of the components of the SVD. Use you expression to compute the least squares estimates for the {\tt PlantGrowth} model of section \ref{sec:qr}, one more time.  
+
+\section{Design, Debug, Test and Profile}
+
+Having covered enough R, and a sufficient diversity of statistically oriented examples, that writing code for serious statistical tasks is possible, it is time to consider some topics that are a essential for larger coding projects. 
+
+\subsection{Design}
+
+As mentioned several times already in these notes, you will write better code more quickly if you spend some time and effort thinking about, planning and writing down the {\em design} of your code, before you type any actual code at the keyboard. A major aim of code design is to achieve well {\em structured} code, in which the overall computational task has been broken down into logical components, coded in concise manageable functions, each with well defined {\em testable} properties. Well structured programmes are are easier to code, test, debug, read and maintain. \index{code!design}\index{code!structure}
+
+For complex projects, design may be multi-levelled, with the task broken down into `high level' logical units, with each unit requiring further design work itself. But however complex the task, the same basic approach is useful at each level.
+\begin{enumerate}
+\item {\em Purpose}. Write down what your code should do. What are the inputs and outputs, and how do you get from one to the other?
+\item {\em Design Considerations}. What are the other important issues to bear in mind? e.g. does your code need to be quick? or deal with large data sets? is it for one off use, by you, or for general use by others? etc.
+\item  {\em Design and structure}. Decide how best to split the code into functions each completing a well defined manageable and testable part of the overall task. Write down the structure.
+\item {\em Review}. Will this structure achieve the purpose and meet the design considerations?  
+\end{enumerate} 
+Often you will need to iterate and refine the process a few times to achieve a design you are happy will do the job, and be as straightforward as possible to code. And some parts of any design are likely to need more careful specification and detailing than others. 
+
+At the design stage you are acting like the architect and structural engineer for a building. Once you start to code you are acting as the builder. This is a useful analogy. Architects' plans never cover how every brick is to be laid. The builder still has to solve many on the ground problems during construction, but the better the plans, the more smoothly the construction phase tends to go. Just as making up any but the simplest building work as you go along is a recipe for making a mess, so is trying to design as you code - at least sketch out a plan first. But also expect to have to modify your plan as you code, as some realities become apparent that were not anticipated. 
+
+Good planning and structure also help to write readable code, but readability also requires good commenting. If you write reasonable good code then as you write it, everything about your code will usually seem very obvious to you. But two weeks later it will not seem obvious. Neither will it seem obvious to anyone else (as the team-working experience from this course so far will hopefully have already made clear). You should therefore aim to comment your code so that you could give it to another R programmer and they could quickly understand what is supposed to be doing and how it does it, {\em without knowing anything about these things previously}. You can help others and your later self by\index{code!comments}
+\begin{enumerate}
+\item Using (short) meaningful variable names where possible.
+\item Explaining what the code does using frequent \verb+# comments+, including a short overview at the start of each function, and in longer projects an overview of the code's overall purpose. 
+\item Laying out the code so that it is clear to read. Remember that white space and blank lines cost nothing.
+\item Whenever you work in a team, always ensure that any piece of code and commenting written by one team member is carefully reviewed and checked by another.    
+\end{enumerate}  
+
+\subsection{Ridge regression ---  a very short design example}
+
+The parameters estimates, $\hat \bp$, for the linear model ${\bf y} = {\bf X}\bp + {\bm \epsilon}$ can become rather unstable if $p$, the number of parameters, becomes large relative to $n$, the number of data. Indeed if $p>n$ then least squares parameter estimates $\hat \bp $, will not exist. This in turn means that model predictions $\hat \mu = {\bf X} \hat \bp$ may poorly approximate the true ${\bm \mu} = E({\bf y})$. One approach that can help is {\em ridge regression}, which reduced variability in $\hat \bp$ by {\em shrinking} parameters towards zero. Specifically we estimate parameters as 
+$$
+\hat \bp = \underset{\bp}{\text{argmin}} ~ \|{\bf y} - \X\bp\|^2 + \lambda \|\bp\|^2 = (\X\ts \X + \lambda {\bf I})^{-1} \X\ts {\bf y}
+$$
+for some {\em smoothing parameter} $\lambda$. The larger we make $\lambda$ the more the elements of  $\hat \bp$ are shrunk towards zero, while $\lambda=0$ returns the least squares estimates\footnote{There is a close link between ridge regression and a Bayesian approach to linear modelling, in which a prior $\beta\sim N({\bf 0}, {\bf I}\lambda^{-1}\sigma^2)$ is placed on the linear model parameters. With such a prior, $\hat \bp$, is the posterior mode for $\bp$.}. $\lambda$ can be selected to optimize an estimate of the error that the model would make in predicting a replicate dataset to which it had not been fitted. One such estimate is the {\em generalized cross validation} score,\index{ridge regression}\index{cross validation!generalized}
+$$
+V(\lambda) = \frac{n\|{\bf y} - {\bf X}\hat \bp\|^2}{\{n-\text{trace}({\bf A})\}^2},
+$$
+where ${\bf A} = \X(\X\ts \X + \lambda {\bf I})^{-1} \X\ts$, so that $\hat {\bm \mu} = {\bf Ay}$. The term $\text{trace}({\bf A})$ is the {\em effective} degrees of freedom of the model. It varies smoothly between $p$ and 0 as $\lambda$ is varied between 0 and $\infty$. 
+
+Let's briefly consider the design a simple ridge regression function.
+
+\begin{enumerate}
+\item {\em Aim}. Produce a function that takes model matrix, $\bf X$, response vector $\bf y$, a sequence of $\lambda $ values to try, and returns the vector of ridge regression parameter estimates $\hat \bp$ corresponding to the GCV optimal choice of $\lambda$.
+\item {\em Considerations}. Reasonable to assume that inputs are correct here. Important to check that the GCV score has a proper minimum. Since ridge regression often used for large $p$, efficiency is of some importance.
+\item {\em Outline high level design}: \begin{enumerate}
+\item Top level function {\tt ridge(y,X,lsp)} loops through log smoothing parameters in {\tt lsp}, calling function {\tt fit.ridge} for each to evaluate GCV score. Hence find optimal log smoothing parameter. Plots GCV against {\tt lsp} using function {\tt plot.gcv}. Returns optimal $\hat \bp$
+\item {\tt fit.ridge(y,X,sp)} fits ridge regression as above using Cholesky\footnote{Actually QR based methods would be more stable, but involve extra maths that is unhelpful for this illustration.} based method to solve for $\hat \bp$. {\tt sp} is the $\lambda $ value to use. Return the GCV score, effective degrees of freedom and $\hat \bp$.
+\item {\tt plot.gcv(edf,lsp,edf)} plots the GCV score against effective degrees of freedom, {\tt edf} and log smoothing parameters, {\tt lsp}, marking the minimum.
+\end{enumerate}
+\end{enumerate}   
+So the overall task has been broken down into simpler tasks for which testable functions can be written. 
+
+\bigskip
+
+\noindent {\bf Exercise:} Complete any necessary design details for each function, and implement {\tt ridge}. 
+
+\subsection{Testing}
+
+It is important to test code. You should of course test code as you write it, checking that it does what you expect in an interactive manner, but you should also devote some time to developing tests that can be run repeatedly in a more automated manner. One important approach is known as {\em unit testing}, where you write code implementing tests that check whether the components of a software project do what they are designed to do. In R programming this would usually mean writing code to check that the functions that make up your project each perform as expected, when supplied with arguments covering the range of conditions that the function is designed to cope with (and often also testing that appropriate error message are given when inappropriate inputs are provided). \index{unit tests}\index{code!testing}
+
+In complex projects it is also a good idea to design appropriate tests that the functions are working together in the appropriate way, although this is often somewhat automatic, since projects are often hierarchical, with some functions calling  several other functions, so that tests of the calling function must automatically test the co-ordinated operation of the functions being called.  
+
+As a very simple example, consider unit tests for the simple matrix argument to matrix value function from section \ref{sec:function}, modified slightly to also include some error checking.\index{error checking}\index{stop}
+\begin{lstlisting}
+mat.fun <- function(A,fun=I) {
+  if (!is.matrix(A)) A <- matrix(A) ## coerce to matrix if not already a matrix
+  if (ncol(A)!=nrow(A)) stop("matrix not square") ## halt execution in this case
+  if(max(abs(A-t(A)))>norm(A)*1e-14) stop("matrix not symmetric")
+  ea <- eigen(A,symmetric=TRUE) ## get eigen decomposition
+  ## generalize 'fun' to matrix case...
+  ea$vectors %*% (fun(ea$values)*t(ea$vectors)) ## note use of re-cycling rule!
+}
+\end{lstlisting}
+We might write tests for the case where \verb+fun+ is the identity, square root and inverse, where in each case the returned value should be easily checked. Another test might check that non-square matrices are correctly handled. 
+\begin{lstlisting}
+## test fun=I and inverse
+n <- 10; A <- matrix(runif(n*n)-.5,n,n)
+A <- A + t(A) ## make symmetric
+
+B <- mat.fun(A) ## identity function case
+if (max(abs(A-B))>norm(A)*1e-10) warning(" mat.fun I failure")
+
+B <- mat.fun(A,function(x) 1/x) ## inverse function case
+if (max(abs(solve(A)-B))>norm(A)*1e-10) warning("mat.fun inv failure")
+
+A <- crossprod(A) ## ensure +ve def for sqrt case
+B <- mat.fun(A,sqrt) ## sqrt function case
+if (max(abs(A-B%*%B))>norm(A)*1e-10) warning("mat.fun sqrt failure")
+
+## use try to check that an error is produced, as intended for non-square argument
+if (!inherits(try(mat.fun(matrix(1:12,4,3)),silent=TRUE),"try-error")) 
+              warning("error handling failure")
+\end{lstlisting}
+Obviously you might choose to bundle these unit tests into a function that can then be called to run the tests, possibly returning a code indicating which error or none occurred, and/or printing warnings as appropriate.  
+
+Writing careful tests that are as comprehensive as possible is good practice, especially for code that will be used by others, and may be subject to future modification. But beware of the complacency that having good tests can bring with it. When modifying code, the mere fact that it still passes all its tests is no proof that the modification is correct. Also don't get in the habit of coding to the unit tests - debugging modifications until the unit tests are all passed and then assuming that all is OK. 
+
+\bigskip
+
+\noindent {\bf Exercise:} add a test for whether non symmetric matrices are being handled as designed.
+
+\subsection{Debugging}
+
+Debugging\footnote{The term comes from the early days of computing, when errors were sometimes caused by moths or other `bugs' getting into the hardware of the computer. It stuck.} is the process of finding and fixing errors in computer code. There are two aspects to debugging. Adopting the right approach, and using an appropriate debugger appropriately. Start with approach. \index{debug}\index{code!debugging}
+\begin{itemize}
+\item  Ideally we would not introduce bugs in the first place. But humans are error prone, and would probably not be creative if that was not the case. So recognise that you are error prone, by adopting working methods that minimize the chance of errors: design before you code. Make sure the task is broken down in a well structured manner, into functions that can be individually tested. Comment carefully, and test as you go along. Note that the act of describing what code is supposed to do in a useful comment is often a good way of noticing that it doesn't do that. 
+\item Be aware that modification of code, for example to add functionality, is often the point at which bugs are introduced. Carefully commenting code to make its original function clear is the first line of defence against this. Being very careful to test modifications is also key. 
+\item But any interesting code will have bugs at some point in its development. Finding bugs usually requires that you adopt a scientific approach - gathering data on what might be wrong, forming hypotheses about the what is causing the problems and then designing experimental tests to check this.
+\item Key to this approach is checking what your code is {\em actually} doing, and whether it conforms to what you think it {\em ought} to be doing. 
+\item While going carefully through your code once looking for errors is sensible, staring at it for hours is rarely productive. You need to actively hunt down the errors. Sometimes this can be done by simply modifying the code to print out information as it runs, but more often the efficient way to proceed is to use a debugger to step through your code checking that it is producing what you expect at each step.       
+\end{itemize}
+
+R provides {\tt debug}, {\tt debugcall}, {\tt trace} and {\tt traceback} functions for debugging, and Rstudio also has a basic debugger. However Mark Bravington's {\tt debug} package is the most useful option currently available. It is not available on CRAN, so see section \ref{sec:software} for installation instructions. Use of {\tt debug} is as follows: 
+
+\begin{enumerate}
+\item Load the package into R with \lstinline+require(debug)+ or \lstinline+library(debug)+.
+\item Use \lstinline+mtrace+ to set which functions you want to debug. e.g. \lstinline+mtrace(lm)+ would set up debugging of R's own {\tt lm} function. \lstinline+mtrace(lm,FALSE)+ turns off debugging of a specific routine (here \lstinline+lm+), while \lstinline+mtrace.off()+ turns off all debugging.
+\item To start debugging just call the function in the usual way. For example \lstinline+lm(rnorm(10)~runif(10))+, will launch \lstinline+lm+ in debugging mode once we have used \lstinline+mtrace+ to set this up. See screenshot below.
+\item Once in debugging mode the R prompt changes to \verb+D(1)>+ and a new window appears showing the source code of the function being debugged. \index{debug!mtrace}\index{debug!bp}\index{debug!go}\index{debug!quit}\index{debug!break points}
+\begin{itemize}
+\item At the prompt you can issue R commands in the usual way. So setting or checking the values of variables is easy, for example.
+\item Pressing the return key without an R command causes the next line of code of the function being debugged to be executed.
+\item The command \lstinline+go()+ causes the function to run to completion, the first error, or to the next {\em breakpoint}.
+\item Breakpoints are markers in the code indicating where you want execution to stop (to allow examination of intermediate variables, typically). They are set and cleared using the \lstinline+bp()+ function. For example:
+\begin{enumerate}
+\item \lstinline+bp(101)+ sets a breakpoint at line 101 of the current function, while \lstinline+bp(101,FALSE)+ turns it off again. The location of breakpoints is shown as a red star next to the appropriate code line in the source code window.
+\item \lstinline+bp(12,i>6,foo)+ sets a breakpoint at line 12 of function {\tt foo}, indicating that execution should only stop at this line if the condition \verb+i>6+ is met.  
+\end{enumerate}
+See {\tt ?bp} for more details. Note that stepping over lengthy loops can be very time-consuming in the debugger (even one line loops), so setting a breakpoint after the loop and \lstinline+go()+ing to it is a common use of breakpoints, even in simple code. 
+\item To step into a function called from the function you are debugging, either {\tt mtrace} it, or set a breakpoint inside it.
+\item \lstinline+qqq()+ quits the debugger from within a function being debugged, without completing execution of the remaining function code.   
+\item See \lstinline+https://www.maths.ed.ac.uk/~swood34/RCdebug/RCdebug.html+ for slightly more information, including how to deal with some minor niggles in {\tt debug}.
+\end{itemize}  
+\end{enumerate}
+
+\eps{0}{0.3}{mtrace.png}
+
+
+\subsection{Profiling}
+
+Once you have working tested debugged code you may, in some circumstances, want to work on its computational speed\footnote{you might also be concerned about its memory footprint, but we won't cover that here.}. This can be especially important if coding statistical analyses of large data sets that may need to be repeated many times: for example the processing of medical images, satellite data, financial data, network traffic data, high throughput genetic data and so on.  
+
+The {\tt Rprof} function in R profiles code by checking what function is being executed every \lstinline+interval+ seconds, where \lstinline+interval+ is an argument with default value 0.02, storing the results to a file (default \lstinline+"Rprof.out"+). Function \lstinline+summaryRprof+ can then be used to tabulate how long R spent in each function. Two times are reported, total time in the function, and time spent executing code solely within the function, as opposed to other functions called by the function. The basic operation is as follows:\index{Rprof} \index{summaryRprof}\index{profiling}
+\begin{lstlisting}
+Rprof()
+## the code you want to profile goes here
+## only the calls to run the code are needed 
+## - not function definitions.
+Rprof(NULL)
+summaryRprof()
+\end{lstlisting}
+Here is a simple example. 
+{\small \begin{verbatim}
+> pointless <- function(A,B,y) { 
++   C <- A%*%B%*%y  ## compute ABy
++   D <- solve(A,B)%*%y  ## compute A^{-1}By
++   E <- A + B 
++   F <- A + t(B)
++ }
+> n <- 2000; A <- matrix(runif(n*n),n,n)
+> B <- matrix(runif(n*n),n,n); y <- runif(n)
+> ## Profile a call to pointless...
+> Rprof()
+> pointless(A,B,y)
+> Rprof(NULL)
+> summaryRprof()
+$by.self
+                self.time self.pct total.time total.pct
+"solve.default"      0.66    60.00       0.66     60.00
+"%*%"                0.38    34.55       0.38     34.55
+"t.default"          0.04     3.64       0.04      3.64
+"+"                  0.02     1.82       0.02      1.82
+
+$by.total
+                total.time total.pct self.time self.pct
+"pointless"           1.10    100.00      0.00     0.00
+"solve.default"       0.66     60.00      0.66    60.00
+"solve"               0.66     60.00      0.00     0.00
+"%*%"                 0.38     34.55      0.38    34.55
+"t.default"           0.04      3.64      0.04     3.64
+"t"                   0.04      3.64      0.00     0.00
+"+"                   0.02      1.82      0.02     1.82
+
+$sample.interval
+[1] 0.02
+
+$sampling.time
+[1] 1.1
+\end{verbatim}}
+Clearly {\tt pointless} is spending most of its time in {\tt solve} and \verb+%*%+, which might encourage you to look again at these. Then recalling the discussions of matrix computation efficiency from section \ref{sec:matrix}, you would modify the function to make it more efficient, and profile again.
+{\small \begin{verbatim}
+> pointless2 <- function(A,B,y) { 
++   C <- A%*%(B%*%y)  ## compute ABy
++   D <- solve(A,B%*%y)  ## compute A^{-1}By
++   E <- A + B
++   F <- A + t(B)
++ }
+> Rprof()
+> pointless2(A,B,y)
+> Rprof(NULL)
+
+> summaryRprof()
+$by.self
+                self.time self.pct total.time total.pct
+"solve.default"      0.22    73.33       0.22     73.33
+"t.default"          0.04    13.33       0.04     13.33
+"%*%"                0.02     6.67       0.02      6.67
+"+"                  0.02     6.67       0.02      6.67
+
+$by.total
+                total.time total.pct self.time self.pct
+"pointless2"          0.30    100.00      0.00     0.00
+"solve.default"       0.22     73.33      0.22    73.33
+"solve"               0.22     73.33      0.00     0.00
+"t.default"           0.04     13.33      0.04    13.33
+"t"                   0.04     13.33      0.00     0.00
+"%*%"                 0.02      6.67      0.02     6.67
+"+"                   0.02      6.67      0.02     6.67
+
+$sample.interval
+[1] 0.02
+
+$sampling.time
+[1] 0.3
+\end{verbatim}}
+This is much better. Far less time is spent on matrix multiplication, as the unnecessary matrix-matrix multiplication is avoided. The time spent in {\tt solve} is also substantially reduced by only solving with a vector right hand side, rather than a matrix. \index{matrix!efficiency}
+
 
 \section{Graphics}
 
-Visualization of data and modelling results is an essential part of statistical analysis and data science more widely. As we have already seen, base R itself provides graphics functions, but there are also add on packages for various tasks. For example the {\tt lattice} package shipped with R is very useful for visualizing grouped data. Here let's cover base R graphics and the popular {\tt ggplot2} add on package. For a good many tasks {\tt ggplot2} lets you build quite complicated visually appealing plots fairly easily. The `gg' stands for `grammer of graphics' and in keeping with this the package uses its own language to describe plot elements, which is not always obvious. 
+Visualization of data and modelling results is an essential part of statistical analysis and data science more widely. As we have already seen, base R itself provides graphics functions, but there are also add on packages for various tasks. For example the {\tt lattice} package shipped with R is very useful for visualizing grouped data. Here let's cover base R graphics and the popular {\tt ggplot2} add on package. For a good many tasks {\tt ggplot2} lets you build quite complicated visually appealing plots fairly easily. The `gg' stands for `grammar of graphics' and in keeping with this the package uses its own language to describe plot elements, which is not always obvious. 
 
 In broad overview, the difference between base R graphics and {\tt ggplot} graphics is as follows.
 \begin{itemize}
@@ -1361,7 +2361,7 @@ points(mpg$displ,mpg$hwy,col=(mpg$transmission=="automatic")+1,pch=19,cex=.5) # 
 {\tt ggplot2} produces plots like the right hand one with a bit less effort, and has lots of other built in features for quickly building plots that would otherwise take rather more coding in base R. For example to produce the sort of plot on the right hand side above might involve this:\index{ggplot}\index{ggplot!aes}\index{ggplot!\verb+geom_point+}
 \begin{lstlisting}
 a <- ggplot(mpg,aes(x=displ,y=hwy)) + geom_point(aes(colour=transmission)) +
-      geom_smooth(method=gam,formula=y~s(x)) ## add a smooth as it's easy!
+      geom_smooth(method="gam",formula=y~s(x)) ## add a smooth as it's easy!
 a    ## 'print' plot object 'a' - that is plot it!
 \end{lstlisting}
 \eps{0}{.7}{mpg-gg.pdf}
@@ -1403,7 +2403,7 @@ A very common adjustment needed when printing to file is to change the size of t
 \begin{lstlisting}
 ggsave("mpg-gg.eps",width=5,height=3)
 \end{lstlisting}
-produced the second plot in the previous section. {\tt ggsave} infers the plot file type from its extension ({\tt .eps} here).\index{ggplot!graphics file}
+produced the second plot in the previous section. {\tt ggsave} infers the plot file type from its extension ({\tt .eps} here).\index{ggplot!graphics file} By default it saves the last plot displayed, but you can also explicitly provide a {\tt ggplot} object as the {\tt plot} argument of the function.
 
 \subsection{Some univariate data plots}
 
@@ -1439,7 +2439,7 @@ $$
 where $h$ is our chosen value for the standard deviation. Such an estimate is known as a {\em kernel density estimate}, with {\em bandwidth} $h$. We could use any other valid pdf in place of $\phi$, of course. The {\tt density} function in R will compute such kernel density estimates, choosing the bandwidth parameter automatically. Sometimes the automatic selection appears to over or under smooth the density. For the eruption times it seems to over smooth putting a bit too much probability between the peaks. We can reduce the bandwidth relative to its automatic value by setting the {\tt adjust} parameter to something less than one. Here is code for plotting the density estimate on the right, above.  
 \begin{lstlisting}
 plot(density(faithful$eruptions,adjust=0.6),type="l",xlab="eruption time (mins)",
-     main="kernel denisty estimate")
+     main="kernel density estimate")
 \end{lstlisting}
 
 \noindent{\bf Exercise}: overlay a kernel density estimate over a histogram of the eruptions data (hint: used {\tt lines}).
