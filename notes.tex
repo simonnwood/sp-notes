@@ -891,7 +891,7 @@ Here is an example of calling {\lstinline+mat.mod+} to find a matrix inverse:
 \end{lstlisting}
 In this case both arguments were supplied by their full name, and a function definition was used to supply argument {\lstinline+fun+}. 
 
-\subsection{The `{\tt \ldots}' argument}
+\subsection{The `{\tt \ldots}' argument \label{sec:dots}}
 
 Functions can also have a special argument `\lstinline$...$', which is used to create functions that can have variable numbers of arguments. It is also used to pass arguments to a function that may in turn be passed on to other functions, without those arguments having to be declared as arguments of the calling function: this is useful for passing arguments that control settings of plotting functions, for example. \index{functions!variable number of arguments}
 \index{functions!\ldots argument}
@@ -2320,6 +2320,492 @@ $sampling.time
 \end{verbatim}}
 This is much better. Far less time is spent on matrix multiplication, as the unnecessary matrix-matrix multiplication is avoided. The time spent in {\tt solve} is also substantially reduced by only solving with a vector right hand side, rather than a matrix. \index{matrix!efficiency}
 
+\section{Maximum Likelihood Estimation \label{sec:mle}}
+
+Linear models are widely used for statistical analysis of data, but there are many situations in which alternative models are more appropriate. Here are a few examples, without straying too far from the {\em regression model} setup of a response variable to be explained by predictor variables,
+\begin{enumerate}
+\item Independent binary response variables $y_i \sim \text{bernouilli}(\mu_i)$ where the probability (and expected value of $y_i$), $\mu_i$, is determined by some predictor variables $x_{ij}$, using a {\em generalized} linear model structure
+$$
+\log\{\mu_i/(1-\mu_i)\} = \eta_i \equiv \beta_0 + x_{i1}\beta_1 + x_{i2} \beta_2 + \ldots
+$$
+The model can include metric or factor predictors exactly as in the linear model case. $\log\{\mu_i/(1-\mu_i)\}$ is an example of a {\em link} function (the `logit' link) and is used here to ensure that $0<\mu_i<1$ whatever the values of the parameters $\beta_j$. The right hand side of the model is known as the {\em linear predictor}, $\eta_i$, for short. Notice how $\mu_i = e^\eta_i/(1+e^\eta_i)$, emphasising how $\mu_i$ is bounded between 0 and 1. This {\em logistic} function gives the model its name: {\em logistic regression}. It can easily be generalized to $y_i \sim \text{binom}(n_i,\mu_i)$.  \index{logistic regression}\index{link function}
+\item Data where the response, $y_i$, are counts of some sort. One model is $y_i \underset{\text{ind}}{\sim} \text{Poi}(\mu_i)$, and given predictors $x_{ij}$, we might use the log-linear model \index{count data}\index{Poisson}\index{log linear model}
+$$
+\log(\mu_i) = \beta_0 + x_{i1}\beta_1 + x_{i2} \beta_2 + \ldots
+$$ 
+Again the r.h.s. is referred to as the linear predictor, $\eta_i$. In this case the link function is the log, and $E(y_i) = \mu_i = e^\eta_i$ -- the link ensures that $\mu_i > 0$. An obvious generalization allows a negative binomial distribution for $y_i$.
+\item Sometimes a linear model structure for $y_i$ is appropriate, but with a relaxation of the simple independent constant variance assumption. Writing $y_i = \mu_i + e_i$ we might want linear models for both the systematic, or {\em fixed} part $\mu_i$, and for the {\em random} part, $e_i$. This leads to the {\em linear mixed model}
+$$
+{\bf y} = \X \bp + {\bf Zb} + {\bm \epsilon} \text{  where  } {\bf b} \sim N({\bf 0}, {\bm \psi}_{\gamma}) \text{  and  } {\bm \epsilon} \sim N({\bf 0}, {\bf I}\sigma^2)
+$$  
+${\bf X}\bp$ is exactly as in the linear model. ${\bf Z}$ is a model matrix for the random component of $\bf y$, constructed from predictor variables (often factors) exactly as $\bf X$ is, {\em except} that we do not need to worry about identifiability issues. The random variables $\bf b$ are known as {\em random effects}, and their covariance matrix ${\bm \psi}_{\gamma}$ is parameterized via a vector of unknown parameters $\bm \gamma$. Notice how basic properties of transformations of covariance matrices imply that the covariance matrix of $\bf e$ and hence ${\bf y}$ is ${\bf Z}{\bm \psi}_{\theta}{\bf Z}\ts + {\bf I} \sigma^2$, so the model implies ${\bf y} \sim N(\X \bp,{\bf Z}{\bm \psi}_{\gamma}{\bf Z}\ts + {\bf I} \sigma^2)$, with parameters, $\bp$, $\bm \gamma$ and $\sigma$ to estimate.\index{random effect}\index{mixed model}
+\end{enumerate}  
+For all these models it is straightforward to write down the joint probability density function\footnote{here I'll used probability density function to refer also to probability mass functions in the discrete r.v. case.} of the $y_i$. It is given explicitly for example 3, and for examples 1 and 2 it is simply the product over all $i$ of the p.d.f. for each $y_i$ given by the model (since the $y_i$ are independent). Let's denote this joint p.d.f. as $\pi_\theta({\bf y})$ (e.g. for example 3 it is the p.d.f. of the given multivariate normal), where $\bm \theta$ denotes all the unknown parameters of the model. 
+
+We need to estimate the model parameters. For linear models we chose the parameters that made the model best fit the data in the least squares sense. This made sense when data had equal variance and were independent, so each $y_i$ should be fitted equally well, but it is problematic in other cases. Poisson data, for example, have $\text{var}(y_i) = E(y_i)$ -- the larger the mean the larger the variance, so trying to fit high and low values equally well is not sensible. We need a notion of `best fit' that can deal with this non-constant variance problem, as well as with data that are not independent. This is where the notion of {\em likelihood} comes in. The idea is beautifully simple.
+\begin{quote}
+Model parameter values that make the observed data ($\bf y$) appear more probable according to the model are more likely to be correct than parameter values that assign lower probability to the observed data.
+\end{quote} 
+That's it. We plug the observed data into the model p.d.f., $\pi_\theta({\bf y})$, and then adjust the parameters, $\bm \theta$, of the p.d.f. to maximize $\pi_\theta({\bf y})$ --- the probability of $\bf y$ according to the model. When considering the model p.d.f. evaluated at $\bf y$ as a function of the parameters $\bm \theta$ we refer to it as the {\em likelihood function}, or just the {\em likelihood} of $\bm \theta$. The log of likelihood is actually more useful, denoted
+$$
+l({\bm \theta}) = \log \pi_\theta({\bf y}).
+$$  
+The log likelihood is maximised at the same $\bm \theta$ value as the likelihood, of course ($\log$ is a monotonic function). It is useful computationally, because it does not {\em underflow} to zero when the likelihood is very small, and also theoretically, as a number of very useful general results are available for the log likelihood. 
+
+Note that when computing we {\bf never} form the likelihood and then take its log, but instead work directly on the log scale. This is to avoid having the likelihood underflow to zero and then attempting to take a log of zero. For example, in the case in which the elements of $\bf y$ are independent then the p.d.f. factorizes
+$$
+\pi_{\theta}({\bf y}) = \prod_{i=1}^n \pi_{i,\theta}(y_i)
+$$ 
+where $\pi_{i,\theta}(y_i)$ is the p.d.f. of $y_i$. Hence from basic properties of logs\footnote{$\log(AB) = \log(A) + \log(B)$.} 
+$$
+l({\bm \theta}) = \log \prod_{i=1}^n \pi_{i,\theta}(y_i) = \sum_{i=1}^n \log \pi_{i,\theta}(y_i)
+$$
+and we would compute the $\log \pi_{i,\theta}(y_i)$ (directly on the log scale) and sum them to compute $l({\bm \theta})$.
+
+As a simple example consider the one parameter Poisson model:
+$
+y_i \sim \text{Poi}\{\exp(\beta x_i)\}
+$ 
+and suppose that we have $n$ pairs of $x_i, y_i$ data. Generally the probability function for a Poisson random variable with mean $\lambda_i$ is $\pi(y_i) = \lambda_i^{y_i} \exp(-\lambda_i)/y_i!$.  So for our model  
+$$
+\pi(y_i) = \exp(\beta x_i)^{y_i} \exp\{-\exp(\beta x_i)\}/y_i!
+$$
+and assuming independence of the $y_i$ the log likelihood is therefore
+$$
+l(\beta) = \sum_{i=1}^n y_i \beta x_i - \exp(\beta x_i) - \log y_i!
+$$
+The following plot illustrates example data and model fit on the left, and plots the log likelihood on the right. 
+\eps{0}{.5}{fig-likelihood-fig-1.pdf}
+
+
+\bigskip 
+
+\noindent {\bf Exercise:} Write an R function to evaluate the log likelihood of parameter vector {\tt beta} for example 2, given a model matrix {\tt X}, specifying the linear predictor, and a response vector {\tt y}.  
+
+\subsection{MLE theoretical results}
+
+The most basic use of the log likelihood is to find the {\em maximum likelihood estimates} (MLE) of parameters
+$$
+\hat {\bm \theta} = \underset{\theta}{\text{argmax}} ~l({\bm \theta}) ~~~~ (\text{equivalently}~\hat {\bm \theta} = \underset{\theta}{\text{argmin}} ~ -l({\bm \theta}))
+$$
+As with any estimate, we can study its behaviour under imaginary replication of the data gathering process, by considering the {\em estimator} version of $\hat {\bm \theta}$. That is, consider $\hat {\bm \theta}$ as a function of the random vector of which the observed $\bf y$ is an observation. Exact results are not available in general, but large sample results are. \index{Maximum Likelihood Estimate}
+
+Let $n$ be the number of elements in $\bf y$, and ${\bm \theta}_t$ be the (unknowable) true value of $\bm \theta$. Under a wide variety of circumstances $\hat {\bm \theta}$ is {\em consistent}. That is $\hat {\bm \theta} \to {\bm \theta}_t$ and $\text{var}(\hat {\bm \theta}) \to 0$ as $n \to \infty$. Furthermore if $\hat{\bm{{\cal I}}}$ is the second derivative (or {\em Hessian}\index{Hessian}) matrix of $-l$, such that $\hat {\cal I}_{ij} = - \ilpddif{l}{\theta_i}{\theta_j}$, then $ \text{cov} (\hat {\bm \theta})\to  \hat{\bm{{\cal I}}}^{-1} $ as $n \to \infty$, with the same holding for ${\bm{{\cal I}}} = E(\hat {\bm{{\cal I}}})$. This means that in the large sample limit maximum likelihood estimators are unbiased and attain the Cram\'er-Rao lower bound - the theoretical lower limit for the variance of an unbiased estimator. \index{consistency}\index{Cram\'er-Rao bound} Note that ${\bm{{\cal I}}}$ is known as the {\em Fisher information matrix} and   $\hat{\bm{{\cal I}}}$ the {\em observed} Fisher information matrix. \index{information matrix}\index{Maximum Likelihood Estimate!large sample results}
+
+In many circumstances in which the information per parameter tends to infinity with $n$, then there is a further result that in the $n \to \infty$ large sample limit
+$$
+\hat {\bm \theta} \sim N({\bm \theta}_t,\hat{\bm{{\cal I}}}^{-1})
+$$
+(again the same holds with ${\bm{{\cal I}}}$ in place of $\hat{\bm{{\cal I}}}$). This immediately allows testing of hypotheses about, and finding confidence intervals for, individual $\theta_i$.  \index{maximum likelihood!estimator distribution}
+
+By way of illustration of what this result means, consider the simple 1 parameter Poisson example above. The following plot shows 100 log likelihood functions for $\beta$ in grey - each is based on a new replicate of the data (which were simulated in this case, so easy to actually replicate). The maximum of each replicate log likelihood is marked, and the corresponding replicate $\hat \beta $ marked on the horizontal axis as a tick. A kernel density estimate (see section \ref{sec:1d-plot}) of the p.d.f. of $\hat \beta$ is shown - notice how it is approximately normal.
+\eps{0}{.5}{fig-beta-dist-1.pdf}
+
+
+Under similar conditions there is another useful result for testing general hypotheses about the parameter vector. Suppose that we want to test the hypothesis $H_0:R({\bm \theta}) = {\bf 0}$, where $R$ is an $r-$vector valued function. Typically we might want to test several elements of $\bm \theta$ (such as the parameters associated with a factor variable) for simultaneous equality to zero, but more generally we might want to compare two models where the simpler (null) model is a reduced version of the full model. Let
+$$
+\hat {\bm \theta}_0 = \underset{\theta}{\text{argmax}} ~l({\bm \theta}) ~~ \text{under the constraint} ~~ R({\bm \theta}) = {\bf 0}
+$$  
+Then {\em if $H_0$ is true}, and in the  $n\to \infty$ limit
+$$
+2\{l(\hat {\bm \theta}_0) - l(\hat {\bm \theta})\}\sim \chi^2_r.
+$$
+If $H_0$ is false then we expect $2\{l(\hat {\bm \theta}_0) - l(\hat {\bm \theta})\}$ to be too large for consistency with a $\chi^2_r$ distribution. This result allows us to conduct very general tests about $\bm \theta$: {\em Generalized Likelihood Ratio Tests}, so called because the test statistic is the log of a likelihood ratio. The main limitation on the result is that it only holds when  $H_0:R({\bm \theta}) = {\bf 0}$ is not restricting any parameter to an edge of the parameter space. For example we can not test whether a variance is zero by this method. \index{likelihood ratio test}
+
+These results provide a very general set of tools for conducting statistical analysis with any of the three example models in the previous section, and with a huge range of other models as well. But to do so we must be able to compute the log likelihood, optimize it to find $\hat {\bm \theta}$, and evaluate the observed information matrix, $\hat{\bm{{\cal I}}}$. Generally these tasks require numerical computation, to be covered next.  
+
+\section{Numerical Optimization}
+
+Maximum likelihood optimization, and many other statistical learning approaches, rely on numerical optimization. Hence  statistical programmers needs to understand the basics of optimization. {\em Optimization} means finding the maximum or minimum of a function. Clearly maximizing a function is the same as minimizing its negative, so in this section let's consider minimization. This is convenient because the optimization functions in R minimize by default, and also it is the Hessian of the negative log likelihood that we need for the MLE large sample results, so we may as well work with negative log likelihoods\footnote{Also for the Gaussian Linear Model, least squares estimation is equivalent to minimizing the negative log likelihood.}. So we are interested in finding \index{objective function}
+$$
+\hat {\bm \theta} = \underset{\theta}{\text{argmin}} ~ D({\bm \theta})
+$$
+for some {\em objective function} $D({\bm \theta})$ (e.g. a negative log likelihood, a residual sum of squares, or whatever). We'll assume that $D$ is smooth with 3 bounded derivatives. Now consider the gradient vector and Hessian matrix of $D$
+$$
+\nabla D({\bm \theta}) = \ \bmat{c} \pdif{D}{\theta_1}\\ \pdif{D}{\theta_2}\\ \cdot \\ \cdot \emat_{ {\bm \theta}} ~~ \text{  and } ~~
+\nabla^2 D({\bm \theta}) = \bmat{cccc}  
+\pdif{^2D}{\theta_1^2} & \pddif{D}{\theta_1}{\theta_2} & \cdot & \cdot \\
+\pddif{D}{\theta_1}{\theta_2} & \pdif{^2D}{\theta_2^2} & \cdot & \cdot \\
+\cdot & \cdot& \cdot & \cdot \\\cdot & \cdot& \cdot & \cdot \\
+\emat_{ {\bm \theta}}.
+$$\index{Hessian}
+The conditions for a minimum, $\hat {\bm \theta}$, are that $\nabla D(\hat {\bm \theta}) = {\bf 0}$ and $\nabla^2 D(\hat {\bm \theta})$ is positive definite. The condition on the Hessian ensures that $D$ increases in every direction from $\hat {\bm \theta}$ (consider a Taylor expansion of $D$ about $\hat {\bm \theta}$). In practice of course we have to test that  $\nabla D(\hat {\bm \theta})$ is `close enough' to ${\bf 0}$. Positive definiteness is easily tested by seeing if a Cholesky decomposition is possible, or (at higher cost) by checking that the eigenvalues are all positive.
+
+\subsection{Newton's method}
+
+Newton's method is based on the idea of minimizing successive quadratic approximations to $D$, to home in on    $\hat {\bm \theta}$. We start from a guess at the parameters, and find the quadratic function matching $D$, $\nabla D$ and $\nabla^2 D$ at that guess. We then minimize the quadratic, which is easy, to find an improved guess, and repeat the process, until we arrive at $\nabla D(\hat {\bm \theta}) = {\bf 0}$. To avoid any possibility of divergence, we have to check that each new proposal for $\bm \theta$ has actually reduced $D$ and if not, backtrack towards the previous value until it does. We also have to ensure that the approximating quadratic has a proper minimum, which means checking that  $\nabla^2 D$ is positive definite, and perturbing it to be so, if it isn't. 
+
+Here is an illustration of the optimization of the simple one parameter Poisson log likelihood example from section \ref{sec:mle} (plotted as maximization to match previous figure), starting with a guess of $\hat \beta = 4$ on the left. The solid curve is the log likelihood, and the dashed curve the quadratic approximation about each panels starting point. The titles gives the $\hat \beta$ maximising the quadratic - the starting point for the next panel.     
+
+\eps{0}{.6}{fig-newton-fig-1.pdf}
+
+\noindent In more detail. Taylor's theorem says that 
+$$
+D({\bm \theta} + {\bm \Delta}) = D({\bm \theta}) + {\bm \Delta}\ts \grad_\theta D  + \tfrac{1}{2} {\bm \Delta} \ts \grad_\theta^2 D {\bm \Delta} + o(\|{\bm \Delta}\|^2)
+$$
+Provided $\grad_\theta^2 D$ is positive definite, the $\bm \Delta $ minimizing the quadratic on the right is  
+$$
+{\bm \Delta} = -(\grad_\theta^2 D)^{-1} \grad_\theta D
+$$
+This also minimizes $D$ in the small $\bm \Delta $ limit, which is the one that applies near $D$'s minimum. A {\em descent direction} is one in which a sufficiently small step will decrease $D$. Interestingly, ${\bm \Delta}$ is a descent direction for positive definite $\grad_\theta^2 D$ or with {\em any positive definite matrix} in place of $\grad_\theta^2 D$ (again Taylor's theorem can be used to prove this). So to guarantee convergence we impose two modifications to the Newton iteration
+\begin{enumerate} 
+\item If $\grad_\theta^2 D$ is not positive definite we just perturb it to be so -- an obvious approach is to add a multiple of the identity matrix to it, large enough to force positive definiteness (tested by Cholesky or eigen decomposition).
+\item Far from the optimum, $\bm \Delta$ might overshoot and increase $D$. If so, repeatedly halve $\bm \Delta$ until $D({\bm \theta} + {\bm \Delta})<D({\bm \theta})$. 
+\end{enumerate}
+It is easy to see that this modified Newton method must converge to a minimum. Whether it is global or local we can not say of course.  \index{optimization!Newton}
+
+As a simple example consider these data on number of AIDS cases in Belgium, $y_i$, each year, $t_i$,  
+
+\bigskip
+
+{ \noindent\tabcolsep=0.11cm \begin{tabular}{l|ccccccccccccc}
+Year (19--)& 81 & 82 & 83 & 84 & 85 & 86 & 87 & 88 & 89 & 90 & 91 & 92 & 93\\
+Cases   & 12 & 14 & 33 & 50 & 67 & 74 & 123& 141& 165& 204& 253& 246& 240
+\end{tabular}}
+
+\bigskip
+
+\noindent A simple `exponential increase' model says that the number of cases, $y_i$, is an observation of an independent Poisson r.v., with expected value
+$ \mu_i = \alpha e^{\beta t_i} $
+where $t_i$ is the number of years since 1980. So  the log likelihood is
+$$
+l(\alpha,\beta) = \sum_{i=1}^n y_i \{\log(\alpha) + \beta t_i\} - \sum_{i=1}^n ( \alpha e^{\beta t_i} - \log (y_i!) ),
+$$
+and hence for parameter vector ${\bm \theta} = (\alpha, \beta)\ts$,
+$$
+\grad l =
+\bmat{c} \sum y_i / \alpha - \sum \exp(\beta t_i) \\
+\sum y_i t_i - \alpha \sum t_i \exp(\beta t_i)
+\emat  \text{~~and~~}
+\grad^2 l =
+\bmat{cc}
+- \sum y_i / \alpha^2 & - \sum t_i e^{\beta t_i} \\
+- \sum t_i e^{\beta t_i} & - \alpha \sum t_i^2 e^{\beta t_i}.
+\emat.
+$$
+The following shows 6 iterations of Newton's method, with the full log likelihood contoured in black in each panel.
+
+\eps{-90}{.5}{newton-aids.eps}
+
+Starting at top left the iteration starts at the black circle. The quadratic approximation around this point is contoured in grey, but does not have a positive definite Hessian, so the black dotted contours are the approximation after perturbation to positive definiteness. The white circle shows the minimizer of the approximation giving the updated parameter values. The upper row middle panel is the next step. The quadratic approximation in grey again has to be modified to get something positive definite - again the dotted contours. This time stepping to the approximation's minimum makes things worse. We have to backtrack towards the starting point until an improvement is obtained at the white circle. The remaining 4 panels apply the Newton iteration with no modification required, to arrive at the MLE. Again, for plotting, the positive log likelihood was used, but we could just as well have plotted the negative log likelihood. 
+
+\subsection{Quasi-Newton: BFGS}
+
+Working out Hessians is a bit tedious. Can we get away with just gradients? The obvious way to do this is to try to build an optimization method on the first order Taylor expansion, rather than the second order one. There are two problems with this. One is that the first order approximation does not have a minimum. The other is that the first order approximation gets worse as we approach the minimum of the objective, since the gradient is tending to zero, leaving ever diminishing grounds for having neglected the second order terms in the expansion. These theoretical problems matter in practice. The `steepest descent' optimization method that results from the first order approximation is often extremely slow to converge near the optimum. 
+
+All is not lost however. A better method using only first derivatives is to combine gradient information over several steps to build up an approximation to the Hessian matrix. The fact that using any positive definite matrix in place of the Hessian in the Newton step still gives us a descent direction implies that the fact our Hessian will only be approximate is not a big problem. The way to build up the approximation is to insist that at each optimization step, the quadratic model implied by the approximate Hessian must be made to match the gradient evaluated at the start and the end of the step. Here is the most common BFGS\footnote{Named after its inventors Broyden, Fletcher, Goldfarb and Shanno} version of the algorithm. It updates the inverse approximate Hessian, thereby avoiding the need for a matrix solve.\index{optimization!quasi-Newton}\index{optimization!BFGS}
+
+\begin{enumerate}
+\item Let ${\bm \theta}^{[k]}$ denote the $k^\text{th}$ trial $\bm \theta$, with approx. inverse Hessian ${\bf B}^{[k]}$.
+\item Let ${\bf s}_k = {\bm \theta}^{[k+1]} -{\bm \theta}^{[k]} $ and ${\bf y}_k = \nabla D({\bm \theta}^{[k+1]}) - \nabla D({\bm \theta}^{[k]})$.
+\item Defining $\rho_k^{-1} = {\bf s}_k\ts {\bf y}_k$ the BFGS update is
+$$
+{\bf B}^{[k+1]} = ({\bf I} - \rho_k {\bf s}_k {\bf y}_k\ts){\bf B}^{[k]}({\bf I} - \rho_k {\bf y}_k {\bf s}_k\ts)
++ \rho_k {\bf s}_k {\bf s}_k\ts
+$$
+\item The Quasi-Newton step from ${\bm \theta}^{[k]}$ is ${\bm \Delta} = - {\bf B}^{[k]} \nabla D({\bm \theta}^{[k]})$.
+\item The actual step length is chosen to satisfy the Wolfe conditions
+\begin{enumerate}
+\item $D({\bm \theta}^{[k]}+{\bm \Delta}) \le D({\bm \theta}^{[k]}) + c_1 \nabla D({\bm \theta}^{[k]})\ts {\bm \Delta}$
+\item $\nabla D({\bm \theta}^{[k]}+{\bm \Delta})\ts {\bm \Delta} \ge c_2 \nabla D({\bm \theta}^{[k]})\ts {\bm \Delta}$
+\end{enumerate}
+where $0<c_1<c_2<1$. Curvature condition (2) ensures that $\rho_k>0$ so that ${\bf B}^{[k+1]}$ stays positive definite.
+\item ${\bf B}^{[0]}$ is sometimes set to $\bf I$, or to the inverse of a finite difference approximation to the Hessian. \end{enumerate}
+The following figure shows the first 6 steps of BFGS applied to the simple AIDS epidemic model. Panels are as in the Newton case. The implied Hessian is always positive definite, so there is no need for perturbation here. Notice how the approximate quadratic is not quite such a good match now, and in consequence progress is a little slower (it takes another 6 steps to reach the optimum). 
+
+\eps{-90}{.45}{bfgs-aids.eps}
+
+\subsection{Derivative free optimization: the Nelder Mead polytope}
+
+What if first derivatives are too taxing, or our objective is not smooth enough for a Newton type method to work well. What can be done with just function evaluations? The Nelder Mead polytope method is one answer. Let $p = \text{dim}({\bm \theta})$, and define an initial  {\em polytope} of $p+1$ distinct $\bm \theta$ values.\index{optimization!Nelder Mead}
+Then iterate\ldots
+\begin{enumerate}
+\item The vector from the worst $\bm \theta$ point through the centroid (mean) of the other $p$ points is the search direction.
+\item The initial step length is twice the distance, $d$, from the worst point to the centroid of others. If the new point is not the worst one, try a length $3d$ step, picking the best new point of the 2 tried, to replace the worst point.
+\item If the previous step did not succeed, try steps of $d/2$ and $3d/2$.
+\item If the previous 2 steps failed, then linearly shrink the polytope towards the best point.   
+\end{enumerate}
+That's it. These rules are simply repeated until convergence. If it's that easy why did we ever bother with Newton and Quasi-Newton? Well, this method takes far more steps than Newton type methods, tends to give a solution to lower accuracy, and has more of a tendency to get stuck before convergence. On the other hand, it can work well on some surprisingly difficult objectives. Here it is in action on the AIDS model example. For a 2 dimensional parameter space the polytope is a triangle. The worst point in each successive polytope is shown with a symbol on this plot. The iteration starts around 15, 0.35. 
+
+\eps{-90}{.4}{polytope-aids.eps}
+
+\subsection{R optimization functions}
+
+R and its add on packages offer a number of general purpose optimization functions. Here consider two: {\tt nlm}, uses a Newton algorithm and {\tt optim} which offers several methods, including BFGS and Nelder Mead (default). 
+
+\begin{itemize}
+\item \verb+optim(par,fn,gr=NULL,...,method="Nelder-Mead",hessian=FALSE)+
+ \begin{itemize}
+ \item {\tt par} is the vector of initial values for the optimization parameters.
+ \item \verb+fn+ is the objective function to minimize. Its first argument is always the vector of optimization parameters. Other arguments must be named, and will be passed to {\tt fn} via the \verb+`...'+ argument to {\tt optim}. It returns the value of the objective.
+ \item \verb+gr+ is as {\tt fn}, but, if supplied, returns the gradient vector of the objective.
+ \item \verb+`...'+ is used to pass named arguments to {\tt  fn} and {\tt gr}. See section \ref{sec:dots}. 
+ \item {\tt method} selects the optimization method. \verb+"BFGS"+ is another possibility.
+ \item {\tt hessian} determines whether or not the Hessian of the objective should be returned. 
+ \end{itemize}
+ \item \verb+nlm(f, p, ...,hessian=FALSE)+
+ \begin{itemize}
+ \item \verb+f+ is the objective function, exactly like {\tt fn} for {\tt optim}. In addition its return value may optionally have \verb+`gradient'+ and \verb+`hessian'+ attributes.
+ \item {\tt p} is the vector of initial values for the optimization parameters.
+ \item \verb+`...'+ is used to pass named arguments to {\tt  f}. See section \ref{sec:dots}.  
+ \item {\tt hessian} determines whether or not the Hessian of the objective should be returned. 
+\end{itemize}\end{itemize}\index{Hessian}
+
+As an example consider the AIDS data log likelihood again. First code up its negative version. Since the Poisson probability function is built into R, we may as well use it, rather than coding the log density explicitly. Note the log scale evaluation.
+\begin{lstlisting}
+nll <- function(theta,t,y) {
+## -ve log likelihood for AIDS model y_i ~ Poi(alpha*exp(beta*t_i))
+## theta = (alpha,beta)  
+  mu <- theta[1] * exp(theta[2] * t) ## mu = E(y)
+  -sum(dpois(y,mu,log=TRUE)) ## the negative log likelihood
+} ## nll
+\end{lstlisting} 
+\subsubsection{Using {\tt optim}}\index{optimization!optim}
+Now let's use it with {\tt optim}'s default Nelder Mead polytope algorithm. I have added comments explaining the return object.
+\begin{lstlisting}
+> t80 <- 1:13 ## years since 1980
+> y <- c(12,14,33,50,67,74,123,141,165,204,253,246,240) ## AIDS cases
+> 
+> fit <- optim(c(10,.1),nll,y=y,t=t80,hessian=TRUE)
+> 
+> fit 
+$par    ## the parameter values minimizing the objective
+[1] 23.1205665  0.2021157
+
+$value  ## the value of the objective at the minimum
+[1] 81.18491
+
+$counts ## how many objective evaluations needed (no gradients for Nelder Mead)
+function gradient 
+      95       NA 
+
+$convergence ## convergence diagnostic message 0 means converged - see ?optim
+[1] 0
+
+$message ## any other message from the optimizer
+NULL
+
+$hessian ## the numerically approximated second derivative matrix of the objective
+           [,1]        [,2]
+[1,]   3.034268    669.9001
+[2,] 669.900082 164447.5279
+\end{lstlisting} 
+Suppose we would like to obtain the approximate standard deviation of $\hat \alpha$ and $\hat \beta$. This is now easy - just invert the Hessian to get the approximate covariance matrix of the parameter estimators, and extract the square root of its diagonal elements.
+\begin{lstlisting}
+> V <- chol2inv(chol(fit$hessian)) ## solve(fit$hessian) also possible
+> se <- diag(V)^.5 ## extract standard deviations
+> se
+[1] 1.80971894 0.00777364
+\end{lstlisting}
+Now try {\tt optim} using BFGS with a supplied gradient function. Here is the gradient function.
+\begin{lstlisting}
+gll <- function(theta,t,y) {
+## grad of -ve log lik of Poisson AIDS early epidemic model
+  alpha <- theta[1];beta <- theta[2] ## enhances readability
+  ebt <- exp(beta*t) ## avoid computing twice
+  -c(sum(y)/alpha - sum(ebt),     ## -dl/dalpha
+    sum(y*t) - alpha*sum(t*ebt)) ## -dl/dbeta
+} ## gll
+\end{lstlisting}
+Any time we code up gradients we need to test them, by comparing the coded gradients with {\em finite difference} approximations (see section \ref{sec:deriv}), as follows. 
+\begin{lstlisting}
+fd <- th0 <- c(10,.1) ## test param value, and approx grad vec
+nll0 <- nll(th0,t=t80,y=y) ## nll at th0
+eps <- 1e-7  ## finite difference interval 
+for (i in 1:length(th0)) { ## loop over parameters
+  th1 <- th0; th1[i] <- th1[i] + eps ## increase th0[i] by eps
+  nll1 <- nll(th1,t=t80,y=y) ## compute resulting nll
+  fd[i] <- (nll1 - nll0)/eps ## approximate -dl/dth[i]
+}
+\end{lstlisting}
+Here is the result indicating that {\tt gll} is indeed coded correctly\ldots
+\begin{lstlisting}
+> fd;gll(th0,t80,y)
+[1]   -134.1501 -13141.5078
+[1]   -134.1501 -13141.5090
+\end{lstlisting}
+When coding derivatives {\bf never} skip this test. Now let's call {\tt optim}
+\begin{lstlisting}
+> fit <- optim(c(10,.1),nll,gr=gll,y=y,t=t80,method="BFGS",hessian=TRUE)
+> fit
+$par
+[1] 23.1173042  0.2021218
+
+$value
+[1] 81.18491
+
+$counts
+function gradient 
+      36       11 
+...
+\end{lstlisting}
+Notice that this took far  fewer function evaluations than Nelder Mead, plus 11 calls to {\tt gll}. If you call {\tt gll} with the parameter estimates from this fit, and from the previous fit, you will see that the gradients are smaller for this latter fit -- it is slightly more accurate. Note that it is possible to select \lstinline+method="BFGS"+ and not supply gradients. In that case {\tt optim} will approximate the required gradients numerically by finite differencing, just as we did to check {\tt gll}. Such an approximation reduces reliability, accuracy and efficiency a little, but for many cases it is good enough. 
+
+\subsubsection{Using {\tt nlm}}\index{optimization!nlm}
+
+Now let's use {\tt nlm} for the same task. The gradient and Hessian of the objective are supplied as attributes of the return value of the objective passed to {\tt nlm}. Here let's code this in a way that allows simple re-use of the code already produced (recognising that there might be more efficient ways to do this). First a Hessian function.
+\begin{lstlisting}
+hll <- function(theta,t,y) {
+## Hessian of -ve log lik of Poisson AIDS early epidemic model
+  alpha <- theta[1];beta <- theta[2] ## enhances readability
+  ebt <- exp(beta*t) ## avoid computing twice
+  H <- matrix(0,2,2) ## matrix for Hessian of -ve ll
+  H[1,1] <- sum(y)/alpha^2
+  H[2,2] <-  alpha*sum(t^2*ebt)
+  H[1,2] <- H[2,1] <- sum(t*ebt)
+  H
+} ## hll
+\end{lstlisting}
+Again it is essential to test this. A finite difference approximation to the Hessian is readily obtained by differencing the gradient vectors produced by {\tt gll}\ldots
+\begin{lstlisting}
+gll0 <- gll(th0,t=t80,y=y) ## gran of nll at th0
+eps <- 1e-7  ## finite difference interval 
+Hfd <- matrix(0,2,2) ## finite diference Hessian
+for (i in 1:length(th0)) { ## loop over parameters
+  th1 <- th0; th1[i] <- th1[i] + eps ## increase th0[i] by eps
+  gll1 <- gll(th1,t=t80,y=y) ## compute resulting nll
+  Hfd[i,] <- (gll1 - gll0)/eps ## approximate second derivs
+}
+\end{lstlisting}
+The result is then\ldots
+\begin{lstlisting}
+> Hfd;hll(th0,t=t80,y=y)
+         [,1]       [,2]
+[1,]  16.2200   234.5491
+[2,] 234.5492 23227.0086
+         [,1]       [,2]
+[1,]  16.2200   234.5491
+[2,] 234.5491 23226.9961
+\end{lstlisting}
+Note that when preparing these notes I actually did make a mistake coding the Hessian, swapping two of the derivatives: the test caught this. Debugging the failing optimization otherwise would have been {\em much} harder. Now a version of the objective suitable for use with {\tt nlm}.
+\begin{lstlisting}
+nll2 <- function(theta,t,y) {
+## wrapper function for nll and its grad and Hessian,
+## suitable for optimization by nlm 
+  z <- nll(theta,t,y) ## the objective
+  attr(z,"gradient") <- gll(theta,t,y)
+  attr(z,"hessian") <- hll(theta,t,y)
+  z
+} ## nll2
+\end{lstlisting}
+Here it is in use (this time without returning the Hessian)\ldots
+\begin{lstlisting}
+> nlm(nll2,th0,y=y,t=t80)
+$minimum  ## negative log likelihood at MLE
+[1] 81.18491
+
+$estimate ## parameter estimates
+[1] 23.1174914  0.2021212
+
+$gradient ## grad at optimum
+[1] -1.518558e-08 -2.150631e-06
+
+$code ## convergence code - 1 indicates successful - see ?nlm
+[1] 1
+
+$iterations ## number of iterations to converge
+[1] 10
+\end{lstlisting}
+Notice how this full Newton method converges in the fewest steps of the three methods tried. It also gives the most accurate solution, with the gradient at convergence being lower than for the preceding two optimizations. Finite differencing is used to obtain the Hessian and/or gradient if the Hessian, or gradient and Hessian, are missing. As with {\tt optim}, these approximations reduce accuracy and reliability somewhat.
+
+\bigskip
+
+\noindent {\bf Exercise:} Run the {\tt nlm} version of the code, and produce a plot of AIDS cases against year, with the estimated  expected number of cases per year overlaid as a curve to illustrate the fit of the model.
+
+\noindent {\bf Exercise:} The {\tt nll2} function was written to conveniently re-use the functions already produced, but actually that means that several quantities are recomputed in {\tt nll}, {\tt gll} and {\tt hll}. Write a function {\tt nll1} suitable for use with {\tt nlm} that computes the objective, gradient and hessian without calling {\tt nll}, {\tt gll} and {\tt hll} and without unnecessary replication of calculations. Also write unit tests for it.  
+
+
+
+\subsection{Positive parameters}\index{optimization!positive parameters}
+
+In the AIDS model example $\alpha$ is intrinsically positive, but the optimization routines do not know this, and might try a negative value at some point, implying impossible means for the Poisson model being used. In the examples we tried this did not actually happen, but in more complex cases it is better to avoid the possibility altogether. An easy way to do this is to have the optimizer work with the log of any positive parameter, so that the optimizer is free to assign positive of negative values to the log parameter, while the parameter itself stays positive. For example, we could re-write {\tt nll} as
+\begin{lstlisting}
+nll3 <- function(theta,t,y) {
+## -ve log likelihood for AIDS model y_i ~ Poi(alpha*exp(beta*t_i))
+## theta = (log(alpha),beta)
+  alpha <- exp(theta[1]) ## so theta[1] unconstrained, but alpha > 0
+  beta <- theta[2]  
+  mu <- alpha * exp(beta * t) ## mu = E(y)
+  -sum(dpois(y,mu,log=TRUE))  ## the negative log likelihood
+} ## nll3
+\end{lstlisting}
+Then a call to optim might be
+\begin{lstlisting}
+> optim(c(log(10),.1),nll3,y=y,t=t80,method="BFGS")
+$par
+[1] 3.1407646 0.2021046
+...
+\end{lstlisting}
+Notice how the first element of {\tt par} is $\log(\hat \alpha)$ now. Obviously if the optimizer is working with a log parameter then any supplied gradients (and Hessians) have to provide derivatives with respect to the log parameter too. Similarly any returned Hessian will provide second derivatives involving the log parameter. 
+
+\bigskip
+
+\noindent {\bf Exercise:} Re-run the optimization of {\tt nll3}, but with \lstinline+hessian=TRUE+. Use the result to obtain approximate 95\% confidence intervals for $\alpha$ and $\beta$. Hint: for $\alpha$ find an approximate interval for $\log \alpha$ and then exponentiate the interval endpoints.  
+
+\subsection{Getting derivatives \label{sec:deriv}}
+
+As we have seen, {\tt optim} and {\tt nlm} approximate any required derivatives not supplied by the user, using finite difference approximations. We already was how this works in code, when checking derivative functions. Mathematically the approximation is as follows\footnote{See also {\em Core Statistics}, \S5.5.2}. Let ${\bm e}_i$ be a vector of zeroes except for its $i^\text{th}$ element which is one. Then for a small $\epsilon$
+$$
+\pdif{D}{\theta_i} \simeq \frac{D({\bm \theta} + \epsilon {\bf e}_i) - D({\bm \theta})}{\epsilon}
+$$ 
+How small should $\epsilon$ be?
+\begin{itemize}
+\item Too large and the approximation will be poor (Taylor's theorem).
+\item Too small and ${\bm \theta} + \epsilon {\bf e}_i$ will only differ from ${\bm \theta}$ in a few (or even none!) of its least significant digits, losing precision.
+\item For many well scaled problems $\epsilon \simeq \sqrt{\epsilon_{\text{machine}}}$, where $\epsilon_{\text{machine}}$ is the smallest value for which $1 + \epsilon_{\text{machine}}$ does not have the same floating point representation as $1$: the {\em  machine precision}.
+\end{itemize}
+
+Optimization is more reliable and efficient if we have numerically exact first derivatives, at least. One approach is  to work out the derivatives of the objective by hand, or using a computer algebra package, and code them up. 
+\begin{enumerate}
+\item {\bf Always} check such derivative code by finite differencing.
+\item {\bf Always, Always, Always}.
+\end{enumerate}
+
+Alternatively we can use {\em automatic differentiation} (AD) methods, which compute derivatives of a function directly from the code implementing the function. R function {\tt deriv} offers a simple AD implementation for differentiation of R expressions. Suppose we want to use if to obtain the gradient and Hessian of the AIDS model negative log likelihood, 
+$$
+l(\alpha,\beta) = \sum_{i=1}^n y_i \{\log(\alpha) + \beta t_i\} - \sum_{i=1}^n ( \alpha e^{\beta t_i} - \log (y_i!) ).
+$$
+Now {\tt deriv} does not know how to differentiate functions involving {\tt sum} - it actually only knows about a modest subset of functions (see {\tt ?deriv}). But since our log likelihood is actual a sum of contributions to the overall log likelihood from individual $t_i$, $y_i$ pairs, we can differentiate the terms in the sum and add up the derivatives. The following function call will produce a function {\tt nlli} evaluating the terms in the negative log likelihood summation. This function returns a vector of the individual terms, and that vector has attributes giving the gradient vector and Hessian for each of the terms.     
+\begin{lstlisting}
+nlli <- deriv( ## what to differentiate...
+            expression(-y*(log(alpha)+beta*t)+alpha*exp(beta*t)+lgamma(y+1)),
+            c("alpha","beta"), ## differentiate w.r.t. these
+            function.arg=c("alpha","beta","t","y"),## return function - with these args 
+            hessian=TRUE) ## compute the Hessian as well as the gradient
+\end{lstlisting}
+The \lstinline+"gradient"+ attribute of {\tt nlli}'s return object is a matrix: each row of this is the derivative of one of the log likelihood contributions w.r.t. the parameters (here $\alpha$ and $\beta$). Summing the columns gives us the gradient vector for the total negative log likelihood. The \lstinline+"hessian"+ attribute is a 3 dimensional array, {\tt H} say, where 
+\lstinline+H[i,,]+ is the Hessian for the ith term in the negative log likelihood. Summing the Hessians for the terms gives the Hessian for the total negative log likelihood. Do try this code and look at the result of a call to {\tt nlli}.
+
+To turn {\tt nlli} into an objective suitable for getting {\tt nlm} to find the MLEs of $\alpha $ and $\beta$ requires that we write an appropriate wrapper function. Here it is.
+\begin{lstlisting}
+nll4 <- function(th,t,y) {
+## negative log lik function for optimization by 'nlm', where computations are done
+## using nlli, produced by 'deriv'. th=c(alpha,beta).
+  nli <- nlli(th[1],th[2],t,y) ## call nlli to get -ve log lik and derivative terms
+  nll <- sum(nli) ## sum negative log likelihood terms
+  attr(nll,"gradient") <- colSums(attr(nli,"gradient")) ## sum term grad vectors
+  attr(nll,"hessian") <- apply(attr(nli,"hessian"),c(2,3),sum) ## same for Hessians 
+  nll
+} ## nll4  
+\end{lstlisting}
+For example
+\begin{lstlisting}
+> nll4(th0,t80,y)
+[1] 1680.478
+attr(,"gradient")
+      alpha        beta 
+  -134.1501 -13141.5090 
+attr(,"hessian")
+         alpha       beta
+alpha  16.2200   234.5491
+beta  234.5491 23226.9961
+\end{lstlisting}
+\ldots which exactly matches what {\tt nll2} produces, and can hence be optimized by {\tt nlm} in the same way. 
+
+\bigskip
+
+\noindent {\bf Exercise:} Get {\tt deriv} to produce a version on {\tt nlli} without the Hessians computed, and write suitable wrapper functions for the new {\tt nlli} for computing the negative log likelihood and its gradient, in the form required by {\tt optim}. Test that the functions work with {\tt optim}.   
+
 
 \section{Graphics}
 
@@ -2405,7 +2891,7 @@ ggsave("mpg-gg.eps",width=5,height=3)
 \end{lstlisting}
 produced the second plot in the previous section. {\tt ggsave} infers the plot file type from its extension ({\tt .eps} here).\index{ggplot!graphics file} By default it saves the last plot displayed, but you can also explicitly provide a {\tt ggplot} object as the {\tt plot} argument of the function.
 
-\subsection{Some univariate data plots}
+\subsection{Some univariate data plots \label{sec:1d-plot}}
 
 Suppose that you are interested in visualizing the distribution of a single variable. For a continuous variable perhaps the simplest plot is a histogram. This divides the range of your data into a series of contiguous intervals, and counts the number data falling within each of them. The intervals (also know as {\em bins}) are then arranged along a horizontal axis, and bars are plotted above each interval, with {\em area} proportional to the number of observations in the interval. If the intervals all have the same width, then the {\em height} of the bar is also proportional to the number of observations in the interval.   
 
