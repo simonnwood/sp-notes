@@ -1016,7 +1016,7 @@ For each distribution, with name {\lstinline+dist+}, say, there are four functio
 \item {\lstinline+rdist+} generates independent pseudorandom deviates from {\lstinline+dist+}. 
 \end{enumerate}
 
-\section{Simulations I: stochastic models and simulation studies}
+\section{Simulations I: stochastic models and simulation studies \label{sec:sim1}}
 
 One major class of statistical programming task involves {\em stochastic simulation}. Simulating processes that involve random numbers. Strictly speaking {\em pseudorandom} numbers. There are several main sorts of simulation that we might need to undertake.
 \begin{enumerate}
@@ -2393,9 +2393,9 @@ As with any estimate, we can study its behaviour under imaginary replication of 
 Let $n$ be the number of elements in $\bf y$, and ${\bm \theta}_t$ be the (unknowable) true value of $\bm \theta$. Under a wide variety of circumstances $\hat {\bm \theta}$ is {\em consistent}. That is $\hat {\bm \theta} \to {\bm \theta}_t$ and $\text{var}(\hat {\bm \theta}) \to 0$ as $n \to \infty$. Furthermore if $\hat{\bm{{\cal I}}}$ is the second derivative (or {\em Hessian}\index{Hessian}) matrix of $-l$, such that $\hat {\cal I}_{ij} = - \ilpddif{l}{\theta_i}{\theta_j}$, then $ \text{cov} (\hat {\bm \theta})\to  \hat{\bm{{\cal I}}}^{-1} $ as $n \to \infty$, with the same holding for ${\bm{{\cal I}}} = E(\hat {\bm{{\cal I}}})$. This means that in the large sample limit maximum likelihood estimators are unbiased and attain the Cram\'er-Rao lower bound - the theoretical lower limit for the variance of an unbiased estimator. \index{consistency}\index{Cram\'er-Rao bound} Note that ${\bm{{\cal I}}}$ is known as the {\em Fisher information matrix} and   $\hat{\bm{{\cal I}}}$ the {\em observed} Fisher information matrix. \index{information matrix}\index{Maximum Likelihood Estimate!large sample results}
 
 In many circumstances in which the information per parameter tends to infinity with $n$, then there is a further result that in the $n \to \infty$ large sample limit
-$$
-\hat {\bm \theta} \sim N({\bm \theta}_t,\hat{\bm{{\cal I}}}^{-1})
-$$
+\beq
+\hat {\bm \theta} \sim N({\bm \theta}_t,\hat{\bm{{\cal I}}}^{-1}) \label{mle.dist}
+\eeq
 (again the same holds with ${\bm{{\cal I}}}$ in place of $\hat{\bm{{\cal I}}}$). This immediately allows testing of hypotheses about, and finding confidence intervals for, individual $\theta_i$.  \index{maximum likelihood!estimator distribution}
 
 By way of illustration of what this result means, consider the simple 1 parameter Poisson example above. The following plot shows 100 log likelihood functions for $\beta$ in grey - each is based on a new replicate of the data (which were simulated in this case, so easy to actually replicate). The maximum of each replicate log likelihood is marked, and the corresponding replicate $\hat \beta $ marked on the horizontal axis as a tick. A kernel density estimate (see section \ref{sec:1d-plot}) of the p.d.f. of $\hat \beta$ is shown - notice how it is approximately normal.
@@ -2407,9 +2407,9 @@ $$
 \hat {\bm \theta}_0 = \underset{\theta}{\text{argmax}} ~l({\bm \theta}) ~~ \text{under the constraint} ~~ R({\bm \theta}) = {\bf 0}
 $$  
 Then {\em if $H_0$ is true}, and in the  $n\to \infty$ limit
-$$
-2\{l(\hat {\bm \theta}_0) - l(\hat {\bm \theta})\}\sim \chi^2_r.
-$$
+\beq
+2\{l(\hat {\bm \theta}_0) - l(\hat {\bm \theta})\}\sim \chi^2_r. \label{glrt}
+\eeq
 If $H_0$ is false then we expect $2\{l(\hat {\bm \theta}_0) - l(\hat {\bm \theta})\}$ to be too large for consistency with a $\chi^2_r$ distribution. This result allows us to conduct very general tests about $\bm \theta$: {\em Generalized Likelihood Ratio Tests}, so called because the test statistic is the log of a likelihood ratio. The main limitation on the result is that it only holds when  $H_0:R({\bm \theta}) = {\bf 0}$ is not restricting any parameter to an edge of the parameter space. For example we can not test whether a variance is zero by this method. \index{likelihood ratio test}
 
 These results provide a very general set of tools for conducting statistical analysis with any of the three example models in the previous section, and with a huge range of other models as well. But to do so we must be able to compute the log likelihood, optimize it to find $\hat {\bm \theta}$, and evaluate the observed information matrix, $\hat{\bm{{\cal I}}}$. Generally these tasks require numerical computation, to be covered next.  
@@ -2596,7 +2596,7 @@ Suppose we would like to obtain the approximate standard deviation of $\hat \alp
 > se <- diag(V)^.5 ## extract standard deviations
 > se
 [1] 1.80971894 0.00777364
-\end{lstlisting}
+\end{lstlisting}\index{Cholesky decomposition!and matrix inversion}
 Now try {\tt optim} using BFGS with a supplied gradient function. Here is the gradient function.
 \begin{lstlisting}
 gll <- function(theta,t,y) {
@@ -3054,7 +3054,92 @@ ggplot(xy,aes(x=x,y=y)) + geom_raster(aes(fill=z)) + geom_contour(aes(z=z))
 \end{lstlisting}
 \eps{0}{.5}{gg-contour.eps} 
 We need to move on, but hopefully you have now a good enough grasp of base R and {\tt ggplot} graphics to be able to explore further independently.
-%\makeindex
+
+\section{Simulations II: simulation for inference}
+
+In section \ref{sec:sim1} we looked at simulation from stochastic models, and simulation studies to test the properties of methods. Now let's consider the use of simulation methods for statistical inference. We'll look at two areas: bootstrapping and Markov Chain Monte Carlo (MCMC) methods for Bayesian inference.
+
+\subsection{Bootstrapping}
+
+When we talk about the distribution (or sampling distribution) of an estimator, we are thinking about the distribution that the parameter estimates would have under repeated replication of the data gathering and parameter estimation process. Results such as (\ref{mle.dist}) for the large sample distribution of a maximum likelihood estimator are obtained theoretically, but there is another possibility. We could try to simulate the process of repeatedly gathering the data and re-estimating the parameters, to obtain a sample of parameter estimates providing information about the distribution of the parameter estimators. 
+
+Suppose we have a full model specifying a p.d.f. $\pi_{\bm \theta}({\bf y})$ for our data $\bf y$. The obvious approach is to simulate replicate data sets, ${\bf y}^*$ from $\pi_{\hat {\bm \theta}}({\bf y})$, where $\hat {\bm \theta}$ is the MLE, or other estimate, of the parameter vector $\bm \theta$ of the model, based on the original $\bf y$. For each ${\bf y}^*$ we then compute a $\hat {\bm \theta}^*$. This process is known as {\em parametric bootstrapping}. Here is a simple example for the New Haven annual temperature data supplied with R. Let's assume a model in which the temperatures are independent $N(\mu,\sigma^2)$ random deviates. Suppose we want to investigate the distributions of $\hat \mu$ and $\hat \sigma$. Here is the code.
+\begin{lstlisting}
+mu <- mean(nhtemp)  ## mean temperature
+sd <- sd(nhtemp)    ## standard dev temp
+n <- length(nhtemp) ## number of data 
+nb <- 10000         ## number of bootstrap samples
+sdb <- mub <- rep(0,nb) ## vectors for replicate estimates
+for (i in 1:nb) { ## parametric bootstrap loop
+  yb <- rnorm(n,mu,sd)  ## generate replicate data
+  mub[i] <- mean(yb)    ## estimate mean
+  sdb[i] <- sd(yb)      ## and standard deviation
+}
+par(mfrow=c(1,3),mar=c(4,4,1,1))
+hist(nhtemp,main="") ## plot data
+hist(mub,breaks=20,freq=FALSE,xlab=expression(hat(mu)),main="")
+lines(density(mub)) ## distribution of estimated mean
+hist(sdb,breaks=20,freq=FALSE,xlab=expression(hat(sigma)),main="")
+lines(density(sdb)) ## distribution of estimated sd
+\end{lstlisting}
+\eps{-90}{.7}{nht-para-bs.eps} \index{bootstrap!parametric}
+Now obviously these simulated parameter estimator distributions will not be centred on the true values of the parameters, as we would hope for unbiased estimators is we had {\em really} gathered replicate datasets (difficult for the {\tt nhtemp } data), but the shape of the distribution otherwise should be a good estimate of the shape of the distributions of the estimators. A reflection of this fact is the close correspondence between the standard deviation of $\hat \mu$ in our bootstrap sample and the theoretical result on the standard error of $\hat \mu$ 
+\begin{lstlisting}
+> c(sd(mub),sd(nhtemp)/sqrt(n))
+[1] 0.1643081 0.1633892
+\end{lstlisting}\index{bootstrap!percentile CI}
+If the distribution of the $\hat \mu^*$ about $\hat \mu$ is a good approximation to the distribution of $\hat \mu$ about the true $\mu$, then the bootstrap distribution can be used to find confidence intervals for $\mu$. If the $\hat \mu^*$ is roughly symmetric, then the simplest intervals are {\em percentile intervals}, where we base the CI on quantiles of the bootstrap distribution of the parameter estimates. Let's compute 95\% cIs for $\mu $ and $\sigma$ this way.
+\begin{lstlisting}
+> quantile(mub,c(.025,.975))
+    2.5%    97.5% 
+50.83482 51.48179 
+> quantile(sdb,c(.025,.975))
+    2.5%    97.5% 
+1.042289 1.492834 
+\end{lstlisting}
+This parametric bootstrapping approach relies on being able to generate random deviates from probability model. Consideration of how that is done also leads naturally to the  {\em nonparametric bootstrap}.
+
+\subsubsection{Generating from distributions and the nonparametric bootstrap}
+
+Many statistical programming tasks involve generating random deviates from some distribution of interest. How do we generate random numbers by computer? Actually we can't (at least not without very special hardware). Instead we generate {\em pseudorandom} sequences of numbers: deterministic sequences, indistinguishable from random by any reasonable test we might apply. The basic problem is to generate pseudorandom sequences indistinguishable from $$U_i \underset{\text{i.i.d}}{\sim} U(0,1)$$ --- other distributions can then be obtained from such deviates. The original pseudorandom number generating task is an interesting and important topic in its own right -- see Appendix C fo {\em Core Statistics} for a brief introduction. For now assume it is solved.
+
+We need to get from uniform deviates to deviates from other distributions. There are efficient algorithms for doing this for many standard distributions, and functions such as {\tt rnorm} in R tend to use these when they are available. But there is also a general approach that can be used for any distribution with a computable {\em quantile function} --- that is an inverse CDF function.   
+\begin{enumerate}
+\item Generate a deviate, $u$, from $U(0,1)$.
+\item Evaluate the the {\em quantile function} for the distribution of interest at $u$.
+\end{enumerate}
+The result is a random draw from the distribution of interest.
+
+To understand why this works recall that the CDF of a random variable, $X$, is defined as $F(x) = \text{Pr}(X \le x)$. The {\em quantile function} is the inverse of the CDF defined as $F^-(u) = \min(x|F(x) \ge u)$. The quantile function definition gives the usual inverse for continuous $F$, but is also defined for discontinuous. To fix ideas, here are 3 example CDFs: for $N(0,1)$; for a mixture with 0.8 probability of drawing from $N(0,1)$ and 0.2 probability of a zero; and for a Poisson with mean 3. 
+\eps{-90}{.5}{cdf.eps}
+Suppose, for the moment, we have a continuous CDF, $F$. Then if $X \sim F$ it follows that $F(X)\sim U(0,1)$. The proof is easy. Defining $U = F(X) $ and $u = F(x)$, we have
+$$ F(x) = \text{Pr}(X \le x) =  \text{Pr}(F(X) \le F(x)) \Rightarrow u = \text{Pr}(U \le u)$$
+but the r.h.s. is just the CDF of a $U(0,1)$ r.v. Notice that this does not work if the CDF is not continuous, since then not all $U$ values on $(0,1)$ can actually occur. 
+
+Similarly if $U \sim U(0,1)$ then $F^-(U) \sim F$. Again assuming continuous $F$, 
+$$
+\text{Pr}(U\le u) = u \Rightarrow \text{Pr}(F^-(U)\le F^-(u)) = u 
+$$
+but defining $F^-(u) = x$, so that $F(x)=u$ we therefore have $\text{Pr}(F^-(U)\le x) = F(x)$ - the CDF of $X$, as required. This result actually does hold when $F$ is not continuous as well. 
+
+Now what it we do not know the CDF, but only have its empirical estimate based on a sample? Let $x_1, x_2, \ldots x_n$ be sampled from a distribution with unknown CDF, $F(x)$. Since $F(x) = \text{Pr}(X \le x)$, we can estimate $F$ by estimating the probabilities on the right, from our sample:
+$$
+\hat F(x) = n^{-1} \sum_i \mathbb{I}(x_i\le x)
+$$
+where $\mathbb{I}(\cdot)$ is the indicator function (1/0 when argument is TRUE/FALSE). 
+
+For example for  ${\bf x} = (1, 0, 4.3, -.5, .8, 2.3, -.2, 1.1, 1.4, 2)$ the empirical CDF is this\ldots
+
+\eps{-90}{.5}{ecdf-bs.eps}
+
+Suppose that we want to generate random deviates from $ \hat F(x) $. Simply generate $U \sim U(0,1)$, ad evaluate $ \hat F^-(U) $. But notice that $\hat F$ increases in equal steps of size $n^{-1}$. So generating $U \sim U(0,1)$ and evaluating $ \hat F^-(U) $ is the same as just randomly picking one of the original $x_i$, with constant probability. In other words, to generate a sample of size $n$ from the empirical CDF, we just sample $n$ observations from our original data {\em with replacement}. This process is known as {\em nonparametric bootstrapping}.\index{bootstrapping!nonparametric}    
+
+\begin{lstlisting}
+
+\end{lstlisting}
+
+
+
 \printindex
 
 \end{document}
