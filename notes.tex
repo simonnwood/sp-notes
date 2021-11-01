@@ -2120,7 +2120,7 @@ Good planning and structure also help to write readable code, but readability al
 \item Whenever you work in a team, always ensure that any piece of code and commenting written by one team member is carefully reviewed and checked by another.    
 \end{enumerate}  
 
-\subsection{Ridge regression ---  a very short design example}
+\subsection{Ridge regression ---  a very short design example \label{sec:ridge}}
 
 The parameters estimates, $\hat \bp$, for the linear model ${\bf y} = {\bf X}\bp + {\bm \epsilon}$ can become rather unstable if $p$, the number of parameters, becomes large relative to $n$, the number of data. Indeed if $p>n$ then least squares parameter estimates $\hat \bp $, will not exist. This in turn means that model predictions $\hat \mu = {\bf X} \hat \bp$ may poorly approximate the true ${\bm \mu} = E({\bf y})$. One approach that can help is {\em ridge regression}, which reduced variability in $\hat \bp$ by {\em shrinking} parameters towards zero. Specifically we estimate parameters as 
 $$
@@ -2130,7 +2130,7 @@ for some {\em smoothing parameter} $\lambda$. The larger we make $\lambda$ the m
 $$
 V(\lambda) = \frac{n\|{\bf y} - {\bf X}\hat \bp\|^2}{\{n-\text{trace}({\bf A})\}^2},
 $$
-where ${\bf A} = \X(\X\ts \X + \lambda {\bf I})^{-1} \X\ts$, so that $\hat {\bm \mu} = {\bf Ay}$. The term $\text{trace}({\bf A})$ is the {\em effective} degrees of freedom of the model. It varies smoothly between $p$ and 0 as $\lambda$ is varied between 0 and $\infty$. 
+where ${\bf A} = \X(\X\ts \X + \lambda {\bf I})^{-1} \X\ts$, so that $\hat {\bm \mu} = {\bf Ay}$. The term $\text{trace}({\bf A})$ is the {\em effective} degrees of freedom of the model. It varies smoothly between $p$ and 0 as $\lambda$ is varied between 0 and $\infty$. \index{effective degrees of freedom}
 
 Let's briefly consider the design a simple ridge regression function.
 
@@ -3627,10 +3627,72 @@ model {
   df ~ dunif(2,100)      ## degrees of freedom (nu) prior
 }
 \end{lstlisting}
+Here is a first run, followed by effective sample sizes and cross and auto-correlation checking of the chains (trace plots not shown, purely to save space). In the model setup I set the years, {\tt t} to run from 1 to 60, since the starting year is irrelevant to the model. 
+\begin{lstlisting}
+> mod2 <- jags.model("basic2.jags",data=list(x=nhtemp,t=1:N,N=N))
+...
+> sam2.coda <- coda.samples(mod2,c("alpha","beta","tau","df"),n.iter=10000)
+  |**************************************************| 100%
+> effectiveSize(sam2.coda)
+    alpha      beta        df       tau 
+ 814.3755  803.4232 3211.8714 2130.8668 
+> crosscorr(sam2.coda)
+            alpha        beta          df         tau
+alpha  1.00000000 -0.87403349 -0.03988463  0.02768711
+beta  -0.87403349  1.00000000  0.07229174 -0.06229575
+df    -0.03988463  0.07229174  1.00000000 -0.40202642
+tau    0.02768711 -0.06229575 -0.40202642  1.00000000
+> acfplot(sam2.coda,aspect=1)
+\end{lstlisting}
+\vspace*{-1cm}
+\eps{-90}{.5}{nht-acf2.eps}
+\noindent The $\alpha $ and $\beta$ chains are mixing quite slowly, and there is high correlation between them. For Gibbs sampling high posterior correlation 
+tends to lead to slow mixing, since individual conditional updates then tend to take rather small steps. In consequence the effective sample sizes are rather low relative to the simulation length. For this simple model setup it ought to be possible to reduce the correlation between $\alpha$ and $\beta $ by centring the year covariate to have mean zero (think about the parameter covariance matrix of a linear model to see why this ought to work). Let's try it. 
 
 \begin{lstlisting}
-
+> mod2 <- jags.model("basic2.jags",data=list(x=nhtemp,t=1:N-N/2,N=N))
+...
+> sam2.coda <- coda.samples(mod2,c("alpha","beta","tau","df"),n.iter=10000)
+  |**************************************************| 100%
+> effectiveSize(sam2.coda)
+   alpha     beta       df      tau 
+6328.395 6155.964 3057.319 2502.423 
+> crosscorr(sam2.coda)
+            alpha        beta          df         tau
+alpha  1.00000000 -0.04276077  0.03469260 -0.03765271
+beta  -0.04276077  1.00000000  0.06277269 -0.05928205
+df     0.03469260  0.06277269  1.00000000 -0.39247169
+tau   -0.03765271 -0.05928205 -0.39247169  1.00000000
 \end{lstlisting}
+\ldots clearly a substantial improvement. Here is \lstinline+plot(sam2.coda)+
+\eps{-90}{.5}{nht-trace2.eps}
+\noindent Notice how the data do not seem to be informative about $\nu$, the degrees of freedom of the $t$ distribution. The posterior is little different to the prior.  
+ 
+Can we say which model is better between the original simple model and the linear trend scaled $t $ model? One approach to this is via the {\em Deviance Information Criterion}, or DIC. The DIC is 
+$$
+\text{DIC} = - 2 \log \pi({\bf y}|\bar {\bm \theta}) + 2 EDF
+$$ 
+where $\bar {\bm \theta}$ is the posterior mean of $\bm \theta$ and EDF is the {\em effective degrees of freedom} of the model. Lower DIC suggests a better model, in some sense estimated to be closer to the true model. We met effective degrees of freedom already in section \ref{sec:ridge}. \index{effective degrees of freedom} Here the idea is that a proper prior puts some restriction on the freedom of a parameter to vary. While an improper prior does not restrict a parameter at all, any proper prior makes soem restriction, with a very narrow prior allowing very little freedom, and the limiting case of a delta function prior offering no freedom at all. In this latter case it makes no sense to treat the parameter as a parameter at all - it is just a constant of the model, contributing 0 degrees of freedom. The idea with an effective degree of freedom for a single parameter is that it should change smoothly from 1 to 0 as a prior is narrowed to shrink a parameter towards some particular value. 
+
+JAGS estimates the EDF using a method based on running 2 or more independent replicates of the sampler, so when the model is set up we need do set {\tt n.chains} to something larger than 1.
+\begin{lstlisting}
+> mod <- jags.model("basic.jags",data=list(x=nhtemp,N=length(nhtemp)),n.chains=2)
+...
+> mod2 <- jags.model("basic2.jags",data=list(x=nhtemp,t=1:N,N=N),n.chains=2)
+...
+> dic.samples(mod,n.iter=10000)
+  |**************************************************| 100%
+Mean deviance:  199.5 
+penalty 2.003 
+Penalized deviance: 201.5 
+> dic.samples(mod2,n.iter=10000)
+  |**************************************************| 100%
+Mean deviance:  182.1 
+penalty 3.427 
+Penalized deviance: 185.5 
+\end{lstlisting}
+The DIC is the {\tt Penalized deviance} reported. Lower is better, so the results support the linear trend model, rather than the original static model.
+
 
 \begin{lstlisting}
 
