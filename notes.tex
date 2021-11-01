@@ -3195,7 +3195,7 @@ lines(density(pvb,adjust=1))
 
 \subsection{Markov Chain Monte Carlo for Bayesian inference}
 
-Suppose we have data $\bf y$ and parameters of a model for the data $\bm \theta$. So far we have treated the parameters as fixed states of nature about which we want to learn, using data. In this way of thinking all the uncertainty is in our estimates of the parameters. But there is another approach that can be taken. Suppose that we {\em treat the parameters as random}, having distributions that describe our state of knowledge about the parameter values. We can describe our beliefs/knowledge about $\bm \theta$, {\em prior} to observing $\bf y$, by a prior distribution with p.d.f. $\pi ({\bm\theta})$, and then seek to update the distribution, and hence out beliefs/knowledge, using the data.
+Suppose we have data $\bf y$ and parameters of a model for the data $\bm \theta$. So far we have treated the parameters as fixed states of nature about which we want to learn, using data. In this way of thinking all the uncertainty is in our estimates of the parameters. But there is another approach that can be taken. Suppose that we {\em treat the parameters as random}, having distributions that describe our state of knowledge about the parameter values. We can describe our beliefs/knowledge about $\bm \theta$, {\em prior} to observing $\bf y$, by a prior distribution with p.d.f. $\pi ({\bm\theta})$, and then seek to update the distribution, and hence out beliefs/knowledge, using the data. \index{Bayes rule}\index{Bayesian inference}
 
 Denoting densities by $\pi(\cdot)$, recall, from basic conditional probability, that the joint density of ${\bf y}$ and ${\bm \theta}$ can be written
 $$
@@ -3215,14 +3215,14 @@ is usually intractable.
 But it turns out that we can simulate samples from $\pi( {\bm \theta}|{\bf y})$, in a way that  only requires evaluation of $\pi({\bf y} | {\bm \theta})\pi ({\bm \theta})$ with the observed $\bf y$ plugged in, thereby bypassing $\pi ({\bf y})$. This is done by simulating sequences of random vectors ${\bm \theta}_1, {\bm \theta}_2, {\bm \theta}_3, \ldots $ so that:
 \begin{enumerate}
 \item $\pi({\bm \theta}_i|{\bm \theta}_{i-1},{\bm \theta}_{i-2},\ldots) = P({\bm \theta}_i|{\bm \theta}_{i-1})$ (Markov property).
-\item ${\bm \theta}_i \sim \pi( {\bm \theta}|{\bf y})$.\end{enumerate}
+\item ${\bm \theta}_i \sim \pi( {\bm \theta}|{\bf y})$.\end{enumerate}\index{MCMC}
 Such an approach is known as Markov Chain Monte Carlo (MCMC). The sequence will not be independent draws from $ \pi( {\bm \theta}|{\bf y})$, but that actually does not matter. What is usually really of interest to us is the expected value of some function of $\bm \theta$, say $g({\bm \theta})$, and expectations can be estimated from correlated sequences without problem, since $E(X+Y) = E(X)+E(Y)$ whatever the dependence of $X $ and $Y$. We just use the obvious estimate
 $$
 E_{\theta|y}\{g({\bm \theta})\} \simeq m^{-1}\sum_{i=1}^m g({\bm \theta}_i)
 $$ 
 where $m$ is the number of ${\bm \theta}_i$ simulated (usually after discarding some initial ${\bm \theta}_i$, for reasons covered below). 
 
-Before considering actual chain construction, we need the following result. A Markov chain, with transition kernel $P({\bm \theta}_i|{\bm \theta}_{i-1})$, will generate from $\pi( {\bm \theta}|{\bf y})$ if it satisfies the {\em reversibility} condition
+Before considering actual chain construction, we need the following result. A Markov chain, with transition kernel $P({\bm \theta}_i|{\bm \theta}_{i-1})$, will generate from $\pi( {\bm \theta}|{\bf y})$ if it satisfies the {\em reversibility} condition\index{reversibility}
 $$
 P({\bm \theta}_i|{\bm \theta}_{i-1}) \pi( {\bm \theta}_{i-1}|{\bf y}) = P({\bm \theta}_{i-1}|{\bm \theta}_{i}) \pi( {\bm \theta}_i|{\bf y})
 $$
@@ -3245,7 +3245,7 @@ $$
 \right \}
 $$
 otherwise set ${\bm \theta}_i = {\bm \theta}_{i-1}$. Increment $i$ by 1.
-\end{enumerate}
+\end{enumerate}\index{Metropolis Hastings sampling}
 
 \noindent Why does this work? Let's compress notation writing $\Pi({\bm \theta})$ for $\pi({\bm \theta}|{\bf y}) \propto \pi({\bf y}|{\bm \theta})\pi({\bm \theta})$ ($\bf y$ is fixed, after all). We can also drop the indices for the moment, as we only need to consider a single transition.
 So the MH probability of accepting proposal ${\bm \theta}^\prime$ in place of current state ${\bm \theta}$ is 
@@ -3260,7 +3260,7 @@ $$
 \Pi({\bm \theta}^\prime)q({\bm \theta}|{\bm \theta}^\prime)}{ \Pi({\bm \theta})q({\bm \theta}^\prime|{\bm \theta}) } \right \}  = \text{min} \{ \Pi({\bm \theta})q({\bm \theta}^\prime|{\bm \theta}),
 \Pi({\bm \theta}^\prime)q({\bm \theta}|{\bm \theta}^\prime) \} = \Pi({\bm \theta}^\prime)P({\bm \theta}|{\bm \theta}^\prime)
 $$
-(last equality by symmetry) --- reversibility! Obviously reversibility holds trivially if ${\bm \theta} ={\bm \theta}^\prime$.
+(last equality by symmetry) --- reversibility! Obviously reversibility holds trivially if ${\bm \theta} ={\bm \theta}^\prime$.\index{reversibility}
 
 Notice that if the proposal distribution is symmetric in ${\bm \theta}^\prime $ and ${\bm \theta} $ so that $q({\bm \theta}^\prime|{\bm \theta}) = q({\bm \theta}|{\bm \theta}^\prime) $ then $q$ cancels from acceptance ratio. In addition if we use an improper uniform distribution $\pi({\bm \theta})$ as prior, then that to cancels, and the acceptance ratio is simply the ratio of the likelihoods of ${\bm \theta}^\prime $ and ${\bm \theta}$. 
 
@@ -3376,7 +3376,7 @@ By Bayes rule, the conditional for each parameter will be proportional to $\pi({
 $$
 \mu|{\bf x},\tau \sim N \left (\frac{dn\bar x\tau + c}{dn\tau + 1}, \frac{d}{dn\tau+1} \right )
 $$
-As an example, consider applying this model once again to the {\tt nhtemp} data. This will involve choosing the constants $a$, $b$, $c$ and $d$ defining the priors. So the following code implements some choices and plots the resulting priors (plus the data again). Plotting priors to check that you are happy with the chosen distribution is always a good idea. 
+As an example, consider applying this model once again to the {\tt nhtemp} data. This will involve choosing the constants $a$, $b$, $c$ and $d$ defining the priors. So the following code implements some choices and plots the resulting priors (plus the data again). Plotting priors to check that you are happy with the chosen distribution is always a good idea. \index{Gibbs sampling}
 
 \begin{lstlisting}
 x <- nhtemp ## just to save later typing
@@ -3443,7 +3443,7 @@ lines(tau,dgamma(tau,a,b),col=2) ## prior for tau
 
 \subsection{Graphical models and automatic Gibbs \label{sec:dag}}
 
-Much of the pain can be removed from Gibbs sampling by automation. What makes that possible is the recognition that many Bayesian models can be abstractly represented as {\em Directed Acyclic Graphs}. Mathematically a graph\footnote{not to be confused with a {\em plot}} is a set of nodes connected in some way by edges. In our case 
+Much of the pain can be removed from Gibbs sampling by automation. What makes that possible is the recognition that many Bayesian models can be abstractly represented as {\em Directed Acyclic Graphs}. Mathematically a graph\footnote{not to be confused with a {\em plot}} is a set of nodes connected in some way by edges. In our case \index{Gibbs sampling}
 \begin{itemize}
 \item Nodes are variables or constants, such as data, model parameters and fixed parameters of priors.
 \item Edges show dependencies between nodes.  
@@ -3467,7 +3467,7 @@ As an example, recall again the model $x_i \sim N(\mu, \sigma^2)$, with priors
 \item $\tau = 1/\sigma^2 \sim \text{gamma}(a,b)$, i.e. prior $\pi(\tau) = b^a \tau^{a-1} e^{-b\tau}/\Gamma(a)$ 
 \item Independently, $\mu \sim N(c,d)$.
 \end{itemize}
-Its graphical representation, showing just 3 of the $x_i $ nodes, is
+Its graphical representation, showing just 3 of the $x_i $ nodes, is \index{DAG}
 \eps{-90}{.5}{norm-dag.eps}
 \noindent The graph is a directed {\em acyclic } graph (DAG), because, following the arrows, no path ever revisits a node.
 That the $x_i$ are {\em independent} draws from $ N(\mu, \sigma^2)$ is encoded in the lack of direct edges between them. Note that we could just as well parameterize the normal density using $\tau$ directly, which is actually what most Bayesian software does. The transform from $\tau$ to $\sigma^2$ in the above DAG is just to illustrate the use of a deterministic edge. 
@@ -3486,13 +3486,13 @@ But only $z_j$ dependent terms stay in the integral, the rest cancel
 \pi(z_j|{\bf z}_{-j}) &=&  \frac{\pi(z_j|\text{parent}\{z_j\})\prod_{i \in \text{child\{j\}}}\pi(z_i|\text{parent}\{z_i\})}
 {\int \pi(z_j|\text{parent}\{z_j\})\prod_{i \in \text{child\{j\}}}\pi(z_i|\text{parent}\{z_i\}) dz_j}\\
 &\propto & \pi(z_j|\text{parent}\{z_j\})\prod_{i \in \text{child\{j\}}}\pi(z_i|\text{parent}\{z_i\}),
-\end{eqnarray*}
+\end{eqnarray*}\index{DAG!factorization}
 So however complicated the model, and however large its DAG, the conditional density of node $z_j$ depends only on its immediate `family' --- its parents, children, and `partners' (other parents of its children). This means that the Gibbs update of $z_j$ only needs to know the state of those `family' nodes. The fact that the DAG allows the conditionals to be modularised in this way:
 \begin{enumerate}
 \item  makes computation efficient as the conditionals only require evaluations over a small portion of the graph.  
 \item facilitates automation of the process of identifying conditionals.  
 \end{enumerate}
-2 makes use of known results on {\em conjugacy} of distributions: the fact that for a likelihood based on a known parametric distribution, there is often a distributional choice for the prior that ensures that the parameter's posterior is from the same distribution, just with different parameters. Notice how in the final factorization of $\pi(z_j|{\bf z}_{-j})$, above, $\pi(z_j|\text{parent}\{z_j\})$ plays the same role mathematically as a prior, while $\prod_{i \in \text{child\{j\}}}\pi(z_i|\text{parent}\{z_i\})$ plays the role of a likelihood - this is what allows conjugacy to be exploited. When conditional distributions can not be identified then alternative samplers have to be used for those components. MH updates would be one possibility, but there are more efficient methods, such as {\em slice sample} (see e.g. {\em Core Statistics} \S 6.6.1). The BUGS (Bayesian Updating by Gibbs Sampling) software was the first widely usable general purpose automatic Gibbs sampling software. Other versions have now been developed including JAGS, which we'll cover next.   
+2 makes use of known results on {\em conjugacy} of distributions: the fact that for a likelihood based on a known parametric distribution, there is often a distributional choice for the prior that ensures that the parameter's posterior is from the same distribution, just with different parameters. Notice how in the final factorization of $\pi(z_j|{\bf z}_{-j})$, above, $\pi(z_j|\text{parent}\{z_j\})$ plays the same role mathematically as a prior, while $\prod_{i \in \text{child\{j\}}}\pi(z_i|\text{parent}\{z_i\})$ plays the role of a likelihood - this is what allows conjugacy to be exploited. When conditional distributions can not be identified then alternative samplers have to be used for those components. MH updates would be one possibility, but there are more efficient methods, such as {\em slice sample} (see e.g. {\em Core Statistics} \S 6.6.1). The BUGS (Bayesian Updating by Gibbs Sampling) software was the first widely usable general purpose automatic Gibbs sampling software. Other versions have now been developed including JAGS, which we'll cover next.  \index{conjugate distribution} 
 
 \subsection{JAGS \label{sec:jags}}
 
@@ -3514,7 +3514,7 @@ JAGS simulation output can be used in the same way as the MCMC simulation output
 \item {\tt HPDinterval} for highest posterior density intervals.
 \end{itemize}
 
-Let us once again look at the {\tt nhtemp} data using the model from section \ref{sec:gibbs}. First we need to code the model up in an external text file using the JAGS language. Here is the contents of an appropriate file {\tt basic.jags}. Commenting works as in R, but unlike R there is no need to avoid looping over vector elements: the model will essentially be compiled by JAGS.   
+Let us once again look at the {\tt nhtemp} data using the model from section \ref{sec:gibbs}. First we need to code the model up in an external text file using the JAGS language. Here is the contents of an appropriate file {\tt basic.jags}. Commenting works as in R, but unlike R there is no need to avoid looping over vector elements: the model will essentially be compiled by JAGS. \index{JAGS!model specification}   
 \begin{lstlisting}
 model{
   for (i in 1:N){  ## loop over the data
@@ -3526,7 +3526,7 @@ model{
 \end{lstlisting}
 Note how the model specification is contained within \lstinline+model{}+. JAGS files can also contain \lstinline+data{}+ statements if data requires transformation of some sort before modelling. The model specification itself is fairly intuitive with \verb+~+ specifying a stochastic dependence, and \verb+<-+ a deterministic one. The full list of distributions available in JAGS is given in the JAGS manual (see {\tt ?rjags} in Rstudio or html help for the current link). Note that the parameterization does not always correspond with R - you need to check. For example the $N(\mu,\sigma^2)$ is parameterized in terms of $\mu$ and $\tau=1/\sigma^2$. One easy way to check your priors is to get JAGS to simulate from your model without conditioning on any data. That is you run the model without supplying data. Without any data the posterior is just the prior, so it easy to then check that your prior specification is as intended. 
 
-With the model coded in a file outside R, we are ready to run JAGS from within R using package {\tt rjags}. First the model has to be compiled using {\tt jags.model}
+With the model coded in a file outside R, we are ready to run JAGS from within R using package {\tt rjags}. First the model has to be compiled using {\tt jags.model} \index{jags.model}
 \begin{lstlisting}
 > library(rjags)                ## load rjags (and coda)
 > setwd("where/basic.jags/is")  ## set working directory
@@ -3541,7 +3541,7 @@ Graph information:
 
 Initializing model
 \end{lstlisting}
-Notice how {\tt jags.model} must be provided with the name of the model specification file, and with the information on which data in R should correspond to which nodes in the  specified model. Note that it would have been perfectly fine to have some of the nodes of {\tt x} unobserved - just supply {\tt NA}'s for these.\index{JAGS!missing data} Note the information provided on the graphical model structure. 60 nodes are observed - the temperature data provided for the $x[i]$ nodes. There are then 2 unobserved stochastic nodes - $\tau$ and $\mu$. The total graph size is 67, so that leaves 5 constant nodes - $a$, $b$, $c$ and $d$ the parameters of the priors plus $N$ the number of data (JAGS counts every variable as a node, and that includes $N$). JAGS would give and error if something was wrong with the model or data specification here. Since no error has been produced we can go on to simulate, using {\tt jags.samples}, which takes the compiled model object as first argument, and array of variable/node names to produce output for, and the number of iterations to perform.   
+Notice how {\tt jags.model} must be provided with the name of the model specification file, and with the information on which data in R should correspond to which nodes in the  specified model. Note that it would have been perfectly fine to have some of the nodes of {\tt x} unobserved - just supply {\tt NA}'s for these.\index{JAGS!missing data} Note the information provided on the graphical model structure. 60 nodes are observed - the temperature data provided for the $x[i]$ nodes. There are then 2 unobserved stochastic nodes - $\tau$ and $\mu$. The total graph size is 67, so that leaves 5 constant nodes - $a$, $b$, $c$ and $d$ the parameters of the priors plus $N$ the number of data (JAGS counts every variable as a node, and that includes $N$). JAGS would give and error if something was wrong with the model or data specification here. Since no error has been produced we can go on to simulate, using {\tt jags.samples}, which takes the compiled model object as first argument, and array of variable/node names to produce output for, and the number of iterations to perform.   \index{jags.samples}
 \begin{lstlisting}
 > sam <- jags.samples(mod,c("mu","tau"),n.iter=10000)
   |**************************************************| 100%
@@ -3560,7 +3560,7 @@ List of 2
 \end{lstlisting}
 The returned object is a list containing an element for each variable for which output was requested. The array itself has 3 dimensions: the would have an extent greater than 1 of we had output a vector quantity, the extent of the second depends on how many iterations were saved, while the extent of the third depends on how many parallel chains were run (1 here, since nothing was specified). The \lstinline+"varname"+ and \lstinline+"type"+ attributes are obvious, while the \lstinline+"iterations"+ attribute is more interesting. It tells you which iterations of the sampler the object relates to, counting from the the first time the model was sampled from. In the above the results are for iterations 1 to 10000, but if the code the sampler were run for 10000 iterations again, the entries would be 10001 to 20000. The final figure in the \lstinline+"iterations"+ array tells you if the output has been thinned, meaning that the sampler has been run for several steps between each output. Thinning is useful for very slow moving chains: by thinning what is stored is more independent from sample to sample, which improves the information content per stored sample. 
 
-The {\tt coda} package expects MCMC output to be stored in a slightly different format, and JAGS can output that as well. 
+The {\tt coda} package expects MCMC output to be stored in a slightly different format, and JAGS can output that as well. \index{coda.samples}
 \begin{lstlisting}
 > sam.coda <- coda.samples(mod,c("mu","tau"),n.iter=10000)
   |**************************************************| 100%
@@ -3587,20 +3587,20 @@ acfplot(sam.coda)
 
 \eps{-90}{.4}{coda-acf.eps}
 
-\noindent Notice how {\tt coda} does not plot the lag zero autocorrelation, which is always 1, with the result that the axis range is more useful for the low autocorrelation data we have here. \lstinline+autocorr(sam.coda)+ would have given a useful numerical summary of the ACF, but let's instead look at the cross correlation of the chains.
+\noindent Notice how {\tt coda} does not plot the lag zero autocorrelation, which is always 1, with the result that the axis range is more useful for the low autocorrelation data we have here. \lstinline+autocorr(sam.coda)+ would have given a useful numerical summary of the ACF, but let's instead look at the cross correlation of the chains. \index{MCMC!cross correlation}
 \begin{lstlisting}
 > crosscorr(sam.coda)
            mu       tau
 mu  1.0000000 0.0117718
 tau 0.0117718 1.0000000
 \end{lstlisting}
-Another very useful concept is the {\em effective sample size} of a set of correlated chain output. Roughly how many independent draws from the posterior is a particular set of correlated draws equivalent to?
+Another very useful concept is the {\em effective sample size} of a set of correlated chain output. Roughly how many independent draws from the posterior is a particular set of correlated draws equivalent to? \index{effective sample size}\index{coda}
 \begin{lstlisting}
 > effectiveSize(sam.coda)
       mu      tau 
 10769.47 10000.00
 \end{lstlisting}
-\ldots in this case the chain has mixed so well that the effective sample size for $\mu$ is estimated as slightly over 10000! This does not happen often. After checking we can move on to other inference. For example computation of credible intervals. A {\em Highest Posterior Density} interval is a credible interval constructed so that all parameter values within the interval have higher probability than any parameter value outside the interval. Somewhat obviously such intervals are the narrowest interval with the specified probability of containing the parameter. Here is a comparison of HPD and quantile 95\% credible intervals.  
+\ldots in this case the chain has mixed so well that the effective sample size for $\mu$ is estimated as slightly over 10000! This does not happen often. After checking we can move on to other inference. For example computation of credible intervals. A {\em Highest Posterior Density} interval is a credible interval constructed so that all parameter values within the interval have higher probability than any parameter value outside the interval. Somewhat obviously such intervals are the narrowest interval with the specified probability of containing the parameter. Here is a comparison of HPD and quantile 95\% credible intervals.\index{credible interval!highest posterior density}  
 \begin{lstlisting}
 > HPDinterval(sam.coda[[1]])
         lower      upper
@@ -3691,24 +3691,88 @@ Mean deviance:  182.1
 penalty 3.427 
 Penalized deviance: 185.5 
 \end{lstlisting}
-The DIC is the {\tt Penalized deviance} reported. Lower is better, so the results support the linear trend model, rather than the original static model.
+The DIC is the {\tt Penalized deviance} reported. Lower is better, so the results support the linear trend model, rather than the original static model. \index{Deviance Information Criterion (DIC)}
 
 
-\begin{lstlisting}
-
-\end{lstlisting}
 
 \section{R markdown}
 
 Statisticians and data scientists program in order to analyse and present data. Sometimes for scientific purposes -- `what do these data tell me about how the world works?'. Sometimes for other purposes -- `how can I make these data look attention grabbing?'. Here is a particularly poor example of the latter. 
 \eps{0}{.2}{BBC2021-10-25}
-Note the lack of any sort of axes on the plots, giving the reader even less chance of contextualizing the data, which is anyway plotted over a time window selected to show upward trends, except for the vaccine plot, which has neglected to show the 3rd vaccinations which make up most of those now given\footnote{Edward Herman and Noam Chomsky's book {\em Manufacturing Consent} is quite an interesting read, but I digress.}.   
+Note the lack of any sort of axes on the plots, giving the reader even less chance of contextualizing the data, which is anyway plotted over a time window selected to show upward trends, except for the vaccine plot, which has neglected to show the 3rd vaccinations which make up most of those now given\footnote{Edward Herman and Noam Chomsky's book {\em Manufacturing Consent} is quite an interesting read, but I digress.}.  \index{R markdown} 
 
-Whatever your purpose in analysing data, it is generally a good thing if what you did is well document and reproducible. Furthermore it is often the case that data analyses and reports may go through several iterations as data is updated, and analyses refined. It is obviously a good idea if the report of an analysis does not accidentally have figure 1 coming from the 2020's data , while figures 2-3 are from 2021, or table 6 accidentally being the version generated under the model that was using the wrong response variable which we since corrected, and so on\ldots But it is easy for such mistakes to occur if documents, data and statistical analyses are all separate and have to be combined `by hand'. 
+Whatever your purpose in analysing data, it is generally a good thing if what you did is well documented and reproducible. Furthermore it is often the case that data analyses and reports may go through several iterations as data is updated, and analyses refined. It is obviously a good idea if the report of an analysis does not accidentally have figure 1 coming from the 2020's data , while figures 2-3 are from 2021, or table 6 accidentally being the version generated under the model that was using the wrong response variable which we since corrected, and so on\ldots But it is easy for such mistakes to occur if documents, data and statistical analyses are all separate and have to be combined `by hand'. 
 
-R markdown is one attempt integrate data analysis and report writing in a way that improves reproducibility, while reducing the scope for errors. It basically provides a way of integrating R code into your document in a nice way. That code runs the analysis and produces plots, and you can choose to display the code as part of the finished report, or have it (or parts of it) hidden. There is a nice `cheat sheet' for R markdown here.
+R markdown is one attempt integrate data analysis and report writing in a way that improves reproducibility, while reducing the scope for errors. It basically provides a way of integrating R code into your document in a nice way. That code runs the analysis and produces plots, and you can choose to display the code as part of the finished report, or have it (or parts of it) hidden. There is a nice `cheat sheet' for R markdown, and a whole book at these addresses\ldots.
 \begin{lstlisting}
 https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf
+https://bookdown.org/yihui/rmarkdown-cookbook/
+\end{lstlisting}
+An R markdown document is usually a text file with a {\tt .Rmd} extension. It starts with a header, optionally giving a title, author(s) and the target type of document to produce (\lstinline+html_document+, \lstinline+pdf_document+, \lstinline+word_document+, \lstinline+beamer_presentation+ or \lstinline+ioslides_presentation+). You don't have to supply any of these, and can choose the document type when you call the {\tt render} function. 
+The easiest way to introduce it is with an R markdown document illustrating its most common features. 
+\begin{lstlisting}
+---
+title: "R markdown"
+author: "Simon Wood"
+output: pdf_document
+---
+# various header
+## sizes are available 
+
+Using Latex mathematice type-setting, you can include maths inline, 
+$\int f^{\prime\prime}(x)^2 dx$, or displayed
+$$
+\hat { \beta} = \underset{\beta}{{\rm argmin}} ~ \|{\bf y} - {\bf X}{ \beta }\|^2.
+$$
+
+***
+
+Quotes can be added, and words emphasized...
+
+> **Likelihood**. Parameter values that make the observed data probable according to 
+the model are more *likely* to be correct than parameter values that make the data 
+appear improbable.
+
+Furthermore
+
+* lists
+  * sub lists (idented 2 spaces)
+  * etc
+* can be added
+
+R code can be included, inline to produce a `r paste("res","ult",sep="")`, or as a 
+*code chunk* for display, but maybe not running...
+```{r eval=FALSE}
+paste("res","ult",sep="") ## can comment too
+```
+... or display and running, as here...
+```{r} 
+paste("res","ult",sep="")
+```
+... or running without diplay, as here...
+```{r echo=FALSE} 
+paste("res","ult",sep="")
+```
+Figures are easily added too
+```{r fig.width=3,fig.height=2.8,fig.align='center'}
+hist(nhtemp,main="")
+```
+\end{lstlisting}
+If this is in the working directory, in a file called {\tt md-notes.Rmd} for example, then the final document is produced in R like this.
+\begin{lstlisting}
+render("md-notes.Rmd")
+\end{lstlisting}
+The rendered document looks like this\ldots
+
+\vspace*{-2cm}
+
+\eps{0}{.7}{md-notes.pdf}
+
+\noindent Careful comparison of the rendered document with its code gives you most of what you need to get started producing R markdown documents. Pay particular attentions to the single backticks and {\tt r} used for inline R code and the triple backticks and \verb+{r}+ plus options used for code chunks. And that is now quite enough.
+
+
+\begin{lstlisting}
+
 \end{lstlisting}
 
 
