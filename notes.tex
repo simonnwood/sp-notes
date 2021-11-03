@@ -1387,7 +1387,7 @@ href=\"http://essentials.baltimoresun.com/micro_sun/homicides/victim/489/alton-a
 \end{lstlisting}
 The web address in the name record needs stripping out. This sort of problem needs a bit more than the simple splitting on a pattern met so far: it needs {\em regular expressions}. 
 
-\subsubsection{Regular Expressions}
+\subsubsection{Regular expressions}
 
 Regular expressions provide a way of matching patterns in text that are more flexibly defined than simple fixed strings. For example, suppose I wanted to find all words in a which at some point an `i' occurs two characters after a `c' (as in `clip' or `script'), or I want to find all words starting with `f' and ending with `k' (as in `fork' or `flunk'). We can accomplish such tasks by constructing strings which contain special characters interpreted as matching particular patterns. Functions such as {\tt grep} and {\tt gsub} can understand these {\em regular expressions} (unless we turn off this ability, with argument \lstinline+fixed=TRUE+). You can get a full description of the available regular expressions by typing \lstinline+?regex+ in R. \index{regular expression}\index{regex} Note the slight irritation that control characters referred to as e.g. \verb+\b+ in the help file actually have to be used as \verb+\\b+ in regular expressions.
 
@@ -2030,7 +2030,7 @@ This is exactly the computational approach used by {\tt lm}. \index{least square
  
 When computing factorizations involving triangular matrices, it turns out that the numerical stability of the factorization is affected by the order in which the rows and/or columns appear in the original matrix. But for all least squares and equation solving tasks the order in which rows and columns are present in the matrix doesn't actually matter - we can always re-order and get the same result (provided we take account of the re-ordering). So rows and/or columns can be re-ordered for maximum numerical stability - that is for minimum numerical error in the final answer. This is known as {\em pivoting}. {\tt chol} and {\tt qr} have options allowing pivoting to be used. Using them requires extra book-keeping, and takes us too far off topic in this course: but for serious computation you should be aware that pivoting is possible, and can be necessary. \index{matrix!pivoting}    
  
-\subsection{Symmetric Eigen-decomposition}
+\subsection{Symmetric eigen-decomposition}
 
 Any real symmetric matrix, $\bf A$, has an {\em eigen-decomposition} 
 $$
@@ -2881,7 +2881,7 @@ postscript("mpg-base.eps",width=8,height=3)
 ## the code to produce the plot goes here - e.g. from previous section
 dev.off()
 \end{lstlisting}
-This was actually the command I used to produce the first plot in the previous section. The first argument to {\tt postscript} is the filename. You either need to change to the directory where you want the file to go using \lstinline+setwd+ before calling \lstinline+postscript+, or give a full path in the filename. {\tt width} and {\tt height} give the width and height of the plot in inches. See {\tt ?postscript} for how to use other units. It is essential to close the postscript file using \lstinline+dev.off()+ when done --- you won't get a properly formed file otherwise. Other commonly use devises are {\tt pdf}, {\tt png}, {\tt jpeg} and {\tt tiff}. \index{graphics file} \index{graphic device}
+This was actually the command I used to produce the first plot in the previous section. The first argument to {\tt postscript} is the filename. You either need to change to the directory where you want the file to go using \lstinline+setwd+ before calling \lstinline+postscript+, or give a full path in the filename. {\tt width} and {\tt height} give the width and height of the plot in inches. See {\tt ?postscript} for how to use other units. It is essential to close the postscript file using \lstinline+dev.off()+ when done --- you won't get a properly formed file otherwise. Other commonly use devices are {\tt pdf}, {\tt png}, {\tt jpeg} and {\tt tiff}. \index{graphics file} \index{graphic device}
 
 A very common adjustment needed when printing to file is to change the size of the axis lables and axis titles. In base R the arguments \lstinline+cex.axis+ and \lstinline+cex.lab+ can provided to most high level plot functions to change these. Values $>1$ enlarge, while $<1$ shrinks. You may also want to change plot symbols sizes, with \lstinline+cex+, or change the symbol with \lstinline+pch+ (a number or a character, including \lstinline+"."+ for the smallest possible point). Line widths are controlled with \lstinline+lwd+. See \lstinline+?par+ for all the graphical parameters that can be set. Several are high level parameters set at plot device level, but the rest can be supplied to most high level plotting functions. There are so many options that they are not listed for each high level plotting function, but are passed via \lstinline+...+, which makes sense as they often control lower level plotting functions. \index{plot options}\index{par}\index{plot!sizing}  
 
@@ -3085,12 +3085,12 @@ hist(sdb,breaks=20,freq=FALSE,xlab=expression(hat(sigma)),main="")
 lines(density(sdb)) ## distribution of estimated sd
 \end{lstlisting}
 \eps{-90}{.7}{nht-para-bs.eps} \index{bootstrap!parametric}
-Now obviously these simulated parameter estimator distributions will not be centred on the true values of the parameters, as we would hope for unbiased estimators is we had {\em really} gathered replicate datasets (difficult for the {\tt nhtemp } data), but the shape of the distribution otherwise should be a good estimate of the shape of the distributions of the estimators. A reflection of this fact is the close correspondence between the standard deviation of $\hat \mu$ in our bootstrap sample and the theoretical result on the standard error of $\hat \mu$ 
+Now obviously these simulated parameter estimator distributions will not be centred on the true values of the parameters, as we would hope for unbiased estimators if we had {\em really} gathered replicate datasets (difficult for the {\tt nhtemp} data), but the shape of the distribution otherwise should be a good estimate of the shape of the distributions of the estimators. A reflection of this fact is the close correspondence between the standard deviation of $\hat \mu$ in our bootstrap sample and the theoretical result on the standard error of $\hat \mu$ 
 \begin{lstlisting}
 > c(sd(mub),sd(nhtemp)/sqrt(n))
 [1] 0.1643081 0.1633892
 \end{lstlisting}\index{bootstrap!percentile CI}
-If the distribution of the $\hat \mu^*$ about $\hat \mu$ is a good approximation to the distribution of $\hat \mu$ about the true $\mu$, then the bootstrap distribution can be used to find confidence intervals for $\mu$. If the $\hat \mu^*$ is roughly symmetric, then the simplest intervals are {\em percentile intervals}, where we base the CI on quantiles of the bootstrap distribution of the parameter estimates. Let's compute 95\% cIs for $\mu $ and $\sigma$ this way.
+If the distribution of the $\hat \mu^*$ about $\hat \mu$ is a good approximation to the distribution of $\hat \mu$ about the true $\mu$, then the bootstrap distribution can be used to find confidence intervals for $\mu$. If the $\hat \mu^*$ distribution is roughly symmetric, then the simplest intervals are {\em percentile intervals}, where we base the CI on quantiles of the bootstrap distribution of the parameter estimates. Let's compute 95\% CIs for $\mu $ and $\sigma$ this way.
 \begin{lstlisting}
 > quantile(mub,c(.025,.975))
     2.5%    97.5% 
@@ -3099,7 +3099,7 @@ If the distribution of the $\hat \mu^*$ about $\hat \mu$ is a good approximation
     2.5%    97.5% 
 1.042289 1.492834 
 \end{lstlisting}
-This parametric bootstrapping approach relies on being able to generate random deviates from probability model. Consideration of how that is done also leads naturally to the  {\em nonparametric bootstrap}.
+This parametric bootstrapping approach relies on being able to generate random deviates from probability models. Consideration of how that is done also leads naturally to the  {\em nonparametric bootstrap}.
 
 \subsubsection{Generating from distributions and the nonparametric bootstrap}
 
@@ -3112,19 +3112,19 @@ We need to get from uniform deviates to deviates from other distributions. There
 \end{enumerate}
 The result is a random draw from the distribution of interest.
 
-To understand why this works recall that the CDF of a random variable, $X$, is defined as $F(x) = \text{Pr}(X \le x)$. The {\em quantile function} is the inverse of the CDF defined as $F^-(u) = \min(x|F(x) \ge u)$. The quantile function definition gives the usual inverse for continuous $F$, but is also defined for discontinuous. To fix ideas, here are 3 example CDFs: for $N(0,1)$; for a mixture with 0.8 probability of drawing from $N(0,1)$ and 0.2 probability of a zero; and for a Poisson with mean 3. 
+To understand why this works recall that the CDF of a random variable, $X$, is defined as $F(x) = \text{Pr}(X \le x)$. The {\em quantile function} is the inverse of the CDF defined as $F^-(u) = \min(x|F(x) \ge u)$. The quantile function definition gives the usual inverse for continuous $F$, but is also defined for discontinuous cases. To fix ideas, here are 3 example CDFs: for $N(0,1)$; for a mixture with 0.8 probability of drawing from $N(0,1)$ and 0.2 probability of a zero; and for a Poisson with mean 3. 
 \eps{-90}{.5}{cdf.eps}
 Suppose, for the moment, we have a continuous CDF, $F$. Then if $X \sim F$ it follows that $F(X)\sim U(0,1)$. The proof is easy. Defining $U = F(X) $ and $u = F(x)$, we have
-$$ F(x) = \text{Pr}(X \le x) =  \text{Pr}(F(X) \le F(x)) \Rightarrow u = \text{Pr}(U \le u)$$
+$$ F(x) = \text{Pr}(X \le x) =  \text{Pr}\{F(X) \le F(x)\} \Rightarrow u = \text{Pr}(U \le u)$$
 but the r.h.s. is just the CDF of a $U(0,1)$ r.v. Notice that this does not work if the CDF is not continuous, since then not all $U$ values on $(0,1)$ can actually occur. 
 
 Similarly if $U \sim U(0,1)$ then $F^-(U) \sim F$. Again assuming continuous $F$, 
 $$
-\text{Pr}(U\le u) = u \Rightarrow \text{Pr}(F^-(U)\le F^-(u)) = u 
+\text{Pr}(U\le u) = u \Rightarrow \text{Pr}\{F^-(U)\le F^-(u)\} = u 
 $$
-but defining $F^-(u) = x$, so that $F(x)=u$ we therefore have $\text{Pr}(F^-(U)\le x) = F(x)$ - the CDF of $X$, as required. This result actually does hold when $F$ is not continuous as well. 
+but defining $F^-(u) = x$, so that $F(x)=u$ we therefore have $\text{Pr}\{F^-(U)\le x\} = F(x)$ - the CDF of $X$, as required. This result actually does hold when $F$ is not continuous as well. 
 
-Now what it we do not know the CDF, but only have its empirical estimate based on a sample? Let $x_1, x_2, \ldots x_n$ be sampled from a distribution with unknown CDF, $F(x)$. Since $F(x) = \text{Pr}(X \le x)$, we can estimate $F$ by estimating the probabilities on the right, from our sample:
+What if we do not know the CDF, but only have its empirical estimate based on a sample? Let $x_1, x_2, \ldots x_n$ be sampled from a distribution with unknown CDF, $F(x)$. Since $F(x) = \text{Pr}(X \le x)$, we can estimate $F$ by estimating the probabilities on the right, from our sample:
 $$
 \hat F(x) = n^{-1} \sum_i \mathbb{I}(x_i\le x)
 $$
@@ -3144,29 +3144,28 @@ for (i in 1:nb) { ## bootstrap llop
   yb <- sample(nhtemp,n,replace=TRUE) ## non-parametric bootstrap sample
   iqb[i] <- diff(quantile(yb,c(.25,.75))) ## bootstrap iqr
 }
-hist(iqbs,freq=FALSE);lines(density(iqbs,adjust=2)) ## examine distribution
+hist(iqb,freq=FALSE);lines(density(iqb,adjust=2)) ## examine distribution
 \end{lstlisting}
 \eps{-90}{.5}{nht-np-bs.eps}
-This distribution is quite skewed, so it is worth thinking a little bit more carefully about the construction of confidence intervals using the bootstrap sample in this case. In particular, you can view the bootstrap process as having found the distribution of $\hat q^*$ when the true interquartile range was the $\hat q$ of the original sample. Suppose then that you find the range that contains 95\% of the $\hat q^*$ values, and write this as $(\hat q - b,\hat q + c)$. Then we have
+This distribution is quite skewed, so it is worth thinking a little bit more carefully about the construction of confidence intervals using the bootstrap sample. In particular, you can view the bootstrap process as having found the distribution of $\hat q^*$ when the true interquartile range was the $\hat q$ of the original sample. Suppose then that you find the range that contains 95\% of the $\hat q^*$ values, and write this as $(\hat q - b,\hat q + c)$. Then we have
 $$
 0.95 = \text{Pr}(\hat q - b < \hat q^* <\hat q + c) = \text{Pr}(-\hat q^* - b < -\hat q < -\hat q^* + c) = 
 \text{Pr}(\hat q^* + b > \hat q > \hat q^* - c)
 $$
 So we can view $b$ and $c$ as being the bootstrap estimates of the constants such that 
+$$\text{Pr}(\hat q + b > q > \hat q - c) = 0.95.
 $$
-\text{Pr}(\hat q + b > q > \hat q - c) = 0.95.
-$$
-That is $(\hat q - c,\hat q +b)$ is a 95\% CI for $q$. Note that for a symmetric distribution this {\em basic bootstrap confidence interval} with the simple percentile interval. Here is some R code\ldots  \index{bootstrap!basic confidence interval}
+That is $(\hat q - c,\hat q +b)$ is a 95\% CI for $q$.
+ Note that for a symmetric distribution this {\em basic bootstrap confidence interval} coincides with the simple percentile interval. Here is some R code\ldots  \index{bootstrap!basic confidence interval}
+ 
 \begin{lstlisting}
 > iq <- diff(quantile(nhtemp,c(.25,.75))) ## original iqr
-> pci <- quantile(iqb,c(.025,.975)) ## 0.25 and 0.975 quantiles of b.s. irq
-> names(iq) <- names(iq) <- NULL ## avoid confusing names
+> pci <- quantile(iqb,c(.025,.975)) ## 0.025 and 0.975 quantiles of b.s. irq
+> names(pci) <- names(iq) <- NULL ## avoid confusing names
 > b <- iq - pci[1]; c <- pci[2] - iq ## get upper and lower interval margins
-> c(iq-c,iq+b)  ## CI
-97.5%  2.5% 
+> c(iq-c,iq+b)  ## basic CI
 0.625 1.650 
 > pci  ## equivalent percentile CI
- 2.5% 97.5% 
 1.000 2.025 
 \end{lstlisting}
 
@@ -3205,7 +3204,7 @@ Re-arranging gives {\em Bayes rule} (a.k.a. {\em Bayes theorem})
 $$
 \pi( {\bm \theta}|{\bf y}) = \pi({\bf y} | {\bm \theta})\pi ({\bm \theta})/\pi({\bf y})
 $$
-The {\em posterior} density on the left describes our knowledge about $\bm \theta$ after having observed $\bf y$. Notice that $ \pi({\bf y} | {\bm \theta})$ is the likelihood. That is the basis of {\em Bayesian} statistics. We append a prior distribution to the model defining the likelihood, describing our initial uncertainty (knowledge or ignorance) about $\bm \theta$, and then allow the data to narrow that uncertainty using Bayes rule.
+The {\em posterior} density on the left describes our knowledge about $\bm \theta$ after having observed $\bf y$. Notice that $ \pi({\bf y} | {\bm \theta})$ is the likelihood. This is the basis of {\em Bayesian} statistics. We append a prior distribution to the model defining the likelihood, describing our initial uncertainty (knowledge or ignorance) about $\bm \theta$, and then allow the data to narrow that uncertainty using Bayes rule.
 
 The only catch is computational. For most interesting models there is no closed form for $\pi( {\bm \theta}|{\bf y})$. Even evaluating $\pi( {\bm \theta}|{\bf y})$ is usually impractical as 
 $$
@@ -3232,7 +3231,7 @@ $$
 $$
 i.e. ${\bm \theta}_{i} \sim \pi( {\bm \theta}|{\bf y}) $. So given reversibility, if ${\bm \theta}_1$ is not impossible under $\pi( {\bm \theta}|{\bf y})$ then  ${\bm \theta}_{i} \sim \pi( {\bm \theta}|{\bf y})$ for $i \ge 1$. But note a slight slipperiness of this result. The ${\bm \theta}_i$ are correlated. If ${\bm \theta}_1$ is in a very improbably part of the posterior distribution then the chain may take many steps to reach the high probability region of the distribution.
 
-\subsubsection{Metropolis Hastings Sampling}
+\subsubsection{Metropolis Hastings sampling}
 
 We can construct an appropriate $P$, based on making a random proposal for ${\bm \theta}_i$ and then accepting or rejecting the proposal with a probability tuned to exactly meet the reversibility condition. This approach is {\em Metropolis Hastings} sampling. Let $q({\bm \theta}_i|{\bm \theta}_{i-1})$ be a {\em proposal} distribution, chosen for convenience. e.g. ${\bm \theta}_i \sim N({\bm \theta}_{i-1},{\bf I}\sigma_\theta^2)$ for some $\sigma_\theta^2$. Metropolis Hastings iterates the following two steps, starting from some ${\bm \theta}_0$ and $i=1$\ldots
 \begin{enumerate}
@@ -3262,7 +3261,7 @@ $$
 $$
 (last equality by symmetry) --- reversibility! Obviously reversibility holds trivially if ${\bm \theta} ={\bm \theta}^\prime$.\index{reversibility}
 
-Notice that if the proposal distribution is symmetric in ${\bm \theta}^\prime $ and ${\bm \theta} $ so that $q({\bm \theta}^\prime|{\bm \theta}) = q({\bm \theta}|{\bm \theta}^\prime) $ then $q$ cancels from acceptance ratio. In addition if we use an improper uniform distribution $\pi({\bm \theta})$ as prior, then that to cancels, and the acceptance ratio is simply the ratio of the likelihoods of ${\bm \theta}^\prime $ and ${\bm \theta}$. 
+Notice that if the proposal distribution is symmetric in ${\bm \theta}^\prime $ and ${\bm \theta} $ so that $q({\bm \theta}^\prime|{\bm \theta}) = q({\bm \theta}|{\bm \theta}^\prime) $ then $q$ cancels from acceptance ratio. In addition if we use an improper uniform distribution $\pi({\bm \theta})$ as prior, then that too cancels, and the acceptance ratio is simply the ratio of the likelihoods of ${\bm \theta}^\prime $ and ${\bm \theta}$. 
 
 Obviously we need to choose a proposal distribution. A common choice is to add a random deviate from some convenient symmetric distribution to each component of $\bm \theta$. Such a {\em random walk proposal} cancels from the MH acceptance ratio.  In practice there are several further practical issues to consider with MH sampling
 \begin{enumerate}
@@ -3280,15 +3279,15 @@ So we usually have to discard some initial portion of the simulation ({\em burn 
 \end{enumerate}
 
 As a simple example let's consider the {\tt nhtemp} data again, but this time adopting a `heavy tailed' model, based on a t distribution.
-Specifically if the ith annual mean temperatures is $T_i$ then the model is
+Specifically if the ith annual mean temperature is $T_i$ then the model is
 $$
 (T_i - \mu)/\sigma \underset{\text{i.i.d.}}{\sim} t_\nu
 $$
 where $\mu$, $\log \sigma$ and $\nu$ are parameters (which can be written in one vector, $\bm \theta$). We'll use $\log \sigma$ as the parameter to work with as $\sigma>0$, although we could also have handled this constraint with a properly set up prior for which $\text{Pr}(\sigma \le 0) = 0$. If $\pi_\nu$ is the p.d.f. of a $t_\nu$ distribution then the p.d.f. for $T_i$ is
 $
-\pi(t|{\bm \theta}) = \pi_\nu((t-\mu)/\sigma) /\sigma
+\pi(t|{\bm \theta}) = \pi_\nu((t-\mu)/\sigma) /\sigma.
 $
-The log likelihood for this model can be coded in R,
+The log likelihood for this model can be coded in R.
 \begin{lstlisting}
 ll <- function(theta,temp) { ## log of pi(T|theta)
   mu <- theta[1];sig <- exp(theta[2]) 
@@ -3352,15 +3351,15 @@ Credible intervals can be readily computed using the empirical quantiles of the 
 > colnames(ci) <- c("mu","sig","df")
 > ci
             mu      sig         df
-2.5%  50.85020 0.893452    3.09977
+2.5%    50.85020 0.893452    3.09977
 97.5% 51.48983 1.484936 1766.29037
 \end{lstlisting}
 
-\subsubsection{Gibbs Sampling \label{sec:gibbs}}
+\subsubsection{Gibbs sampling \label{sec:gibbs}}
 
-In Metropolis Hastings sampling it can be difficult to find a distribution that makes good proposals for the whole parameter vector, $\bm \theta$. But there is nothing in the MH scheme to prevent us using a proposal that updates the parameters in smaller blocks, or even one at a time, cycling through the elements of $\bm \theta$. Such single element proposals are easier to tune. Another interesting fact is that if our proposal distribution is $\pi({\bm \theta}|{\bf y})$ then the MH acceptance probability is exactly 1 (try it). This observation is not very practical for all at once updating of $\bm\theta$, but it turns out to be very useful for one at a time updating, and is one way of motivating {\em Gibbs sampling}.  
+In Metropolis Hastings sampling it can be difficult to find a distribution that makes good proposals for the whole parameter vector, $\bm \theta$. But there is nothing in the MH scheme to prevent us using a proposal that updates the parameters in smaller blocks, or even one at a time, cycling through the elements of $\bm \theta$. Such single element proposals are easier to tune. Another interesting fact is that if our proposal distribution is $\pi({\bm \theta}|{\bf y})$ then the MH acceptance probability is exactly 1 (try it). This observation is not very practical for all-at-once updating of $\bm\theta$, but it turns out to be very useful for one at a time updating, and is one way of motivating {\em Gibbs sampling}.  
 
-Let ${\bm \theta}_{-i}$ denote the elements of $\bm \theta$ other than $\theta_i$. Suppose we want a random draw from $\pi({\bm \theta}|{\bf y})$, and we already have a random draw, ${\bm \theta}_{-i}^*$, from $\pi({\bm \theta}_{-i}|{\bf y})$. All we need to do is generate $\theta_i^*$ from $\pi(\theta_i|{\bm \theta}_{-i}^*,{\bf y})$ and append this to ${\bm \theta}_{-i}^*$ to get ${\bm \theta}^* \sim \pi({\bm \theta}|{\bf y}) = \pi(\theta_i|{\bm \theta}_{-i},{\bf y})\pi({\bm \theta}_{-i}|{\bf y})$. To get a slightly different draw from the same distribution we could discard $\theta_i^*$ and draw a fresh value in the same way. We could repeatedly cycle through all elements of $\bm \theta$, dropping each and replacing with a draw from its conditional $\pi(\theta_i|{\bm \theta}_{-i}^*,{\bf y})$. 
+Let ${\bm \theta}_{-i}$ denote the elements of $\bm \theta$ other than $\theta_i$. Suppose we want a random draw from $\pi({\bm \theta}|{\bf y})$, and we already have a random draw, ${\bm \theta}_{-i}^*$, from $\pi({\bm \theta}_{-i}|{\bf y})$. All we need to do is generate $\theta_i^*$ from $\pi(\theta_i|{\bm \theta}_{-i}^*,{\bf y})$ and append this to ${\bm \theta}_{-i}^*$ to get ${\bm \theta}^* \sim \pi({\bm \theta}|{\bf y}) = \pi(\theta_i|{\bm \theta}_{-i},{\bf y})\pi({\bm \theta}_{-i}|{\bf y})$. To get a slightly different draw from the same distribution we could discard $\theta_i^*$ and draw a fresh value in the same way. We could also repeatedly cycle through all elements of $\bm \theta$, dropping each and replacing it with a draw from its conditional $\pi(\theta_i|{\bm \theta}_{-i}^*,{\bf y})$. 
 This method is {\em Gibbs sampling}. To use it we need to identify the conditional densities. When identification of a conditional is not possible, we can use a Metropolis Hastings step for that parameter, or more efficient one dimensional alternatives.
 
 As a simple example consider $n$ observations from model $x_i \sim N(\mu, \sigma^2)$, with priors
@@ -3426,14 +3425,14 @@ acf(th[1,]);acf(th[2,])
 \eps{-90}{.4}{nh-acf.eps}
 \noindent But actually this is a special property of this two parameter example and is not some general property of Gibbs sampling, which can be every bit as slow to mix as MH in general. 
 
-{\bf How much did the data matter?} A common error is to believe that having updated your beliefs about the parameters using data, then {\em all} those beliefs are now validated by data. The Covid literature provides many examples. To avoid this it is a good idea to compare priors to posteriors, to see what effect the data had, if any. The following code does this, using histograms to visualize the posteriors, and overlaying the priors over these as red curves. 
+{\bf How much did the data matter?} A common error is to believe that having updated your beliefs about the parameters using data, then {\em all} those beliefs are now validated by data. The Covid literature provides many examples. To avoid this it is a good idea to compare priors to posteriors, to see what effect the data had, if any. The following code does this, using histograms to visualize the posteriors, and plotting the priors over these as red curves. 
 \begin{lstlisting}
 hist(th[1,],xlab=expression(mu),main="",probability=TRUE) ## posterior for mu
 mu <- seq(50,52,length=100)
 lines(mu,dnorm(mu,c,d^.5),col=2)  ## prior for mu
-hist(1/th[2,]^2,xlab=expression(tau),main="",probability=TRUE) ## posterior for tau = 1/sigma^2
+hist(1/th[2,]^2,xlab=expression(tau),main="",probability=TRUE) ## posterior for tau
 tau <- seq(0.1,1.2,length=100) 
-lines(tau,dgamma(tau,a,b),col=2) ## prior for tau 
+lines(tau,dgamma(tau,a,b),col=2) ## prior for tau = 1/sigma^2
 \end{lstlisting}
 \vspace*{-1cm}
 \eps{-90}{.5}{nh-popr.eps}
@@ -3462,7 +3461,7 @@ In a {\em directed} graph edges have direction, shown by arrows, with the node a
 \ldots the child is a deterministic node.  
 \end{itemize}
 
-As an example, recall again the model $x_i \sim N(\mu, \sigma^2)$, with priors
+\noindent As an example, recall again the model $x_i \sim N(\mu, \sigma^2)$, with priors
 \begin{itemize}
 \item $\tau = 1/\sigma^2 \sim \text{gamma}(a,b)$, i.e. prior $\pi(\tau) = b^a \tau^{a-1} e^{-b\tau}/\Gamma(a)$ 
 \item Independently, $\mu \sim N(c,d)$.
@@ -3476,7 +3475,7 @@ So why is the DAG representation of the model actually useful?  To see this let 
 $$
 \pi({\bf z}) = \prod_{i} \pi (z_i|\text{parent}\{z_i\})
 $$
-Then, from the definition of a conditional p.d.f.
+Then, from the definition of a conditional p.d.f.,
 $$
 \pi(z_j|{\bf z}_{-j}) = \frac{\pi({\bf z})}{\int \pi({\bf z}) d z_{j}} = \frac{\prod_{i} \pi(z_i|\text{parent}\{z_i\})}{
 \int \prod_{i} \pi(z_i|\text{parent}\{z_i\}) dz_j},
@@ -3505,7 +3504,7 @@ JAGS (Just Another Gibbs Sampler) is a stand alone software package for automati
 \item An alternative to {\tt jags.samples} is {\tt coda.samples} which returns an object of class {\tt mcmc.list} suitable for direct use with the {\tt coda} package for checking and post-processing MCMC output. 
 \item Model comparison via the {\em deviance information criterion} (DIC) is facilitated by {\tt dic.samples} (requires the model to have been compiled by {\tt jags.models} with at least {\tt n.chains=2}).
 \end{enumerate}
-JAGS simulation output can be used in the same way as the MCMC simulation output from previous sections, but the {\tt coda} package for checking and processing simulation output overs some very convenient functions to help.
+JAGS simulation output can be used in the same way as the MCMC simulation output from previous sections, but the {\tt coda} package for checking and processing simulation output offers some very convenient functions to help.
 \begin{itemize}
 \item {\tt plot.mcmc.list} plot method for MCMC simulation output.
 \item {\tt acfplot} plots chain ACFs compactly.
@@ -3514,7 +3513,7 @@ JAGS simulation output can be used in the same way as the MCMC simulation output
 \item {\tt HPDinterval} for highest posterior density intervals.
 \end{itemize}
 
-Let us once again look at the {\tt nhtemp} data using the model from section \ref{sec:gibbs}. First we need to code the model up in an external text file using the JAGS language. Here is the contents of an appropriate file {\tt basic.jags}. Commenting works as in R, but unlike R there is no need to avoid looping over vector elements: the model will essentially be compiled by JAGS. \index{JAGS!model specification}   
+Let us once again look at the {\tt nhtemp} data using the model from section \ref{sec:gibbs}. First we need to code the model up in an external text file using the JAGS language. Here is the contents of an appropriate file {\tt basic.jags}. Commenting works as in R, but unlike R there is no need to avoid looping over vector elements, as the model will be compiled by JAGS. \index{JAGS!model specification}   
 \begin{lstlisting}
 model{
   for (i in 1:N){  ## loop over the data
@@ -3524,7 +3523,7 @@ model{
   tau ~ dgamma(1.4,.6) ## prior for precision tau
 }
 \end{lstlisting}
-Note how the model specification is contained within \lstinline+model{}+. JAGS files can also contain \lstinline+data{}+ statements if data requires transformation of some sort before modelling. The model specification itself is fairly intuitive with \verb+~+ specifying a stochastic dependence, and \verb+<-+ a deterministic one. The full list of distributions available in JAGS is given in the JAGS manual (see {\tt ?rjags} in Rstudio or html help for the current link). Note that the parameterization does not always correspond with R - you need to check. For example the $N(\mu,\sigma^2)$ is parameterized in terms of $\mu$ and $\tau=1/\sigma^2$. One easy way to check your priors is to get JAGS to simulate from your model without conditioning on any data. That is you run the model without supplying data. Without any data the posterior is just the prior, so it easy to then check that your prior specification is as intended. 
+Note how the model specification is contained within \lstinline+model{}+. JAGS files can also contain \lstinline+data{}+ statements if data requires transformation of some sort before modelling. The model specification itself is fairly intuitive with \verb+~+ specifying a stochastic dependence, and \verb+<-+ a deterministic one. The full list of distributions available in JAGS is given in the JAGS manual (see {\tt ?rjags} in Rstudio or html help for the current link). The parameterization does not always correspond with R - you need to check. For example the $N(\mu,\sigma^2)$ is parameterized in terms of $\mu$ and $\tau=1/\sigma^2$. One easy way to check your priors is to get JAGS to simulate from your model without conditioning on any data. That is you run the model without supplying data. Without any data the posterior is just the prior, so it is easy to then check that your prior specification is as intended. 
 
 With the model coded in a file outside R, we are ready to run JAGS from within R using package {\tt rjags}. First the model has to be compiled using {\tt jags.model} \index{jags.model}
 \begin{lstlisting}
@@ -3541,7 +3540,7 @@ Graph information:
 
 Initializing model
 \end{lstlisting}
-Notice how {\tt jags.model} must be provided with the name of the model specification file, and with the information on which data in R should correspond to which nodes in the  specified model. Note that it would have been perfectly fine to have some of the nodes of {\tt x} unobserved - just supply {\tt NA}'s for these.\index{JAGS!missing data} Note the information provided on the graphical model structure. 60 nodes are observed - the temperature data provided for the $x[i]$ nodes. There are then 2 unobserved stochastic nodes - $\tau$ and $\mu$. The total graph size is 67, so that leaves 5 constant nodes - $a$, $b$, $c$ and $d$ the parameters of the priors plus $N$ the number of data (JAGS counts every variable as a node, and that includes $N$). JAGS would give and error if something was wrong with the model or data specification here. Since no error has been produced we can go on to simulate, using {\tt jags.samples}, which takes the compiled model object as first argument, and array of variable/node names to produce output for, and the number of iterations to perform.   \index{jags.samples}
+Notice how {\tt jags.model} must be provided with the name of the model specification file, and with the information on which data in R should correspond to which nodes in the  specified model. It would have been perfectly fine to have some of the nodes of {\tt x} unobserved - just supply {\tt NA}'s for these.\index{JAGS!missing data} Also note the information provided on the graphical model structure. 60 nodes are observed - the temperature data provided for the $x[i]$ nodes. There are then 2 unobserved stochastic nodes - $\tau$ and $\mu$. The total graph size is 67, so that leaves 5 constant nodes - $a$, $b$, $c$ and $d$ the parameters of the priors plus $N$ the number of data (JAGS counts every variable as a node, and that includes $N$). JAGS would give an error if something was wrong with the model or data specification here. Since no error has been produced we can go on to simulate, using {\tt jags.samples}, which takes the compiled model object as first argument, an array of variable/node names to produce output for, and the number of iterations to perform.   \index{jags.samples}
 \begin{lstlisting}
 > sam <- jags.samples(mod,c("mu","tau"),n.iter=10000)
   |**************************************************| 100%
@@ -3558,9 +3557,9 @@ List of 2
   ..- attr(*, "iterations")= Named num [1:3] 1 10000 1
   .. ..- attr(*, "names")= chr [1:3] "start" "end" "thin"
 \end{lstlisting}
-The returned object is a list containing an element for each variable for which output was requested. The array itself has 3 dimensions: the would have an extent greater than 1 of we had output a vector quantity, the extent of the second depends on how many iterations were saved, while the extent of the third depends on how many parallel chains were run (1 here, since nothing was specified). The \lstinline+"varname"+ and \lstinline+"type"+ attributes are obvious, while the \lstinline+"iterations"+ attribute is more interesting. It tells you which iterations of the sampler the object relates to, counting from the the first time the model was sampled from. In the above the results are for iterations 1 to 10000, but if the code the sampler were run for 10000 iterations again, the entries would be 10001 to 20000. The final figure in the \lstinline+"iterations"+ array tells you if the output has been thinned, meaning that the sampler has been run for several steps between each output. Thinning is useful for very slow moving chains: by thinning what is stored is more independent from sample to sample, which improves the information content per stored sample. 
+The returned object is a list containing an element for each variable for which output was requested. The array itself has 3 dimensions: the first would have an extent greater than 1 if we had output a vector quantity, the extent of the second depends on how many iterations were saved, while the extent of the third depends on how many parallel chains were run (1 here, since nothing was specified). The \lstinline+"varname"+ and \lstinline+"type"+ attributes are obvious, while the \lstinline+"iterations"+ attribute is more interesting. It tells you which iterations of the sampler the object relates to, counting from the the first time the model was sampled from. In the above the results are for iterations 1 to 10000, but if the sampler were run for 10000 further iterations, the entries would be 10001 to 20000. The final figure in the \lstinline+"iterations"+ array tells you if the output has been thinned, meaning that the sampler has been run for several steps between each output. Thinning is useful for very slow moving chains: by thinning what is stored is more independent from sample to sample, which improves the information content per stored sample. 
 
-The {\tt coda} package expects MCMC output to be stored in a slightly different format, and JAGS can output that as well. \index{coda.samples}
+The {\tt coda} package expects a slightly different format, and JAGS can output that as well. \index{coda.samples}
 \begin{lstlisting}
 > sam.coda <- coda.samples(mod,c("mu","tau"),n.iter=10000)
   |**************************************************| 100%
@@ -3668,11 +3667,11 @@ tau   -0.03765271 -0.05928205 -0.39247169  1.00000000
 \eps{-90}{.5}{nht-trace2.eps}
 \noindent Notice how the data do not seem to be informative about $\nu$, the degrees of freedom of the $t$ distribution. The posterior is little different to the prior.  
  
-Can we say which model is better between the original simple model and the linear trend scaled $t $ model? One approach to this is via the {\em Deviance Information Criterion}, or DIC. The DIC is 
+Can we say which model is better between the original simple model and the linear trend scaled $t $ model? One approach to this is via the {\em Deviance Information Criterion},
 $$
-\text{DIC} = - 2 \log \pi({\bf y}|\bar {\bm \theta}) + 2 EDF
+\text{DIC} = - 2 \log \pi({\bf y}|\bar {\bm \theta}) + 2 \text{EDF},
 $$ 
-where $\bar {\bm \theta}$ is the posterior mean of $\bm \theta$ and EDF is the {\em effective degrees of freedom} of the model. Lower DIC suggests a better model, in some sense estimated to be closer to the true model. We met effective degrees of freedom already in section \ref{sec:ridge}. \index{effective degrees of freedom} Here the idea is that a proper prior puts some restriction on the freedom of a parameter to vary. While an improper prior does not restrict a parameter at all, any proper prior makes soem restriction, with a very narrow prior allowing very little freedom, and the limiting case of a delta function prior offering no freedom at all. In this latter case it makes no sense to treat the parameter as a parameter at all - it is just a constant of the model, contributing 0 degrees of freedom. The idea with an effective degree of freedom for a single parameter is that it should change smoothly from 1 to 0 as a prior is narrowed to shrink a parameter towards some particular value. 
+where $\bar {\bm \theta}$ is the posterior mean of $\bm \theta$ and EDF is the {\em effective degrees of freedom} of the model. Lower DIC suggests a better model, in some sense estimated to be closer to the true model. We met effective degrees of freedom already in section \ref{sec:ridge}. \index{effective degrees of freedom} Here the idea is that a proper prior puts some restriction on the freedom of a parameter to vary. While an improper prior does not restrict a parameter at all, any proper prior introduces some restriction, with a very narrow prior allowing very little freedom, and the limiting case of a delta function prior offering no freedom at all. In this latter case it makes no sense to treat the parameter as a parameter at all - it is just a constant of the model, contributing 0 degrees of freedom. The idea with an effective degree of freedom for a parameter is that it should change smoothly from 1 to 0 as a prior is narrowed to shrink a parameter towards some particular value. 
 
 JAGS estimates the EDF using a method based on running 2 or more independent replicates of the sampler, so when the model is set up we need do set {\tt n.chains} to something larger than 1.
 \begin{lstlisting}
@@ -3699,9 +3698,9 @@ The DIC is the {\tt Penalized deviance} reported. Lower is better, so the result
 
 Statisticians and data scientists program in order to analyse and present data. Sometimes for scientific purposes -- `what do these data tell me about how the world works?'. Sometimes for other purposes -- `how can I make these data look attention grabbing?'. Here is a particularly poor example of the latter. 
 \eps{0}{.2}{BBC2021-10-25}
-Note the lack of any sort of axes on the plots, giving the reader even less chance of contextualizing the data, which is anyway plotted over a time window selected to show upward trends, except for the vaccine plot, which has neglected to show the 3rd vaccinations which make up most of those now given\footnote{Edward Herman and Noam Chomsky's book {\em Manufacturing Consent} is quite an interesting read, but I digress.}.  \index{R markdown} 
+Note the lack of any sort of axes on the plots, giving the reader even less chance of contextualizing the data, which is anyway plotted over a time window selected to show upward trends, except for the vaccine plot, which has neglected to show the 3rd vaccinations which make up most of those given later on\footnote{Edward Herman and Noam Chomsky's book {\em Manufacturing Consent} is quite an interesting read, but I digress.}.  \index{R markdown} 
 
-Whatever your purpose in analysing data, it is generally a good thing if what you did is well documented and reproducible. Furthermore it is often the case that data analyses and reports may go through several iterations as data is updated, and analyses refined. It is obviously a good idea if the report of an analysis does not accidentally have figure 1 coming from the 2020's data , while figures 2-3 are from 2021, or table 6 accidentally being the version generated under the model that was using the wrong response variable which we since corrected, and so on\ldots But it is easy for such mistakes to occur if documents, data and statistical analyses are all separate and have to be combined `by hand'. 
+Whatever your purpose in analysing data, it is generally a good thing if what you did is well documented and reproducible. Furthermore it is often the case that data analyses and reports may go through several iterations as data is updated, and analyses refined. It is obviously a good idea if the report of an analysis does not accidentally have figure 1 coming from the 2020's data, while figures 2-3 are from 2021, or table 6 accidentally being the version generated under the model that was using the wrong response variable which we since corrected, and so on\ldots But it is easy for such mistakes to occur if documents, data and statistical analyses are all separate and have to be combined `by hand'. 
 
 R markdown is one attempt integrate data analysis and report writing in a way that improves reproducibility, while reducing the scope for errors. It basically provides a way of integrating R code into your document in a nice way. That code runs the analysis and produces plots, and you can choose to display the code as part of the finished report, or have it (or parts of it) hidden. There is a nice `cheat sheet' for R markdown, and a whole book at these addresses\ldots.
 \begin{lstlisting}
@@ -3709,7 +3708,7 @@ https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf
 https://bookdown.org/yihui/rmarkdown-cookbook/
 \end{lstlisting}
 An R markdown document is usually a text file with a {\tt .Rmd} extension. It starts with a header, optionally giving a title, author(s) and the target type of document to produce (\lstinline+html_document+, \lstinline+pdf_document+, \lstinline+word_document+, \lstinline+beamer_presentation+ or \lstinline+ioslides_presentation+). You don't have to supply any of these, and can choose the document type when you call the {\tt render} function. 
-The easiest way to introduce it is with an R markdown document illustrating its most common features. 
+The easiest way to introduce it is with an R markdown document illustrating its most common basic features. 
 \begin{lstlisting}
 ---
 title: "R markdown"
@@ -3719,7 +3718,7 @@ output: pdf_document
 # various header
 ## sizes are available 
 
-Using Latex mathematice type-setting, you can include maths inline, 
+Using Latex mathematics type-setting, you can include maths inline, 
 $\int f^{\prime\prime}(x)^2 dx$, or displayed
 $$
 \hat { \beta} = \underset{\beta}{{\rm argmin}} ~ \|{\bf y} - {\bf X}{ \beta }\|^2.
@@ -3736,7 +3735,7 @@ appear improbable.
 Furthermore
 
 * lists
-  * sub lists (idented 2 spaces)
+  * sub lists (indented 2 spaces)
   * etc
 * can be added
 
@@ -3749,7 +3748,7 @@ paste("res","ult",sep="") ## can comment too
 ```{r} 
 paste("res","ult",sep="")
 ```
-... or running without diplay, as here...
+... or running without display, as here...
 ```{r echo=FALSE} 
 paste("res","ult",sep="")
 ```
@@ -3760,6 +3759,7 @@ hist(nhtemp,main="")
 \end{lstlisting}
 If this is in the working directory, in a file called {\tt md-notes.Rmd} for example, then the final document is produced in R like this.
 \begin{lstlisting}
+library(rmarkdown)
 render("md-notes.Rmd")
 \end{lstlisting}
 The rendered document looks like this\ldots
@@ -3768,7 +3768,7 @@ The rendered document looks like this\ldots
 
 \eps{0}{.7}{md-notes.pdf}
 
-\noindent Careful comparison of the rendered document with its code gives you most of what you need to get started producing R markdown documents. Pay particular attentions to the single backticks and {\tt r} used for inline R code and the triple backticks and \verb+{r}+ plus options used for code chunks. And that is now quite enough.
+\noindent Careful comparison of the rendered document with its code gives you most of what you need to get started producing R markdown documents. Pay particular attentions to the single backticks and {\tt r} used for inline R code and the triple backticks and \verb+{r}+ plus options used for code chunks. Enough.
 
 
 \begin{lstlisting}
