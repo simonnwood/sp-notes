@@ -1,0 +1,140 @@
+## 5.2.2
+
+set.seed(5); n <- 2000
+w <- runif(n)
+A <- matrix(runif(n*n),n,n)
+system.time(B <- diag(w) %*% A )
+
+## Let W = diag(w). Generically B_{ij} = \sum_k W_{ik} B_{kj}
+## But W_{ik} = 0 except for W_{ii} = w_i, so B_{ij} = w_i B_{ij}
+## given that B is actually stored column-wise that is in the order
+## B_11 B_21, B_31, ... B_12 B_22 ... then the product can be
+## computed using the recycling rule an vector multiplication...
+
+system.time(B1 <- w * A )
+range(B1-B)
+
+## The huge speed up is because we have avoided all those multiplications
+## by zero that contribute nothing anyway.
+
+
+## 5.2.4.
+
+a <- factor(sample(c("fred","george","sue","ann"),20,replace=TRUE))
+a
+b <- factor(a,levels=c("ann","sue","fred","george"))
+b
+as.numeric(a)
+as.numeric(b)
+## The codes are 1 for the first level, 2 for the second and so on
+## so the change results in 4 -> 2, 2 -> 3 and 3 -> 4
+
+al <- levels(a)
+an <- as.numeric(a)
+al[an]
+
+## 5.4
+x <- rnorm(20); z <- rnorm(20); y <- rnorm(20)
+ii <- z!=0 & (z<1 | y/z <0)
+x[ii] <- x[ii]^2
+## Note that the fact that z is tested for equality to zero before y/z test
+## ensures that we don't have a problem with y/z being undefined if z==0 -
+## y/z will not be evaluated in that case.
+
+## 5.5 other options are possible...
+
+f <- function(x) log(x) - 1/x
+
+xr <- c(.1,10) ## current bracketing interval
+xt <- mean(xr) ## mid-point of interval
+ft <- 1
+while(abs(ft)>1e-8) {
+  xt <- mean(xr) ## mid-point of interval
+  ft <- f(xt)
+  if (ft>0) xr[2] <- xt else xr[1] <- xt
+}
+xt
+
+
+## 5.6 mostly as above... 
+
+f <- function(x) log(x) - 1/x
+g <- function(x,a=1,b=1) x^b - exp(a*x) + 2 
+
+root <- function(xr,f,...) {
+## finds the solution of f(x,...) = 0 in the interval xr
+  f0 <- f(xr[1],...);f1 <- f(xr[2],...)
+  if (f0==0) return(xr[1])
+  if (f1==0) return(xr[2])
+  if (f0*f1>0) stop("Interval does not appear to bracket solution")
+  up <- sign(f1) ## +1 if function increasing, -1 otherwise 
+  repeat { ## bisection loop
+    xt <- mean(xr) ## mid-point of interval
+    ft <- f(xt,...)
+    if (up*ft>0) xr[2] <- xt else xr[1] <- xt
+    if (abs(ft)<1e-8) break
+  }
+  xt
+}
+
+root(c(.1,10),f)
+root(c(0,10),g,a=1,b=2)
+
+## 5.8.1 following looks long, but only 3 lines are modified from notes 
+
+ecdf3 <- function(x,h=.1) {
+## function to plot empirical cdf of sample x, smoothed with
+## bandwidth h
+  x <- x + rnorm(length(x)*100,sd=h) ## changed line!!
+  n <- length(x)
+  p <- 1:n/n ## create cumulative probability vector 
+  xs <- sort(x) ## sort the x values
+  ## plot the x, p points
+  p1 <- x1 <- rep(NA,3*n+2) ## create p1 and x1 with NAs everywhere
+  p1[1:n*3+2] <- p1[1:n*3+1] <- p ## fill in the step heights
+  x1[1:n*3+1] <- xs ## step start
+  x1[1:n*3+2] <- c(xs[-1],2*xs[n]-xs[1]) ## step ends
+  p1[1:2] <- 0 ## initial prob is zero
+  x1[1:2] <- c(2*xs[1]-xs[n],xs[1]) ## x co-ords for zero prob
+  ## changed plot symbol!!...
+  plot(xs,p,pch=".",cex=.5,xlab="x",ylab=expression(P(X<=x)),col=4)
+  lines(x1,p1,col=2)
+} ## ecdf3
+
+set.seed(8);
+x <- rgamma(50,shape=3,scale=2) ## test data
+ecdf3(x,h=1.5)
+x0 <- seq(0,25,length=200)
+lines(x0,pgamma(x0,shape=3,scale=2))
+
+
+## 6.1.1
+
+n <- length(morley$Speed)
+bs.ls <- matrix(sample(morley$Speed,n*1000,replace=TRUE),n,1000)
+bs.mean <- colMeans(bs.ls)
+quantile(bs.mean,c(.025,.975))
+
+## 6.1.2 One of many alternaives for doing this...
+
+n <- 2^(1:9) ## the n sequence
+m <- 10000   ## sample sizes
+U <- matrix(rexp(m*max(n)),m) ## exponential deviate to sum
+par(mfrow=c(3,3)) ## split the plot window
+x <- seq(0,6,length=1000) ## extra bit: sequence of x values for pdf plotting
+for (i in n) { ## loop over n
+  Xn <- rowMeans(U[,1:i]) ## sum n=2, 4, ... , 512 U values
+  hist(Xn,main="",xlab=paste("X",i),freq=FALSE,breaks=30) ## visualize dist
+  lines(x,dnorm(x,mean=mean(Xn),sd=sd(Xn))) ## plot normal pdf with same mean and sd
+}
+
+## 6.3
+
+n.rep <- 10000 ## number of CIs to compute
+n.ci <- 0 ## counter for number that include the truth
+n <- 20;p <- .2
+x <- rbinom(n.rep,n,p) ## generate x
+p.hat <- x/n ## compute the estimate of p
+sig.p <- sqrt(p.hat*(1-p.hat)/n) ## and its standard error
+cp <- mean(p.hat - 1.96*sig.p <p & p.hat+1.96*sig.p > p)
+cp ## observed coverage probability 

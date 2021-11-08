@@ -1,0 +1,43 @@
+---
+title: "R markdown"
+author: "Simon Wood"
+output: pdf_document
+---
+# various header
+## sizes are available 
+
+Using Latex mathematics type-setting, you can include maths inline, $\int f^{\prime\prime}(x)^2 dx$, or displayed
+$$
+\hat { \beta} = \underset{\beta}{{\rm argmin}} ~ \|{\bf y} - {\bf X}{ \beta }\|^2.
+$$
+
+
+***
+
+Quotes can be added, and words emphasized...
+
+> **Likelihood**. Parameter values that make the observed data probable according to the model are more *likely* to be correct than parameter values that make the data appear improbable.
+
+Furthermore
+
+* lists
+  * sub lists (indented 2 spaces)
+  * etc
+* can be added
+
+R code can be included, inline to produce a `r paste("res","ult",sep="")`, or as a *code chunk* for display, but maybe not running...
+```{r eval=FALSE}
+paste("res","ult",sep="") ## can comment too
+```
+... or display and running, as here...
+```{r} 
+paste("res","ult",sep="")
+```
+... or running without display, as here...
+```{r echo=FALSE} 
+paste("res","ult",sep="")
+```
+Figures are easily added too
+```{r fig.width=3,fig.height=2.8,fig.align='center'}
+hist(nhtemp,main="")
+```

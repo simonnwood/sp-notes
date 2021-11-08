@@ -1,0 +1,60 @@
+## scatterplots...
+
+library(ggplot2)
+head(mpg)
+mpg$transmission <- rep("manual",nrow(mpg)) ## simplified transmission variable
+mpg$transmission[grep("auto",mpg$trans)] <- "automatic" ## note automatics
+
+par(mfrow=c(1,2),mar=c(4,4,1,1)) ## two panel window
+
+plot(mpg$displ,mpg$hwy,xlab="displacement",ylab="highway mpg",
+     pch=19,col=(mpg$transmission=="automatic")+1)
+
+
+plot(mpg$displ,mpg$hwy,xlab="displacement",ylab="highway mpg",type="n") # empty plot
+rect(0,0,8,50,col="lightgrey") # add a grey rectangle over plot area 
+abline(v=2:7,h=seq(10,45,by=5),col="white") # add grid lines
+points(mpg$displ,mpg$hwy,col=(mpg$transmission=="automatic")+1,pch=19,cex=.5) # data
+
+
+a <- ggplot(mpg,aes(x=displ,y=hwy)) 
+a <- a + geom_point(aes(colour=transmission)) 
+a <- a + geom_smooth(method="gam",formula=y~s(x)) ## add a smooth as it's easy!
+a    ## 'print' plot object 'a' - that is plot it!
+
+b1 <- a + coord_cartesian(xlim=c(0,8),ylim=c(0,50))
+b1
+
+b2 <- a + scale_x_continuous(limits=c(2,6),name="displacement (litres)")
+b2
+
+postscript("some-plot.eps",width=8,height=3)
+## the code to produce the plot goes here - e.g. from previous section
+dev.off()
+
+ggsave("some-plot.eps",width=5,height=3)
+
+
+## univariate
+library(ggplot2)
+par(mfrow=c(1,2)) ## set up to allow 2 histograms side by side
+hist(faithful$eruptions) ## default
+hist(faithful$eruptions,breaks=quantile(faithful$eruptions,seq(0,1,length=15)),
+     xlab="eruption time (mins)",main="Old Faithful geyser",col="purple")
+
+
+n <- nrow(faithful);set.seed(8)
+erupt <- faithful$eruption + rnorm(n*1000,sd=.2) ## simulate much bigger sample
+hist(erupt,breaks=100,freq=FALSE) ## plot it
+
+plot(density(faithful$eruptions,adjust=0.6),type="l",
+xlab="eruption time (mins)",main="kernel density estimate")
+
+
+ggplot(faithful,aes(x=eruptions,after_stat(density))) + ## data, base mappings etc
+geom_histogram(bins=20,col="green",fill="purple") +     ## garish histogram
+geom_density(adjust=.5,col="red")                       ## added kernel density estimate
+
+
+par(mfrow=c(1,2))
+acf(faithful$eruptions); pacf(faithful$eruptions)

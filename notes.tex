@@ -2190,6 +2190,8 @@ Obviously you might choose to bundle these unit tests into a function that can t
 
 Writing careful tests that are as comprehensive as possible is good practice, especially for code that will be used by others, and may be subject to future modification. But beware of the complacency that having good tests can bring with it. When modifying code, the mere fact that it still passes all its tests is no proof that the modification is correct. Also don't get in the habit of coding to the unit tests - debugging modifications until the unit tests are all passed and then assuming that all is OK. 
 
+A very common R error is for a function to accidentally use an object that just happened to be in your workspace: it then appears to work, although it will fail in general. Testing in a clean workspace is one defence. 
+
 \bigskip
 
 \noindent {\bf Exercise:} add a test for whether non symmetric matrices are being handled as designed.
@@ -2200,7 +2202,7 @@ Debugging\footnote{The term comes from the early days of computing, when errors 
 \begin{itemize}
 \item  Ideally we would not introduce bugs in the first place. But humans are error prone, and would probably not be creative if that was not the case. So recognise that you are error prone, by adopting working methods that minimize the chance of errors: design before you code. Make sure the task is broken down in a well structured manner, into functions that can be individually tested. Comment carefully, and test as you go along. Note that the act of describing what code is supposed to do in a useful comment is often a good way of noticing that it doesn't do that. 
 \item Be aware that modification of code, for example to add functionality, is often the point at which bugs are introduced. Carefully commenting code to make its original function clear is the first line of defence against this. Being very careful to test modifications is also key. 
-\item But any interesting code will have bugs at some point in its development. Finding bugs usually requires that you adopt a scientific approach - gathering data on what might be wrong, forming hypotheses about the what is causing the problems and then designing experimental tests to check this.
+\item But any interesting code will have bugs at some point in its development. Finding bugs usually requires that you adopt a scientific approach - gathering data on what might be wrong, forming hypotheses about what is causing the problems and then designing experimental tests to check this.
 \item Key to this approach is checking what your code is {\em actually} doing, and whether it conforms to what you think it {\em ought} to be doing. 
 \item While going carefully through your code once looking for errors is sensible, staring at it for hours is rarely productive. You need to actively hunt down the errors. Sometimes this can be done by simply modifying the code to print out information as it runs, but more often the efficient way to proceed is to use a debugger to step through your code checking that it is producing what you expect at each step.       
 \end{itemize}
@@ -2509,7 +2511,7 @@ $$
 \item $D({\bm \theta}^{[k]}+{\bm \Delta}) \le D({\bm \theta}^{[k]}) + c_1 \nabla D({\bm \theta}^{[k]})\ts {\bm \Delta}$
 \item $\nabla D({\bm \theta}^{[k]}+{\bm \Delta})\ts {\bm \Delta} \ge c_2 \nabla D({\bm \theta}^{[k]})\ts {\bm \Delta}$
 \end{enumerate}
-where $0<c_1<c_2<1$. Curvature condition (2) ensures that $\rho_k>0$ so that ${\bf B}^{[k+1]}$ stays positive definite.
+where $0<c_1<c_2<1$. Curvature condition (b) ensures that $\rho_k>0$ so that ${\bf B}^{[k+1]}$ stays positive definite.
 \item ${\bf B}^{[0]}$ is sometimes set to $\bf I$, or to the inverse of a finite difference approximation to the Hessian. \end{enumerate}
 The following figure shows the first 6 steps of BFGS applied to the simple AIDS epidemic model. Panels are as in the Newton case. The implied Hessian is always positive definite, so there is no need for perturbation here. Notice how the approximate quadratic is not quite such a good match now, and in consequence progress is a little slower (it takes another 6 steps to reach the optimum). 
 
@@ -3029,7 +3031,7 @@ so the width of the white shapes at some length value is proportional to the est
  
 \subsection{3D plotting}
 
-Sometimes it is useful to be able to plot functions of 2 variables. In statistical work these are often model output, representing, for example $E(z|x,y)$. For now consider the case of visualizing a simple function of two variables. Base R offers 3 approaches - perspective plots, image plots and contour plots. They all require the same input - vectors defining the $x$ and $y$ values against which to plot, and a matrix {\tt z} whose \lstinline+z[i,j]+ value gives the function value at \lstinline+x[i]+, \lstinline+y[i]+. Here is some example code.
+Sometimes it is useful to be able to plot functions of 2 variables. In statistical work these are often model output, representing, for example $E(z|x,y)$. For now consider the case of visualizing a simple function of two variables. Base R offers 3 approaches - perspective plots, image plots and contour plots. They all require the same input - vectors defining the $x$ and $y$ values against which to plot, and a matrix {\tt z} whose \lstinline+z[i,j]+ value gives the function value at \lstinline+x[i]+, \lstinline+y[j]+. Here is some example code.
 \begin{lstlisting}
 foo <- function(x,y) { ## function to be visualized
   r <- sqrt(x^2+y^2)

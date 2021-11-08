@@ -1,0 +1,7 @@
+# 8.1
+grep("<dd>Cause:",raw) -> ii
+raw[-ii] ## OK these realy are missing - code as NA
+x <- gsub(".*<dd>Cause: ","",raw)
+cause <- gsub("</dd>.*","",x)
+cause[-ii] <- NA
+mean(tolower(cause)=="shooting",na.rm=TRUE)

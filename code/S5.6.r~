@@ -1,0 +1,12 @@
+
+
+## Functions
+
+foo <- function(x,a,b) x/a + b
+
+mat.fun <- function(A,fun=I,...) {
+  ea <- eigen(A,symmetric=TRUE)
+  ea$vectors %*% (fun(ea$values,...)*t(ea$vectors)) ## note use of re-cycling rule!
+}
+
+mat.fun(B,fun=foo,a=2,b=3)

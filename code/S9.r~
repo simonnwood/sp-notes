@@ -1,0 +1,10 @@
+X <- model.matrix(weight~group,PlantGrowth)
+
+library(ggplot2)
+mpg1 <- data.frame(mpg) ## convert to regular data frame
+head(mpg1)
+
+mpg1$trans <- factor(gsub("\\(.*\\)","",mpg1$trans)) ## convert to 2 level
+head(model.matrix(cty~trans+displ,mpg1)) ## get model matrix
+
+head(model.matrix(cty~trans*displ,mpg1))

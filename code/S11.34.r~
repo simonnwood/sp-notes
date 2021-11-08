@@ -1,0 +1,9 @@
+X <- model.matrix(~group,PlantGrowth) ## model matrix (note: response not needed!)
+qrx <- qr(X)              ## get QR decomposition of model matrix
+y <- PlantGrowth$weight   ## response
+p <- ncol(X)              ## number of parameters
+Qty <- qr.qty(qrx,y)[1:p] ## get Q^T y
+beta <- backsolve(qr.R(qrx),Qty) ## R^{-1} Q^T y
+beta
+coef(lm(weight~group,PlantGrowth))
+

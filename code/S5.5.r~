@@ -1,0 +1,53 @@
+
+## if/loop
+
+if (runif(1)>.5) {
+  cat("heads")
+} else {
+  cat("tails")
+}
+
+if (runif(1)>.5) {
+  cat("heads\n")
+} else if (runif(1)>.7) {
+  cat("tails\n")
+} else cat("also tails\n")
+
+if ((rnorm(1)>0||rnorm(1)>0) && runif(1)<2/3) {
+  cat("heads")
+} else {
+  cat("tails")
+}
+
+coin <- if (runif(1)>.5) "heads" else "tails"
+coin
+
+
+vec <- c("I","am","bored")
+for (a in vec) cat(a," ")
+
+n <- 100;p <- rep(.5,n)
+for (i in 2:n) p[i] <- 3.7*p[i-1]*(1-p[i-1]) 
+plot(p,type="l")
+
+p[1] <- .7
+for (i in 2:n) {
+  p[i] <- 3.7 * p[i-1] * (1 - p[i-1])
+  if (p[i] > .924) break
+}  
+plot(p[1:i],type="l")
+
+i <- 1
+while(p[i] < .924) {
+  i <- i + 1
+  p[i] <- 3.7 * p[i-1] * (1 - p[i-1])
+}
+
+i <- 1
+repeat {
+  i <- i + 1
+  p[i] <- 3.7 * p[i-1] * (1 - p[i-1])
+  if (p[i] > .924 || i>99) break
+}
+
+
