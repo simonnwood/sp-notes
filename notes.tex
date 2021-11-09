@@ -2660,7 +2660,7 @@ hll <- function(theta,t,y) {
 \end{lstlisting}
 Again it is essential to test this. A finite difference approximation to the Hessian is readily obtained by differencing the gradient vectors produced by {\tt gll}\ldots
 \begin{lstlisting}
-gll0 <- gll(th0,t=t80,y=y) ## gran of nll at th0
+gll0 <- gll(th0,t=t80,y=y) ## grad of nll at th0
 eps <- 1e-7  ## finite difference interval 
 Hfd <- matrix(0,2,2) ## finite diference Hessian
 for (i in 1:length(th0)) { ## loop over parameters
