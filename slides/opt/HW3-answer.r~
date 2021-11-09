@@ -1,0 +1,183 @@
+## HW3 - a solution
+
+fdH <- function(theta,f,g0,...) {
+## compute FD approx Hessian, g0 is grad at theta.
+  p <- length(theta);H <- matrix(0,p,p)
+  eps <- 1e-7
+  for (i in 1:p) { ## FD loop
+    ## perturb ith element of theta...
+    th1 <- theta; th1[i] <- th1[i] + eps
+    ## difference grad vectors to get each Hess col...
+    H[,i] <- (attr(f(th1,...),"gradient")-g0)/eps
+  }
+  0.5*(t(H)+H) ## return symmetric H
+} ## fdH
+
+pchol <- function(H) {
+## Check if H is positive definite and modify if not.
+## Check is by seeing if chol fails. An increasingly large multiple of the
+## identity matrix is added to the Hessian until it is pos def if the original
+## is not. Returns the Cholesky factor of the modified H.
+  ok <- FALSE
+  reg <- 0; I <- diag(ncol(H))
+  k <- 0
+  while (!ok) {
+    k <- k + 1
+    if (k>20) stop("can't make H +ve def")
+    R <- try(chol(H + reg*I),silent=TRUE) ## succeeds only if +ve def
+    if (inherits(R,"try-error")) { ## failed - not pos def.
+      reg <- if (reg==0) max(abs(H)) * 1e-8 else reg <- reg * 10
+    } else ok <- TRUE ## it is +ve def
+  }
+  attr(R,"Hpd") <- reg==0 ## was original H +ve def?
+  R ## cholesky factor
+} ## pchol
+
+ffinite <- function(f) {
+## check that objective and all derivs are finite.
+  if (!is.finite(f)) return(FALSE)
+  g <- attr(f,"gradient")
+  if (!all(is.finite(g))) return(FALSE)
+  H <- attr(f,"hessian");
+  ## only check H if it is provided...
+  if (!is.null(H)&&!all(is.finite(H))) return(FALSE)
+  return(TRUE) ## if we got this far, all is fine
+} ## ffinite
+
+newton <- function(theta,f,...,tol=1e-8,fscale=1,maxit=100,max.half=20) {
+## Newton method optimizer.
+## * theta is vector of parameters to optimize
+## * f is objective function, to be called as f(theta,...) - value returned
+##   will have attributes "gradient" (vector) and "hessian" (matrix)
+## * ... extra arguments of f.
+## * tol convergence tolerance.
+## * fscale a number within a few orders of magnitude of the typical value
+##   of the objective near the minimum. Used for convergence testing.
+## * maxit maximum number of Newton steps to take.
+## * max.half how many time to try halving the Newton step if it is too long.
+  f0 <- f(theta,...) ## initial value, run a couple of checks...
+  if (is.null(attr(f0,"gradient"))) stop("no gradient supplied")
+  if (!ffinite(f0)) stop("f is not finite at initial theta ")
+  fd <- is.null(attr(f0,"hessian")) ## do we need to finite difference?
+  for (i in 1:maxit) { ## main loop
+    g <- attr(f0,"gradient")
+    H <- if (fd) fdH(theta,f,g,...) else attr(f0,"hessian"); 
+    if (max(abs(g))<(abs(f0)+fscale)*tol) break ## converged?
+    R <- pchol(H) ## get chol factor of (perturbed?) Hessian
+    s <- -backsolve(R,forwardsolve(t(R),g)) ## Newton step
+    for (k in 1:max.half) { ## step check and halving loop
+      f1 <- f(theta + s,...)
+      if (ffinite(f1) && f1<f0) { ## accept step
+        theta <- theta + s
+	f0 <- f1
+        break
+      } else s <- s/2 ## need to halve step
+    } ## end of step half loop
+    if (k==max.half) {
+      warning("step failed")
+      break
+    }
+  }
+  if (i==maxit) warning("iteration limit reached")
+  if (!attr(R,"Hpd")) warning("Hessian indefinite")
+  list(f=as.numeric(f0),theta=theta,iter=i,g=g,Hi=chol2inv(R))
+} ## newton
+
+## Two test examples
+
+## auto generate Rosenbrock function with grad and Hess...
+rb0 <- deriv(expression(k*(z-x^2)^2 + (1-x)^2),c("z","x"),
+            function.arg=c("z","x","k"),hessian=TRUE)
+
+rb <- function(theta,k) {
+## wrapper in format expected by 'newton' returning results from
+## rb0 in exact format required by 'newton'
+  v <- rb0(theta[1],theta[2],k)
+  attr(v,"hessian") <- attr(v,"hessian")[1,,]
+  attr(v,"gradient") <- attr(v,"gradient")[1,]
+  v
+} ## rb
+
+## Same again, but without Hessian...
+rb1 <- deriv(expression(k*(z-x^2)^2 + (1-x)^2),c("z","x"),
+            function.arg=c("z","x","k"))
+
+rb2 <- function(theta,k) {
+## wrapper in format expected by 'newton' returning results from
+## rb1 in exact format required by 'newton'
+  v <- rb1(theta[1],theta[2],k)
+  attr(v,"gradient") <- attr(v,"gradient")[1,]
+  v
+} ## rb2
+
+f1 <- function(theta) {
+  f <- -exp(-theta^2)
+  g <- -2*f*theta
+  h <- 4*f*theta^2 - 2*f
+  attr(f,"gradient") <- g
+  attr(f,"hessian") <- matrix(h,1,1)
+  f
+}
+
+f3 <- function(theta) {
+## simple 3D test...
+  f <- abs(theta[1]-3)^3+(theta[2]+1)^2 - exp(-theta[3]^2)
+  g <- c(3*sign(theta[1]-3)*(theta[1]-3)^2,2*(theta[2]+1),
+         2*exp(-theta[3]^2)*theta[3])
+  h <- c(6*abs(theta[1]-3),2,
+         -4*exp(-theta[3]^2)*theta[3]^2+2*exp(-theta[3]^2))	 
+  attr(f,"gradient") <- g
+  #attr(f,"hessian") <- diag(h)
+  f
+} # f3
+
+ll <- function(theta,y,t) {
+  alpha <- theta[1];beta <- theta[2]
+  l <- -sum(y*(log(alpha)+beta*t) - alpha*exp(beta*t))
+  g <- c(sum(y/alpha-exp(beta*t)),sum(y*t-alpha*t*exp(beta*t)))
+  H <- matrix(0,2,2)
+  H[1,1] <- -sum(y)/alpha^2;
+  H[2,2] <- -alpha*sum(t^2*exp(beta*t))
+  H[1,2] <- H[2,1] <- -sum(t*exp(beta*t))
+  attr(l,"gradient") <- -g
+  attr(l,"hessian") <- -H
+  l
+} ## l
+
+aids <- c(12,14,33,50,67,74,123,141,165,204,253,246,240)
+year <- 1:length(aids)
+
+fd.check(th=c(3,.2),f=ll,y=aids,t=year)
+
+
+fd.check <- function(th,f,...,eps=1e-7) {
+  p <- length(th)
+  f0 <- f(th,...)
+  g0 <- attr(f0,"gradient")
+  H0 <- attr(f0,"hessian")
+  H <- H0; g <- g0
+  for (i in 1:p) {
+    th1 <- th; th1[i] <- th[i] + eps
+    f1 <- f(th1,...)
+    g[i] <- (f1-f0)/eps
+    if (!is.null(H)) {
+      g1 <- attr(f1,"gradient")
+      H[,i] <- (g1 - g0)/eps
+    }  
+  }
+  if (!is.null(H)) H <- 0.5*(H+t(H))
+  list(gfd=g,g=g0,Hfd=H,H=H0)
+} ## fd.check
+
+th0 <- c(-.5,2)
+newton(th0,rb,k=10) ## full version
+ 
+newton(th0,rb2,k=10) ## gradient only version
+
+th0 <- 4
+newton(th0,f1,max.half=100) ## full version
+
+th0 <- c(2,2,2)
+newton(th0,f3) ## full version
+
+newton(theta=c(3,.2),ll,y=aids,t=year)

@@ -1,0 +1,196 @@
+\documentclass{beamer}
+
+% for themes, etc.
+\mode<presentation>
+{ \usetheme{boxes} }
+\setbeamertemplate{navigation symbols}{}
+\usepackage{times}  % fonts are up to you
+\usefonttheme{serif} 
+\usepackage{graphicx, color,pgf}
+\usepackage{multimedia}
+%\usepackage{media9}
+%\usepackage{lmodern}
+\usepackage{amsmath,amsfonts,amsthm, amssymb}
+\usepackage{bm}
+\usepackage{animate}
+\newcommand{\dif}[2]{\frac{{\rm d} #1}{{\rm d} #2}}
+\newcommand{\ddif}[3]{\frac{{\rm d}^2 #1}{{\rm d} #2 {\rm d} #3}}
+\newcommand{\ildif}[2]{{\rm d} #1/{{\rm d} #2 }}
+\newcommand{\ilpdif}[2]{\partial #1/{\partial #2 }}
+\newcommand{\pdif}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\pddif}[3]{\frac{\partial^2 #1}{\partial #2 \partial #3}}
+\newcommand{\ilpddif}[3]{\partial^2 #1/{\partial #2 \partial #3}}
+\newcommand{\comb}[2]{\left (\begin{array}{c}{#1}\\{#2}\end{array}\right )}
+\newcommand{\perm}[2]{^{#1}{\rm P}_{#2}}
+\newcommand{\gfrac}[2]{\mbox{$ { \textstyle{ \frac{#1}{#2} }\displaystyle}$}}
+\newcommand{\defn}{\begin{quote}{\bf Definition. }}
+\newcommand{\edefn}{\end{quote}}
+\newcommand{\thm}{\begin{theorem}}
+\newcommand{\ethm}{\end{theorem}}
+\newcommand{\its}{^{\sf -T}} % transpose inverse
+\newcommand{\fv}{\hat{\bm{\mu}}}
+\newcommand{\X}{{\bf X}}
+\newcommand{\Xt}{\X\ts}
+\newcommand{\y}{{\bf y}}
+\newcommand{\A}{{\bf A}}
+\newcommand{\bp}{{\bm \beta}}
+\newcommand{\bmat}[1]{\left [ \begin{array}{#1}}
+\newcommand{\emat}{\end{array}\right ]}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\beq}{\begin{equation}}
+\newcommand{\eeq}{\end{equation}}
+\newcommand{\Gi}{{\bf G}^{-1}}
+\newcommand{\B}{{\bf B}}
+\newcommand{\Bt}{{\bf B}\ts}
+\newcommand{\D}{{\bf D}}
+\newcommand{\V}{{\bf V}}
+\newcommand{\p}{{\bf P}}
+\newcommand{\K}{{\bf K}}
+\newcommand{\Uo}{{\bf U}_1}
+\newcommand{\Tk}{{\bf T}_k}
+\newcommand{\Tm}{{\bf T}_m}
+\newcommand{\Tkm}{{\bf T}_{km}}
+\newcommand{\grad }{\nabla}
+
+\newcommand{\eps}[3]
+{{\begin{center}
+ \rotatebox{#1}{\scalebox{#2}{\includegraphics{#3}}}
+ \end{center}}
+}
+\newcommand{\epstwo}[6]
+{{\begin{center}
+\rotatebox{#1}{\scalebox{#2}{\includegraphics{#3}}}
+\rotatebox{#4}{\scalebox{#5}{\includegraphics{#6}}}
+\end{center}}
+}
+
+
+\newcommand{\tr}{{\rm tr}}
+\renewcommand*{\thefootnote}{\fnsymbol{footnote}}
+\newcommand{\bd}[1]{\ensuremath{\mbox{\boldmath $#1$}}}
+\newcommand{\ts}{^{\mbox{\sf \tiny T}}}
+% these will be used later in the title page
+\title{Graphical models and automating Gibbs sampling}
+
+\author{{\bf Simon Wood}, University of Edinburgh, U.K.}
+
+
+\date{}
+
+
+% have this if you'd like a recurring outline
+%\AtBeginSection[]  % "Beamer, do the following at the start of every section"
+%{
+%\begin{frame}<beamer>
+%\frametitle{Outline} % make a frame titled "Outline"
+%\tableofcontents[currentsection]  % show TOC and highlight current section
+%\end{frame}
+%}
+%\usetheme{Dresden}
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}{Automatic Gibbs sampling}
+\begin{itemize}
+\item Much of the pain can be removed from Gibbs sampling by automation.
+\item What makes that possible is the recognition that many Bayesian models can be abstractly represented as {\em Directed Acyclic Graphs}. 
+\item Mathematically a graph\footnote{not to be confused with a {\em plot}} is a set of nodes connected in some way by edges. In our case 
+\begin{itemize}
+\item Nodes are variables or constants, such as data, model parameters and fixed parameters of priors.
+\item Edges show dependencies between nodes.  
+\end{itemize}
+\item In a {\em directed} graph edges have direction, shown by arrows, with the node at the pointy end being the {\em child} of the {\em parent} at the other end. Parents directly control children. 
+\eps{-90}{.4}{pc-dag.eps}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Types of node and edge}
+\begin{itemize}
+\item Nodes and edges are of different types. 
+\item A node with no parents is a {\em constant}
+\item A continuous arrow denotes a {\em stochastic dependence} -- the distribution of the child node depends on the parent node. In this case the child node is a {\em stochastic} node. e.g. 
+\eps{-90}{.4}{pc-dag.eps}
+\ldots constant parent, stochastic child.
+\item A dashed arrow denotes a {\em deterministic dependence} -- the child depends deterministically (not randomly) on the parent, and is a {\em deterministic} node. e.g.
+\eps{-90}{.4}{stoch-dag.eps}
+\ldots the child is a deterministic node.  
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The simple example again}
+\begin{itemize}
+\item Recall the model $x_i \sim N(\mu, \sigma^2)$, with priors
+\begin{itemize}
+\item $\tau = 1/\sigma^2 \sim \text{gamma}(a,b)$, i.e. prior $\pi(\tau) = b^a \tau^{a-1} e^{-b\tau}/\Gamma(a)$ 
+\item Independently, $\mu \sim N(c,d)$.
+\end{itemize}
+\item Its graphical representation, showing just 3 of the $x_i $ nodes, is
+\eps{-90}{.4}{norm-dag.eps}
+\item The graph is a directed {\em acyclic } graph (DAG), because, following the arrows, no path ever revisits a node.
+\item That the $x_i$ are independent draws from $ N(\mu, \sigma^2)$ is encoded in the lack of direct edges between them.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Why the DAG is useful\ldots}
+\begin{itemize}
+\item Let $z_i$ denote the variable corresponding to the $i^\text{th}$ node of the graph. Given the DAG structure of the model, we can write the joint density over all non-constant nodes as 
+$$
+\pi({\bf z}) = \prod_{i} \pi (z_i|\text{parent}\{z_i\})
+$$
+\item Then, from the definition of a conditional p.d.f.
+$$
+\pi(z_j|{\bf z}_{-j}) = \frac{\pi({\bf z})}{\int \pi({\bf z}) d z_{j}} = \frac{\prod_{i} \pi(z_i|\text{parent}\{z_i\})}{
+\int \prod_{i} \pi(z_i|\text{parent}\{z_i\}) dz_j},
+$$ 
+\item But only $z_j$ dependent terms stay in the integral, the rest cancel
+\begin{eqnarray*}
+\pi(z_j|{\bf z}_{-j}) &=&  \frac{\pi(z_j|\text{parent}\{z_j\})\prod_{i \in \text{child\{j\}}}\pi(z_i|\text{parent}\{z_i\})}
+{\int \pi(z_j|\text{parent}\{z_j\})\prod_{i \in \text{child\{j\}}}\pi(z_i|\text{parent}\{z_i\}) dz_j}\\
+&\propto & \pi(z_j|\text{parent}\{z_j\})\prod_{i \in \text{child\{j\}}}\pi(z_i|\text{parent}\{z_i\}),
+\end{eqnarray*}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{\ldots why the DAG is useful}
+\begin{itemize}
+\item So however complicated the model, and however large its DAG, the conditional density of node $z_j$ depends only on its immediate `family' --- its parents, children, and `partners' (other parents of its children). 
+\item The Gibbs update of $z_j$ only needs to know the state of those `family' nodes.
+\item The fact that the DAG allows the conditionals to be modularised in this way:
+\begin{enumerate}
+\item  makes computation efficient as the conditionals only require evaluations over a small portion of the graph.  \item facilitates automation of the process of identifying conditionals (using known results on {\em conjugacy} of distributions).  
+\end{enumerate}
+\item  JAGS (Just Another Gibbs Sampler) is a stand alone software package for automatic Gibbs sampling. {\tt rjags} interfaces to R.
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}{JAGS basic use}
+\begin{itemize}
+\item JAGS requires that your model is specified in the JAGS language written down in a text file.
+\item This text file should be in the working directory, which can be checked by {\tt getwd} and set by {\tt setwd}.
+\item From within R the file is then compiled into a Gibbs sampler via a call to the function {\tt jags.model}.
+\item The returned sampler object can then be used to simulate from the model posterior using the {\tt jags.samples} function.
+\item An alternative to {\tt jags.samples} is {\tt coda.samples} which returns an object of class {\tt mcmc.list} suitable for direct use with the {\tt coda} package for checking and post-processing MCMC output. 
+\item Model comparison via the {\em deviance information criterion} (DIC) is facilitated by {\tt dic.samples} (requires the model to have been compiled by {\tt jags.models} with at least {\tt n.chains=2}).
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Useful {\tt coda} functions}
+\begin{itemize}
+\item {\tt plot.mcmc.list} plot method for MCMC simulation output.
+\item {\tt acfplot} plots chain ACFs compactly.
+\item {\tt autocorr} and {\tt crosscorr} for examining within chain correlation.
+\item {\tt effectiveSize} to get the effective sample sizes of simulation output.
+\item {\tt HPDinterval} for highest posterior density intervals.
+\end{itemize}
+\end{frame}
+
+
+
+\end{document}
+

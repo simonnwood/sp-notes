@@ -1,0 +1,18 @@
+\frametitle{Posterior means and CIs}
+\begin{itemize}
+\item Nothing is different here to in the MH sampling case (except that we only have 2 parameter in this example).
+{\scriptsize \begin{verbatim}
+> pm <- rowMeans(th)
+> names(pm) <- c("mu","sigma")
+> pm ## posterior mean
+       mu     sigma
+51.158764  1.263793
+>
+> ci <- apply(th,1,quantile,probs=c(.025,.975))
+> colnames(ci) <- c("mu","sigma")
+> ci ## confidence intervals
+            mu    sigma
+2.5%  50.83651 1.064045
+97.5% 51.48939 1.511449
+\end{verbatim}}
+\end{itemize}

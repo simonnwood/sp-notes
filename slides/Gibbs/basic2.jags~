@@ -1,0 +1,7 @@
+model {
+  for (i in 1:N) {
+    x[i] ~ dnorm(mu,tau)
+  }
+  mu ~ dnorm(50,.01)
+  tau ~ dgamma(1.4,.6)
+}

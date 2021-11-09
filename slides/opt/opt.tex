@@ -1,0 +1,333 @@
+\documentclass{beamer}
+
+% for themes, etc.
+\mode<presentation>
+{ \usetheme{boxes} }
+\setbeamertemplate{navigation symbols}{}
+\usepackage{times}  % fonts are up to you
+\usefonttheme{serif} 
+\usepackage{graphicx, color,pgf}
+\usepackage{multimedia}
+%\usepackage{media9}
+%\usepackage{lmodern}
+\usepackage{amsmath,amsfonts,amsthm, amssymb}
+\usepackage{bm}
+\usepackage{animate}
+\newcommand{\dif}[2]{\frac{{\rm d} #1}{{\rm d} #2}}
+\newcommand{\ddif}[3]{\frac{{\rm d}^2 #1}{{\rm d} #2 {\rm d} #3}}
+\newcommand{\ildif}[2]{{\rm d} #1/{{\rm d} #2 }}
+\newcommand{\ilpdif}[2]{\partial #1/{\partial #2 }}
+\newcommand{\pdif}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\pddif}[3]{\frac{\partial^2 #1}{\partial #2 \partial #3}}
+\newcommand{\ilpddif}[3]{\partial^2 #1/{\partial #2 \partial #3}}
+\newcommand{\comb}[2]{\left (\begin{array}{c}{#1}\\{#2}\end{array}\right )}
+\newcommand{\perm}[2]{^{#1}{\rm P}_{#2}}
+\newcommand{\gfrac}[2]{\mbox{$ { \textstyle{ \frac{#1}{#2} }\displaystyle}$}}
+\newcommand{\defn}{\begin{quote}{\bf Definition. }}
+\newcommand{\edefn}{\end{quote}}
+\newcommand{\thm}{\begin{theorem}}
+\newcommand{\ethm}{\end{theorem}}
+\newcommand{\its}{^{\sf -T}} % transpose inverse
+\newcommand{\fv}{\hat{\bm{\mu}}}
+\newcommand{\X}{{\bf X}}
+\newcommand{\Xt}{\X\ts}
+\newcommand{\y}{{\bf y}}
+\newcommand{\A}{{\bf A}}
+\newcommand{\bp}{{\bm \beta}}
+\newcommand{\bmat}[1]{\left [ \begin{array}{#1}}
+\newcommand{\emat}{\end{array}\right ]}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\beq}{\begin{equation}}
+\newcommand{\eeq}{\end{equation}}
+\newcommand{\Gi}{{\bf G}^{-1}}
+\newcommand{\B}{{\bf B}}
+\newcommand{\Bt}{{\bf B}\ts}
+\newcommand{\D}{{\bf D}}
+\newcommand{\V}{{\bf V}}
+\newcommand{\p}{{\bf P}}
+\newcommand{\K}{{\bf K}}
+\newcommand{\Uo}{{\bf U}_1}
+\newcommand{\Tk}{{\bf T}_k}
+\newcommand{\Tm}{{\bf T}_m}
+\newcommand{\Tkm}{{\bf T}_{km}}
+\newcommand{\grad }{\nabla}
+\newcommand{\eps}[3]
+{{\begin{center}
+ \rotatebox{#1}{\scalebox{#2}{\includegraphics{#3}}}
+ \end{center}}
+}
+\newcommand{\tr}{{\rm tr}}
+\renewcommand*{\thefootnote}{\fnsymbol{footnote}}
+\newcommand{\bd}[1]{\ensuremath{\mbox{\boldmath $#1$}}}
+\newcommand{\ts}{^{\mbox{\sf \tiny T}}}
+% these will be used later in the title page
+\title{Optimization}
+
+\author{{\bf Simon Wood}, University of Edinburgh, U.K.\\~\\ {\em Slides work best with Adobe Reader}}
+
+
+\date{}
+
+
+% have this if you'd like a recurring outline
+%\AtBeginSection[]  % "Beamer, do the following at the start of every section"
+%{
+%\begin{frame}<beamer>
+%\frametitle{Outline} % make a frame titled "Outline"
+%\tableofcontents[currentsection]  % show TOC and highlight current section
+%\end{frame}
+%}
+%\usetheme{Dresden}
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+
+\begin{frame}{Optimization}
+\begin{itemize}
+\item Optimization is concerned with finding the maximum or minimum of a function. 
+\item For example, consider an {\em objective function} $D({\bm \theta})$. We might want to find the value of parameter vector, $\bm \theta$,  minimizing $D$:
+$$
+\hat {\bm \theta} = \underset{\theta}{\text{argmin}} ~ D({\bm \theta})
+$$
+\item Note: minimization of a function $D$ is equivalent to maximization of $-D$, so it suffices to consider minimization. 
+\item Many statistical modelling methods and machine learning algorithms rely on optimization, so it is important to know something about programming such methods.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Smooth optimization}
+\begin{itemize}
+\item Optimization is easiest if the objective function is sufficiently smooth, and unimodal. Here, we'll assume it is. 
+\item Then the conditions for a minimum are that
+{\small $$
+\nabla D = \ \bmat{c} \pdif{D}{\theta_1}\\ \pdif{D}{\theta_2}\\ \cdot \\ \cdot \emat_{\hat {\bm \theta}} = {\bf 0}~~ \& ~~
+\nabla^2 D = \bmat{cccc}  
+\pdif{^2D}{\theta_1^2} & \pddif{D}{\theta_1}{\theta_2} & \cdot & \cdot \\
+\pddif{D}{\theta_1}{\theta_2} & \pdif{^2D}{\theta_2^2} & \cdot & \cdot \\
+\cdot & \cdot& \cdot & \cdot \\\cdot & \cdot& \cdot & \cdot \\
+\emat_{\hat {\bm \theta}} ~~ \text{+ def.}
+$$}
+$\nabla D$ is the {\em gradient vector}, and $\nabla^2 D$ the {\em Hessian matrix} of $D$.
+\item The condition on the Hessian ensures that $D$ increases in every direction from $\hat {\bm \theta}$ (consider a Taylor expansion about $\hat {\bm \theta}$).
+\item Conditions for a maximum are similar, except that we require $ - \nabla^2 D$ to be positive definite.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Newton's method: basic idea}
+\begin{itemize}
+\item Newton's method is used to optimize smooth  objective functions, such as (negative) log likelihoods, w.r.t. some parameters.
+\item We start with a guess of the parameter values.
+\item Then evaluate the function and its first and second derivatives w.r.t. the parameters at the guess. 
+\item There is a unique quadratic function matching the value and derivatives, so we find that and optimize it to find the next guess at the optimizer of the objective.
+\item This derivative -- quadratic approximation -- maximize quadratic cycle is repeated to convergence. 
+\item Convergence when the first derivatives are approximately zero.
+\item Note that Newton's method uses the same quantities that appear in the large sample results used with MLE.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Newton's method illustrated in one dimension}
+% insert 'autoplay' to have it start automatically
+\begin{center}
+\animategraphics[scale=.55,controls,buttonfg=.5,buttonsize=.72em]{1}{ani/newt1d}{0}{25}
+\end{center}
+\end{frame}
+
+\begin{frame}{Newton's method in more detail}
+\begin{itemize}
+\item Consider minimizing $D({\bm \theta})$ w.r.t. $\bm \theta$. Taylor's theorem says 
+$$
+D({\bm \theta} + {\bm \Delta}) = D({\bm \theta}) + {\bm \Delta}\ts \grad_\theta D  + \tfrac{1}{2} {\bm \Delta} \ts \grad_\theta^2 D {\bm \Delta} + o(\|{\bm \Delta}\|^2)
+$$
+\item Provided $\grad_\theta^2 D$ is positive definite, the $\bm \Delta $ minimizing the quadratic on the right is  
+$$
+{\bm \Delta} = -(\grad_\theta^2 D)^{-1} \grad_\theta D
+$$
+\item This also minimizes $D$ in the small $\bm \Delta $ limit, which is the one that applies near $D$'s minimum.  
+\item Interestingly, ${\bm \Delta}$ is a descent direction for {\em any positive definite matrix} in place of the Hessian $\grad_\theta^2 D$. 
+\item So if $\grad_\theta^2 D$ is not positive definite we just perturb it to be so.
+\item Far from the optimum, $\bm \Delta$ might overshoot. If so, repeatedly halve $\bm \Delta$ until $D({\bm \theta} + {\bm \Delta})<D({\bm \theta})$ to guarantee convergence, 
+
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Newton in 2D with Hessian perturbation and step halving}
+% insert 'autoplay' to have it start automatically
+\begin{center}
+\animategraphics[scale=.45,controls,buttonfg=.5,buttonsize=.72em]{2}{ani/newt2d}{0}{20}
+\end{center}
+\end{frame}
+
+\begin{frame}{Why Newton?}
+\begin{itemize}
+\item Why not not simplify and use a first order Taylor expansion in place of the Newton method's second order expansion?
+\item Doing so gives the method of {\em steepest descent} and two problems
+\begin{enumerate}
+\item As we approach the optimum the first derivative of the objective vanishes, so that there is ever less justification for dropping the second derivative term.
+\item Without second derivative information we have nothing to say how long the step should be.
+\end{enumerate}
+\item In practice 1. leads to steepest descent often requiring huge numbers of steps as the optimum is approached.
+\item For some problems co-ordinate descent can work well.
+\begin{enumerate}
+\item Cycle through optimizing with respect to each parameter $\theta_i$ in turn, keeping the other parameters at their last updated value.
+\item The one dimensional optimizations can be cheap and easy to code, but you may need lots of them.   
+\item For the previous example, Newton takes 20 steps and co-ordinate descent over 4000 (for reduced accuracy). Here are the first 20\ldots
+\end{enumerate}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{First 20 coordinate descent steps}
+% insert 'autoplay' to have it start automatically
+\begin{center}
+\animategraphics[scale=.45,controls,buttonfg=.5,buttonsize=.72em]{2}{ani/cd}{0}{40}
+\end{center}
+\end{frame}
+
+\begin{frame}{Quasi Newton}
+\begin{itemize}
+\item What can be done without having to calculate Hessians?
+\item Recall that we can use {\em any} positive definite matrix in place of the Hessian in the Newton update and still get a descent direction. 
+\item So we could use an approximate Hessian. 
+\item What if we try to build an approximate Hessian by using the second derivative information contained in the way the first derivative changes as the optimization progresses? 
+\item In particular, after a step, update the approximate Hessian so that the quadratic model matches the gradient vector at both ends of the step.   
+\item \ldots that's the Quasi-Newton idea. 
+\item The best known version is the BFGS\footnote{Broyden, Fletcher, Goldfarb, Shanno} method. 
+\end{itemize}
+\end{frame}
+
+\begin{frame}{BFGS}
+\begin{itemize}
+\item Let ${\bm \theta}^{[k]}$ denote the $k^\text{th}$ trial $\bm \theta$, with approx. inverse Hessian ${\bf B}^{[k]}$.
+\item Let ${\bf s}_k = {\bm \theta}^{[k+1]} -{\bm \theta}^{[k]} $ and ${\bf y}_k = \nabla D({\bm \theta}^{[k+1]}) - \nabla D({\bm \theta}^{[k]})$.
+\item Defining $\rho_k^{-1} = {\bf s}_k\ts {\bf y}_k$ the BFGS update is
+$$
+{\bf B}^{[k+1]} = ({\bf I} - \rho_k {\bf s}_k {\bf y}_k\ts){\bf B}^{[k]}({\bf I} - \rho_k {\bf y}_k {\bf s}_k\ts)
++ \rho_k {\bf s}_k {\bf s}_k\ts
+$$
+\item The Quasi-Newton step from ${\bm \theta}^{[k]}$ is ${\bm \Delta} = - {\bf B}^{[k]} \nabla D({\bm \theta}^{[k]})$.
+\item The actual step length is chosen to satisfy the Wolfe conditions
+\begin{enumerate}
+\item $D({\bm \theta}^{[k]}+{\bm \Delta}) \le D({\bm \theta}^{[k]}) + c_1 \nabla D({\bm \theta}^{[k]})\ts {\bm \Delta}$
+\item $\nabla D({\bm \theta}^{[k]}+{\bm \Delta})\ts {\bm \Delta} \ge c_2 \nabla D({\bm \theta}^{[k]})\ts {\bm \Delta}$
+\end{enumerate}
+where $0<c_1<c_2<1$. Curvature condition (2) ensures that $\rho_k>0$ so that ${\bf B}^{[k+1]}$ stays positive definite.
+
+\item ${\bf B}^{[0]}$ is sometimes set to $\bf I$, or to the inverse of a finite difference approximation to the Hessian. \end{itemize}
+\end{frame}
+
+\begin{frame}{Derivative free optimization: Nelder Mead}
+\begin{itemize}
+\item What can be done with only function evaluations?
+\item Let $p = \text{dim}({\bm \theta})$. Define a {\em polytope} of $p+1$ distinct $\bm \theta$ values.
+\item Iterate\ldots
+\begin{enumerate}
+\item The vector from the worst $\bm \theta$ point through the centroid (mean) of the other $p$ points is the search direction.
+\item Initial step length is twice distance, $d$, from worst point to centroid of others. If new point is not worst one, try $3d$, picking the best of the two to replace the worst point.
+\item If previous step did not succeed, try steps of $0.5d$ and $1.5d$.
+\item If previous 2 steps failed, then linearly rescale the polytope towards the best point.   
+\end{enumerate}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Nelder Mead method}
+% insert 'autoplay' to have it start automatically
+\begin{center}
+\animategraphics[scale=.45,controls,buttonfg=.5,buttonsize=.72em]{5}{ani/nm2d}{0}{76}
+\end{center}
+\end{frame}
+
+\begin{frame}{Optimization in R}
+\begin{itemize}
+\item R also has built in optimizer functions, and add on packages providing more.
+\item Here we will look at {\tt optim} and {\tt nlm}.
+\item {\tt optim} offers Nelder-Mead (default), BFGS and other optimization methods.
+ \begin{itemize}
+ \item the user supplies an objective function, and, optionally, a function for evaluating the gradient vector of the objective. 
+ \end{itemize}
+\item {\tt nlm} performs Newton optimization. 
+ \begin{itemize}
+ \item optionally the user supplied objective function can return its value with gradient vector and Hessian matrix as attributes
+ \end{itemize}
+\item Both functions will use approximate numerical derivatives when these are not supplied by the user.   
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{{\tt optim}}
+\begin{itemize}
+\item {\small \verb+optim(par,fn,gr=NULL,...,method="Nelder-Mead")+}
+ \begin{itemize}
+ \item {\tt par} is the vector of initial values for the optimization parameters.
+ \item \verb+fn+ is the objective function to minimize. Its first argument is always the vector of optimization parameters. Other arguments must be named, and will be passed to {\tt fn} via the \verb+`...'+ argument to {\tt optim}. It returns the value of the objective.
+ \item \verb+gr+ is as {\tt fn}, but, if supplied, returns the gradient vector of the objective.
+ \item \verb+`...'+ is used to pass named arguments to {\tt  fn} and {\tt gr}. 
+ \item {\tt method} selects the optimization method. \verb+"BFGS"+ is another possibility.
+ \end{itemize}
+\item Example with Rosenbrock's function
+{\small \begin{verbatim}
+rb0 <- function(theta,k) { ## Rosenbrock
+  z <- theta[1]; x <- theta[2]
+  k * (z - x^2)^2 + (1 - x)^2 
+} ## rb0
+optim(c(-.5,1), rb0, k=10)
+\end{verbatim}}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{{\tt nlm}}
+\begin{itemize}
+\item \verb+nlm(f, p, ...)+
+ \begin{itemize}
+ \item \verb+f+ is the objective function, exactly like {\tt fn} for {\tt optim}. In addition its return value may optionally have \verb+`gradient'+ and \verb+`hessian'+ attributes.
+ \item {\tt p} is the vector of initial values for the optimization parameters.
+ \item \verb+`...'+ is used to pass named arguments to {\tt  f}.  
+\end{itemize}
+\item Example with Rosenbrock's function
+{\small \begin{verbatim}
+rb0 <- function(theta,k) { ## Rosenbrock
+  z <- theta[1]; x <- theta[2]
+  k * (z - x^2)^2 + (1 - x)^2 
+} ## rb0
+nlm(rb0, c(-.5,1), k=10)
+\end{verbatim}}\end{itemize}
+\end{frame}
+
+\begin{frame}{Approximating derivatives}
+\begin{itemize}
+\item {\tt optim} and {\tt nlm} approximate any required derivatives not supplied by the user. How?
+\item Using {\em finite differencing}\footnote{See {\em Core Statistics}, \S5.5.2}. Let ${\bm e}_i$ be a vector of zeroes except for its $i^\text{th}$ element which is one. Then for a small $\epsilon$
+$$
+\pdif{D}{\theta_i} \simeq \frac{D({\bm \theta} + \epsilon {\bf e}_i) - D({\bm \theta})}{\epsilon}
+$$ 
+\item How small should $\epsilon$ be?
+\begin{itemize}
+\item Too large and the approximation will be poor (Taylor's theorem).
+\item Too small and ${\bm \theta} + \epsilon {\bf e}_i$ will only differ from ${\bm \theta}$ in a few (or even none!) of its least significant digits, losing precision.
+\item For many well scaled problems $\epsilon \simeq \sqrt{\epsilon_{\text{machine}}}$, where $\epsilon_{\text{machine}}$ is the smallest value for which $1 + \epsilon_{\text{machine}}$ does not have the same floating point representation as $1$: the {\em  machine precision}.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Numerically exact derivatives}
+\begin{itemize}
+\item We can work out the derivatives of the objective by hand, or using a computer algebra package, and code them up. 
+\begin{itemize}
+\item {\bf Always} check such derivative code by finite differencing.
+\item {\bf Always, Always, Always}.
+\end{itemize}
+\item Alternatively we can use {\em automatic differentiation} (AD) methods\footnote{See {\em Core Statistics} \S5.5.3}, which compute derivatives of a function directly from the code implementing the function. 
+\item R function {\tt deriv} offers a simple AD implementation for differentiation of R expressions.
+\item Let's use it to obtain a function evaluating Rosenbrock's function, its gradient vector and Hessian matrix (attached as attributes to the return value).
+{\small \begin{verbatim}
+rb <- deriv(expression(k*(z-x^2)^2 + (1-x)^2),
+            c("x","z"), ## diff w.r.t. these
+            function.arg=c("x","z","k"), 
+            hessian=TRUE)
+\end{verbatim}}
+\end{itemize}
+\end{frame}
+
+\end{document}
+

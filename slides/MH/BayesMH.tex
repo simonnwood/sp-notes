@@ -1,0 +1,320 @@
+\documentclass{beamer}
+
+% for themes, etc.
+\mode<presentation>
+{ \usetheme{boxes} }
+\setbeamertemplate{navigation symbols}{}
+\usepackage{times}  % fonts are up to you
+\usefonttheme{serif} 
+\usepackage{graphicx, color,pgf}
+\usepackage{multimedia}
+%\usepackage{media9}
+%\usepackage{lmodern}
+\usepackage{amsmath,amsfonts,amsthm, amssymb}
+\usepackage{bm}
+\usepackage{animate}
+\newcommand{\dif}[2]{\frac{{\rm d} #1}{{\rm d} #2}}
+\newcommand{\ddif}[3]{\frac{{\rm d}^2 #1}{{\rm d} #2 {\rm d} #3}}
+\newcommand{\ildif}[2]{{\rm d} #1/{{\rm d} #2 }}
+\newcommand{\ilpdif}[2]{\partial #1/{\partial #2 }}
+\newcommand{\pdif}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\pddif}[3]{\frac{\partial^2 #1}{\partial #2 \partial #3}}
+\newcommand{\ilpddif}[3]{\partial^2 #1/{\partial #2 \partial #3}}
+\newcommand{\comb}[2]{\left (\begin{array}{c}{#1}\\{#2}\end{array}\right )}
+\newcommand{\perm}[2]{^{#1}{\rm P}_{#2}}
+\newcommand{\gfrac}[2]{\mbox{$ { \textstyle{ \frac{#1}{#2} }\displaystyle}$}}
+\newcommand{\defn}{\begin{quote}{\bf Definition. }}
+\newcommand{\edefn}{\end{quote}}
+\newcommand{\thm}{\begin{theorem}}
+\newcommand{\ethm}{\end{theorem}}
+\newcommand{\its}{^{\sf -T}} % transpose inverse
+\newcommand{\fv}{\hat{\bm{\mu}}}
+\newcommand{\X}{{\bf X}}
+\newcommand{\Xt}{\X\ts}
+\newcommand{\y}{{\bf y}}
+\newcommand{\A}{{\bf A}}
+\newcommand{\bp}{{\bm \beta}}
+\newcommand{\bmat}[1]{\left [ \begin{array}{#1}}
+\newcommand{\emat}{\end{array}\right ]}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\beq}{\begin{equation}}
+\newcommand{\eeq}{\end{equation}}
+\newcommand{\Gi}{{\bf G}^{-1}}
+\newcommand{\B}{{\bf B}}
+\newcommand{\Bt}{{\bf B}\ts}
+\newcommand{\D}{{\bf D}}
+\newcommand{\V}{{\bf V}}
+\newcommand{\p}{{\bf P}}
+\newcommand{\K}{{\bf K}}
+\newcommand{\Uo}{{\bf U}_1}
+\newcommand{\Tk}{{\bf T}_k}
+\newcommand{\Tm}{{\bf T}_m}
+\newcommand{\Tkm}{{\bf T}_{km}}
+\newcommand{\grad }{\nabla}
+
+\newcommand{\eps}[3]
+{{\begin{center}
+ \rotatebox{#1}{\scalebox{#2}{\includegraphics{#3}}}
+ \end{center}}
+}
+\newcommand{\epstwo}[6]
+{{\begin{center}
+\rotatebox{#1}{\scalebox{#2}{\includegraphics{#3}}}
+\rotatebox{#4}{\scalebox{#5}{\includegraphics{#6}}}
+\end{center}}
+}
+
+
+\newcommand{\tr}{{\rm tr}}
+\renewcommand*{\thefootnote}{\fnsymbol{footnote}}
+\newcommand{\bd}[1]{\ensuremath{\mbox{\boldmath $#1$}}}
+\newcommand{\ts}{^{\mbox{\sf \tiny T}}}
+% these will be used later in the title page
+\title{Metropolis Hastings Sampling for Bayesian Inference}
+
+\author{{\bf Simon Wood}, University of Edinburgh, U.K.}
+
+
+\date{}
+
+
+% have this if you'd like a recurring outline
+%\AtBeginSection[]  % "Beamer, do the following at the start of every section"
+%{
+%\begin{frame}<beamer>
+%\frametitle{Outline} % make a frame titled "Outline"
+%\tableofcontents[currentsection]  % show TOC and highlight current section
+%\end{frame}
+%}
+%\usetheme{Dresden}
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}{Bayesian Inference}
+\begin{itemize}
+\item Suppose we have data $\bf y$ and parameters of a model for the data $\bm \theta$. 
+\item Suppose that we {\em treat the parameters as random} and describe our beliefs/knowledge about $\bm \theta$, {\em prior} to observing $\bf y$, by p.d.f. $\pi ({\bm\theta})$.
+\item Denoting densities by $\pi(\cdot)$, recall that from basic conditional probability the joint density of ${\bf y}$ and ${\bm \theta}$ can be written
+$$
+\pi({\bf y}, {\bm \theta}) = \pi({\bf y} | {\bm \theta})\pi ({\bm \theta}) = \pi( {\bm \theta}|{\bf y})\pi ({\bf y})
+$$
+\item Re-arranging gives Bayes theorem
+$$
+\pi( {\bm \theta}|{\bf y}) = \pi({\bf y} | {\bm \theta})\pi ({\bm \theta})/\pi({\bf y})
+$$
+\item The {\em posterior} density on the left describes our knowledge about $\bm \theta$ after having observed $\bf y$. Notice that $ \pi({\bf y} | {\bm \theta})$ is the likelihood.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Simulating from the posterior, $\pi( {\bm \theta}|{\bf y})$ }
+\begin{itemize}
+\item For most interesting models there is no closed form for $\pi( {\bm \theta}|{\bf y})$.
+\item Even evaluating $\pi( {\bm \theta}|{\bf y})$ is usually impractical as 
+$$
+\pi({\bf y}) = \int \pi({\bf y} | {\bm \theta})\pi ({\bm \theta}) d{\bm \theta}
+$$
+is usually intractable.
+\item But it turns out that we can simulate samples from $\pi( {\bm \theta}|{\bf y})$, in a way that  only requires evaluation of $\pi({\bf y} | {\bm \theta})\pi ({\bm \theta})$ (at the observed $\bf y$), thereby bypassing
+$\pi ({\bf y})$.
+\item We simulate sequences of random vectors ${\bm \theta}_1, {\bm \theta}_2, {\bm \theta}_3, \ldots $ so that:
+\begin{enumerate}
+\item $\pi({\bm \theta}_i|{\bm \theta}_{i-1},{\bm \theta}_{i-2},\ldots) = P({\bm \theta}_i|{\bm \theta}_{i-1})$ (Markov property).
+\item ${\bm \theta}_i \sim \pi( {\bm \theta}|{\bf y})$.\end{enumerate}
+This is known as Markov Chain Monte Carlo (MCMC).
+
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The condition for MCMC to work: Reversibility}
+\begin{itemize}
+\item A Markov chain, with transition kernel $P({\bm \theta}_i|{\bm \theta}_{i-1})$, will generate from $\pi( {\bm \theta}|{\bf y})$ if it satisfies the reversibility condition
+$$
+P({\bm \theta}_i|{\bm \theta}_{i-1}) \pi( {\bm \theta}_{i-1}|{\bf y}) = P({\bm \theta}_{i-1}|{\bm \theta}_{i}) \pi( {\bm \theta}_i|{\bf y})
+$$
+\item Why? If ${\bm \theta}_{i-1} \sim \pi( {\bm \theta}|{\bf y}) $ then LHS is joint density of ${\bm \theta}_i, {\bm \theta}_{i-1}$ from the chain. Integrating out ${\bm \theta}_{i-1}$ we get the marginal for ${\bm \theta}_i$
+$$
+\int P({\bm \theta}_i|{\bm \theta}_{i-1}) \pi( {\bm \theta}_{i-1}|{\bf y}) d {\bm \theta}_{i-1} = \int P({\bm \theta}_{i-1}|{\bm \theta}_{i}) \pi( {\bm \theta}_i|{\bf y}) d {\bm \theta}_{i-1} = \pi( {\bm \theta}_i|{\bf y})
+$$
+i.e. ${\bm \theta}_{i} \sim \pi( {\bm \theta}|{\bf y}) $. 
+\item So given reversibility, if ${\bm \theta}_1$ is not impossible under $\pi( {\bm \theta}|{\bf y})$ then  ${\bm \theta}_{i} \sim \pi( {\bm \theta}|{\bf y})$ for $i \ge 1$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Constructing a reversible $P({\bm \theta}_i|{\bm \theta}_{i-1})$: Metropolis Hastings}
+\begin{itemize}
+\item We can construct an appropriate $P$, based on making a random proposal for ${\bm \theta}_i$ and then accepting or rejecting the proposal with an appropriately tuned probability.
+\item Let $q({\bm \theta}_i|{\bm \theta}_{i-1})$ be a {\em proposal} distribution, chosen for convenience. e.g. ${\bm \theta}_i \sim N({\bm \theta}_{i-1},{\bf I}\sigma_\theta^2)$ for some $\sigma_\theta^2$.
+\item Metropolis Hastings iterates the following two steps, starting from some ${\bm \theta}_0$ and $i=1$\ldots
+\begin{enumerate}
+\item Generate a proposal ${\bm \theta}_i^\prime \sim q({\bm \theta}_i|{\bm \theta}_{i-1})$.
+\item Accept and set ${\bm \theta}_i = {\bm \theta}_i^\prime$ with probability
+$$
+\alpha = \text{min}\left \{ 1, \frac{\pi({\bf y} | {\bm \theta}_i^\prime)\pi({\bm \theta}_i^\prime)q({\bm \theta}_{i-1}|{\bm \theta}_{i}^\prime)}{
+\pi({\bf y} | {\bm \theta}_{i-1})\pi({\bm \theta}_{i-1})q({\bm \theta}_{i}^\prime|{\bm \theta}_{i-1})
+}
+\right \}
+$$
+otherwise set ${\bm \theta}_i = {\bm \theta}_{i-1}$. Increment $i$ by 1.
+\end{enumerate}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Why Metropolis Hastings works in theory}
+\begin{itemize}
+\item Let's compress notation writing $\Pi({\bm \theta})$ for $\pi({\bm \theta}|{\bf y}) \propto \pi({\bf y}|{\bm \theta})\pi({\bm \theta})$ ($\bf y$ is fixed, after all).
+\item So the MH acceptance probability for ${\bm \theta}^\prime$ in place of ${\bm \theta}$ is 
+$$
+\alpha({\bm \theta}^\prime,{\bm \theta}) = \text{min} \left \{1, 
+\frac{\Pi({\bm \theta}^\prime)q({\bm \theta}|{\bm \theta}^\prime)}{ \Pi({\bm \theta})q({\bm \theta}^\prime|{\bm \theta})}
+\right \}
+$$
+\item $P({\bm \theta}^\prime|{\bm \theta}) = q({\bm \theta}^\prime|{\bm \theta})\alpha({\bm \theta}^\prime,{\bm \theta})$ so for ${\bm \theta} \ne {\bm \theta}^\prime$
+\begin{multline*}
+\Pi({\bm \theta})P({\bm \theta}^\prime|{\bm \theta}) = \Pi({\bm \theta})q({\bm \theta}^\prime|{\bm \theta})\text{min} \left \{1,\frac{ 
+\Pi({\bm \theta}^\prime)q({\bm \theta}|{\bm \theta}^\prime)}{ \Pi({\bm \theta})q({\bm \theta}^\prime|{\bm \theta}) } \right \} \\ = \text{min} \{ \Pi({\bm \theta})q({\bm \theta}^\prime|{\bm \theta}),
+\Pi({\bm \theta}^\prime)q({\bm \theta}|{\bm \theta}^\prime) \} = \Pi({\bm \theta}^\prime)P({\bm \theta}|{\bm \theta}^\prime)
+\end{multline*}
+(last equality by symmetry) --- reversibility! Trivial if ${\bm \theta} ={\bm \theta}^\prime$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Making Metropolis Hastings work in practice}
+\begin{itemize}
+\item The chain output will be correlated. It may take a long time to reach the high probability region of $\pi({\bm \theta}|{\bf y})$ from a poor ${\bm \theta}_0$.
+\item So we usually have to discard some initial portion of the simulation (burn in).
+\item The proposal distribution will make a big difference to how rapidly the chain explores  $\pi({\bm \theta}|{\bf y})$
+\begin{itemize}
+\item Large ambitious proposals will result in frequent rejection, and the chain remaining stuck for many steps.
+\item Small over cautious proposals will lead to high acceptance, but slow movement as each step is small. 
+\end{itemize} 
+\item It is necessary to examine chain output to see how quickly the sampler is exploring $\pi({\bm \theta}|{\bf y})$ (how well it is {\em mixing}), and to tune the proposal if necessary.
+\item Output must also be checked for convergence to the high probability region of $\pi({\bm \theta}|{\bf y})$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{An example}
+\begin{itemize}
+\item Consider the {\tt nhtemp} supplied with base R, giving annual mean temperatures, $T_i$, in New Haven over several years.
+\item Suppose we want to model the data using a heavy tailed distribution, and adopt the model
+$$
+(T_i - \mu)/\sigma \underset{\text{i.i.d.}}{\sim} t_\nu
+$$
+where $\mu$, $\sigma$ and $\nu$ are parameters. If $f_\nu$ is the p.d.f. of a $t_\nu$ distribution then the p.d.f. for $T_i$ is
+$
+f(t) = f_\nu((t-\mu)/\sigma) /\sigma
+$
+\item The log likelihood for this model can be coded:
+{\small \begin{verbatim}
+ll <- function(theta,temp) { 
+  mu <- theta[1];sig <- exp(theta[2]) 
+  df = 1 + exp(theta[3])
+  sum(dt((temp-mu)/sig,df=df,log=TRUE) - log(sig)) 
+}
+\end{verbatim}}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Priors and Proposals}
+\begin{itemize}
+\item To complete the model, we need priors for the parameters. 
+\item Let's use improper uniform priors for $\theta_1 = \mu$ and $\theta_2=\log(\sigma)$.
+\begin{itemize}
+\item Note: these parts of the prior cancel in the MH acceptance ratio.
+\end{itemize}
+\item $\nu$ becomes somewhat unidentifiable if it is too high, so for convenience, let's assume a prior
+$\log \nu = \theta_3 \sim N(3,2^2)$.
+\item Now the Bayesian model is complete, we need to pick a proposal distribution to form the basis for an MH sampler. 
+\item Let's use the {\em random walk} proposal ${\bm \theta}_i^\prime \sim N({\bm \theta}_{i-1},{\bf D})$, where $\bf D$ is diagonal, and we will need to tune its elements. 
+\begin{itemize}
+\item Note that for this proposal $q({\bm \theta}_i^\prime|{\bm \theta}_{i-1}) = q({\bm \theta}_{i-1}|{\bm \theta}^\prime_i)$, so $q$ cancels in MH acceptance ratio.
+\end{itemize}
+\item Remember that the proposal does not change the posterior, but will affect how quickly the chain explores the posterior. 
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{MH sampler code}
+
+{\scriptsize \begin{verbatim}
+ns <- 10000; th <- matrix(0,3,ns)
+th[,1] <- c(mean(nhtemp),log(sd(nhtemp)),log(6))
+llth <- ll(th[,1],nhtemp) ## initial log likelihood
+lprior.th <- dnorm(th[3,1],mean=3,sd=2,log=TRUE)
+p.sd <- c(.5,.1,1.2) ## proposal SD (tuned)
+accept <- 0 ## acceptance counter
+for (i in 2:ns) { ## MH sampler loop
+  thp <- th[,i-1] + rnorm(3)*p.sd ## proposal
+  lprior.p <- dnorm(thp[3],mean=3,sd=2,log=TRUE) 
+  llp <- ll(thp,nhtemp) ## log lik of proposal
+  if (runif(1) < exp(llp + lprior.p - llth - lprior.th)) {
+    th[,i] <- thp;llth <- llp;lprior.th <- lprior.p
+    accept <- accept  + 1
+  } else { ## reject
+    th[,i] <- th[,i-1]
+  }
+}
+accept/ns ## about 1/4 is ideal
+\end{verbatim}
+}
+\end{frame}
+
+\begin{frame}[fragile]{Checking the chains}
+
+{\scriptsize \begin{verbatim}
+par(mfrow=c(3,1),mar=c(4,4,1,1))
+plot(th[1,],type="l")
+plot(th[2,],type="l")
+plot(th[3,],type="l")
+\end{verbatim}}
+
+\eps{-90}{.3}{chains.eps}
+
+\ldots quick convergence, but mixing fairly slow.
+
+\end{frame}
+
+
+\begin{frame}[fragile]{Chain correlation and marginal posteriors}
+
+{\scriptsize \begin{verbatim}
+par(mfrow=c(2,3))
+acf(th[1,]);acf(th[2,]);acf(th[3,]);
+hist(th[1,]);hist(exp(th[2,]));hist(th[3,]);
+\end{verbatim}}
+
+\eps{-90}{.3}{acf-hist.eps}
+
+\ldots standard deviation and degrees of freedom quite highly correlated.
+
+\end{frame}
+
+\begin{frame}[fragile]{CIs, posterior means etc.}
+
+{\scriptsize \begin{verbatim}
+> pm <- rowMeans(th) ## posterior mean
+> ## transform to original scale...
+> pm[2:3] <- exp(pm[2:3])
+> pm[3] <- pm[3] + 1
+> names(pm) <- c("mu","sig","df")
+> pm
+       mu       sig        df 
+51.175612  1.176176 27.191217 
+> 
+> ## 95% Credible Intervals...
+> ci <- apply(th,1,quantile,prob=c(.025,.975))
+> ci[,2:3] <- exp(ci[,2:3]) ;ci[,3] <- ci[,3]+1
+> colnames(ci) <- c("mu","sig","df")
+> ci
+            mu      sig         df
+2.5%  50.85020 0.893452    3.09977
+97.5% 51.48983 1.484936 1766.29037
+\end{verbatim}}
+
+\end{frame}
+
+\end{document}
+

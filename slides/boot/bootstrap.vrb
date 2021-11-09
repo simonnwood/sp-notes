@@ -1,0 +1,20 @@
+\frametitle{A more interesting bootstrap}
+\begin{itemize}
+\item We can bootstrap to find a CI for the optimum yield. Suppose {\tt x} and {\tt y} data are in dataframe {\tt dat}.
+{\scriptsize
+\begin{verbatim}
+n <- nrow(dat); nb <- 1000; mx <- rep(0,nb)
+for (i in 1:nb) { ## bootstrap loop
+  ii <- sample(1:n,n,replace=TRUE) ## resample row indices
+  b <- coef(lm(y ~ x + I(x^2),data=dat[ii,])) ## fit to resample
+  mx[i] <- -b[2]/(2*b[3]) ## compute location of maximum
+}
+quantile(mx,c(0.05,0.95)) ## 90% CI
+  0.3785062 0.4458549
+hist(mx)
+\end{verbatim}
+}
+\vspace*{-.5cm}
+\eps{-90}{.35}{quad-mod-hist.eps}
+
+\end{itemize}

@@ -1,0 +1,506 @@
+\documentclass{beamer}
+
+% for themes, etc.
+\mode<presentation>
+{ \usetheme{boxes} }
+\setbeamertemplate{navigation symbols}{}
+\usepackage{times}  % fonts are up to you
+\usefonttheme{serif} 
+\usepackage{graphicx, color,pgf}
+\usepackage{multimedia}
+%\usepackage{media9}
+%\usepackage{lmodern}
+\usepackage{amsmath,amsfonts,amsthm, amssymb}
+\usepackage{bm}
+\usepackage{animate}
+\newcommand{\dif}[2]{\frac{{\rm d} #1}{{\rm d} #2}}
+\newcommand{\ddif}[3]{\frac{{\rm d}^2 #1}{{\rm d} #2 {\rm d} #3}}
+\newcommand{\ildif}[2]{{\rm d} #1/{{\rm d} #2 }}
+\newcommand{\ilpdif}[2]{\partial #1/{\partial #2 }}
+\newcommand{\pdif}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\pddif}[3]{\frac{\partial^2 #1}{\partial #2 \partial #3}}
+\newcommand{\ilpddif}[3]{\partial^2 #1/{\partial #2 \partial #3}}
+\newcommand{\comb}[2]{\left (\begin{array}{c}{#1}\\{#2}\end{array}\right )}
+\newcommand{\perm}[2]{^{#1}{\rm P}_{#2}}
+\newcommand{\gfrac}[2]{\mbox{$ { \textstyle{ \frac{#1}{#2} }\displaystyle}$}}
+\newcommand{\defn}{\begin{quote}{\bf Definition. }}
+\newcommand{\edefn}{\end{quote}}
+\newcommand{\thm}{\begin{theorem}}
+\newcommand{\ethm}{\end{theorem}}
+\newcommand{\its}{^{\sf -T}} % transpose inverse
+\newcommand{\fv}{\hat{\bm{\mu}}}
+\newcommand{\X}{{\bf X}}
+\newcommand{\Xt}{\X\ts}
+\newcommand{\y}{{\bf y}}
+\newcommand{\A}{{\bf A}}
+\newcommand{\bp}{{\bm \beta}}
+\newcommand{\bmat}[1]{\left [ \begin{array}{#1}}
+\newcommand{\emat}{\end{array}\right ]}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\beq}{\begin{equation}}
+\newcommand{\eeq}{\end{equation}}
+\newcommand{\Gi}{{\bf G}^{-1}}
+\newcommand{\B}{{\bf B}}
+\newcommand{\Bt}{{\bf B}\ts}
+\newcommand{\D}{{\bf D}}
+\newcommand{\V}{{\bf V}}
+\newcommand{\p}{{\bf P}}
+\newcommand{\K}{{\bf K}}
+\newcommand{\Uo}{{\bf U}_1}
+\newcommand{\Tk}{{\bf T}_k}
+\newcommand{\Tm}{{\bf T}_m}
+\newcommand{\Tkm}{{\bf T}_{km}}
+\newcommand{\grad }{\nabla}
+\newcommand{\eps}[3]
+{{\begin{center}
+ \rotatebox{#1}{\scalebox{#2}{\includegraphics{#3}}}
+ \end{center}}
+}
+\newcommand{\tr}{{\rm tr}}
+\renewcommand*{\thefootnote}{\fnsymbol{footnote}}
+\newcommand{\bd}[1]{\ensuremath{\mbox{\boldmath $#1$}}}
+\newcommand{\ts}{^{\mbox{\sf \tiny T}}}
+% these will be used later in the title page
+\title{Design, test, debug and profile}
+
+\author{{\bf Simon Wood}, University of Edinburgh, U.K.}
+
+
+\date{}
+
+
+% have this if you'd like a recurring outline
+%\AtBeginSection[]  % "Beamer, do the following at the start of every section"
+%{
+%\begin{frame}<beamer>
+%\frametitle{Outline} % make a frame titled "Outline"
+%\tableofcontents[currentsection]  % show TOC and highlight current section
+%\end{frame}
+%}
+%\usetheme{Dresden}
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}{Introduction}
+\begin{itemize}
+\item {\bf Structured programming} involves {\em designing} your programme before you start coding, so that the programming task is broken down into manageable functions reflecting the structure of the task being programmed. 
+\begin{itemize}
+\item Properly designed well structured programmes are easier to code, test, debug, read and maintain or modify. 
+\end{itemize}
+\item {\bf Testing} is an essential part of programming reliably.
+\item {\bf Debugging} is the process of finding and correcting code errors. 
+\begin{itemize}
+\item Use of the appropriate tools and the right approach can save large amounts of time and effort. 
+\end{itemize}
+\item {\bf Profiling} is the process of improving your code's computational efficiency (i.e. speed or memory use), by establishing where the computational effort is going, and carefully examining the most expensive steps to see if they can be made more efficient.
+\begin{itemize}
+\item Efficient use of profiling can be the difference between needing a cluster or laptop to run your programme.  
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Structure}
+\begin{itemize}
+\item {\em Design} before you {\em code}!
+\begin{enumerate}
+\item {\em Purpose}. Write down what your code should do. What are the inputs and outputs, and how do you get from one to the other?
+\item {\em Design considerations}. What are the other important issues to bear in mind? e.g. does the code need to be fast? or deal with large data sets? is it for one off use, or for repeated general use?
+\item {\em Design the structure}. Decide how best to split the code into functions each completing a well defined manageable and testable part of the overall task. Write down this structure. 
+\item {\em Review}. Will the structure achieve the purpose and meet the design considerations?
+\end{enumerate}
+\item Generally the more you write down of the design and code specification before you start coding, the quicker the coding process will be and the fewer mistakes you will make. 
+\item Designing as you code is a recipe for making a mess.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{Readability}
+\begin{itemize}
+\item As you write it, everything about your code will often seem very obvious to you.
+\item Two weeks later it won't seem obvious. 
+\item Neither will it seem obvious to anyone else.
+\item Help others and your later self by:
+\begin{enumerate}
+\item Using (short) meaningful variable names where possible.
+\item Explaining what the code does using frequent \verb+# comments+, including a short overview at the start of each function.
+\item Laying out the code so that it is clear to read. White space is free.
+\item Always having a another team member review your code and comments when team-working.
+\end{enumerate}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Simple design example: ridge regression}
+
+\begin{itemize}
+\item Consider the standard linear statistical model
+$$
+{\bf y} = {\bf X} \bp + {\bm \epsilon}
+$$
+$\bf X$ is an $n \times p$ model matrix, $\bf y$ a response vector, $\bp $ a parameter vector and ${\bm \epsilon}$ a vector of i.i.d. zero mean errors, variance $\sigma^2$.
+\item The least squares estimate of $\bp$ is
+$$
+\hat \bp = \underset{\bp}{\text{argmin}}~ \|{\bf y} - {\bf X}\bp \|^2 = ({\bf X}\ts {\bf X})^{-1} {\bf X}\ts {\bf y}
+$$
+\item When $p$ is large, $\hat \bp$ can become quite unstable, and a {\em ridge regression} estimate can have better predictive performance.
+$$
+\hat \bp = \underset{\bp}{\text{argmin}}~ \|{\bf y} - {\bf X}\bp \|^2 + \lambda \|\bp\|^2 = ({\bf X}\ts {\bf X} + \lambda {\bf I})^{-1} {\bf X}\ts {\bf y}
+$$
+where $\lambda $ is a {\em smoothing parameter} to be selected somehow.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Simple design example: ridge regression}
+\begin{itemize}
+\item As $\lambda \to \infty$ the coefficient estimates become less variable, but are shrunk towards zero.
+\item $\lambda$ can be chosen to minimize a measure of prediction error, the {\em Generalized Cross Validation} (GCV) score
+$$
+V(\lambda) = \frac{n \|{\bf y} - {\bf X}\hat {\bm \beta}\|^2}{\{ n - \text{tr}({\bf A})\}^2}
+$$
+where ${\bf A} = {\bf X} ({\bf X}\ts {\bf X} + \lambda {\bf I})^{-1} {\bf X}\ts $.
+\item Note that if ${\bm \mu} = E({\bf y})$ then $\hat {\bm \mu} = {\bf Ay}$.
+\item Also $\text{tr}({\bf A})$ is a measure of the {\em effective degrees of freedom} of the model - it lies between 0 and $p$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Designing a ridge regression function}
+\begin{itemize}
+\item {\bf Aim}: Function should take inputs ${\bf y}$ and ${\bf X}$ and a sequence of $\log \lambda$ values, search for the GCV minimizing $\lambda$, and return the corresponding $\hat \bp$.
+\item {\bf Considerations}: reasonable to assume that the inputs are correct, important to check that GCV score has a proper minimum, efficiency of some importance.
+\item {\bf Outline Design}
+\begin{itemize}
+\item \verb+ridge(y,X,lsp)+ loops through log smoothing parameters in {\tt lsp} calling {\tt fit.ridge} for each to evaluate GCV score. Hence find optimal log smoothing parameter. Plot GCV trajectory using {\tt plot.gcv} and return best fit $\hat \bp $.
+\item \verb+fit.ridge(y,X,sp)+ fit model for a single smoothing parameter value using a Cholesky method to solve for $\hat {\bm \beta}$, returning $\hat {\bm \beta}$, GCV score and EDF.
+\item \verb+plot.gcv(edf,lsp,gcv)+ plot GCV against EDF and log smoothing parameters. 
+\end{itemize} 
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Code, test, debug}
+\begin{itemize}
+\item Once you have a decent design on paper - which will usually involve writing out further details for each function -  code it up. 
+\item If possible test each function as it is written. This has 2 parts
+\begin{enumerate} 
+\item Initial interactive informal testing.
+\item Tests that the function works as intended for the intended range of inputs, written as code that you can run repeatedly - e.g. each time a function's code is modified. These are known as {\em unit tests}.
+\end{enumerate}
+\item For any moderately interesting piece of code the testing, or subsequent use, is likely to produce some errors - {\em bugs}. The cause of these have to be found - {\em debugging}.
+\item Rarely is staring at code an efficient approach to debugging.
+\item Act as a detective, gather evidence, test theories and {\em use debugging software}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Debugging approach}
+\begin{itemize}
+\item Try to avoid introducing bugs, but accept that humans are error prone. Work in a way that reduces the risk: design before you code. Aim for a good structure that makes coding easy, with readily testable components. Comment carefully.
+\item Be aware that code modification is often where bugs creep in.
+\item Interesting code will have bugs at some point. To find them be scientific. Gather data on what might be wrong - including your basic assumptions. Form hypotheses about the problem, and experiment to test them.
+\item The key skills are narrowing down the problem, and checking that the code is {\em actually} doing what you {\em think} it does.
+\item One careful read through is useful to look for stand-out errors. Code staring is not. Get active and test things. 
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Profiling}
+\begin{itemize}
+\item Once your code is tested and functioning correctly, it may still be inconveniently slow to run.
+\item This is a frequent and substantial problem in big data settings. 
+\item {\em Profiling} is the process of investigating which parts of your code are taking the most time to run, so that you can examine closely the time consuming steps and try to improve them. 
+\begin{enumerate}
+\item In {\tt R} inefficiencies often arise from loops with many iterations but little work done at each iteration. Vectorization helps.
+\item In statistical methods generally, inefficiencies often arise from careless coding of matrix operations.
+\end{enumerate}
+\item {\tt R} can measure the time taken by each function of code using \ldots 
+{\scriptsize \begin{verbatim}
+Rprof()
+## some code to profile
+Rprof(NULL)
+summaryRprof()
+\end{verbatim}}
+\item Note that it can be important to profile memory usage too.
+\end{itemize}
+\end{frame}
+
+
+
+\end{document}
+\end{document}
+
+
+\begin{frame}{Generalized Additive Models}
+\begin{itemize}
+\item Another generalization relaxes the Gaussian response assumption, so that the model becomes
+$$
+y_i \underset{ind.}{\sim} \text{EF}(\mu_i,\phi)~~~ g(\mu_i) = \alpha+ \sum_j f_j(x_{ji})~~ (\equiv \eta_i)
+$$
+\item $\text{EF}(\mu_i,\phi)$ denotes some exponential family distribution\footnote{e.g. Gaussian, Poisson, binomial, gamma, Tweedie etc.} with mean $\mu_i$ and scale parameter $\phi$. $\bm \eta$ is the {\em  linear predictor}. 
+\item $g$ is a known smooth monotonic {\em link function}. 
+
+\item $\bm \lambda$ estimation requires GCV or REML criteria to be modified.  
+\item The $\bp$ estimation given $\bm \lambda$ is now a non-linear optimization and has to be done using Newton's method. Let's look at this first.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Newton's method: basic idea}
+\begin{itemize}
+\item Newton's method is used to maximize or minimize smooth {\em objective functions}, such as quadratically penalized likelihoods, w.r.t. some parameters.
+\item We start with a guess of the parameter values.
+\item Then evaluate the function and its first and second derivatives w.r.t. the parameters at the guess. 
+\item There is a unique quadratic function matching the value and derivatives, so we find that and optimize it to find the next guess at the optimizer of the objective.
+\item This derivative -- quadratic approximation -- maximize quadratic cycle is repeated to convergence. 
+\item Convergence occurs when the first derivatives are zero\footnote{The (negative) {\em Hessian} matrix of second derivatives should be positive definite at a minimum (maximum).}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Newton's method illustrated in one dimension}
+% insert 'autoplay' to have it start automatically
+\begin{center}
+\animategraphics[scale=.55,controls,buttonfg=.5,buttonsize=.72em]{1}{ani/newt1d}{0}{25}
+\end{center}
+\end{frame}
+
+\begin{frame}{Newton's method in more detail}
+\begin{itemize}
+\item Consider minimizing $D({\bm \theta})$ w.r.t. $\bm \theta$. Taylor's theorem says 
+$$
+D({\bm \theta} + {\bm \Delta}) = D({\bm \theta}) + {\bm \Delta}\ts \grad_\theta D  + \tfrac{1}{2} {\bm \Delta} \ts \grad_\theta^2 D {\bm \Delta} + o(\|{\bm \Delta}\|^2)
+$$
+\item Provided $\grad_\theta^2 D$ is positive definite, the $\bm \Delta $ minimizing the quadratic on the right is  
+$$
+{\bm \Delta} = -(\grad_\theta^2 D)^{-1} \grad_\theta D
+$$
+\item This also minimizes $D$ in the small $\bm \Delta $ limit, which is the one that applies near $D$'s minimum.  
+\item Interestingly, ${\bm \Delta}$ is still a descent direction with {\em any positive definite matrix} in place of the Hessian $\grad_\theta^2 D$. 
+\item So if $\grad_\theta^2 D$ is not positive definite we just perturb it to be so.
+\item Far from the optimum $\bm \Delta$ might overshoot. If so, repeatedly halve $\bm \Delta$ until $D({\bm \theta} + {\bm \Delta})<D({\bm \theta})$ to guarantee convergence, 
+
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Newton in 2D with Hessian perturbation and step halving}
+% insert 'autoplay' to have it start automatically
+\begin{center}
+\animategraphics[scale=.45,controls,buttonfg=.5,buttonsize=.72em]{2}{ani/newt2d}{0}{20}
+\end{center}
+\end{frame}
+
+\begin{frame}{Why Newton?}
+\begin{itemize}
+\item Why not not simplify and use a first order Taylor expansion in place of the Newton method's second order expansion?
+\item Doing so gives the method of {\em steepest descent} and two problems
+\begin{enumerate}
+\item As we approach the optimum the first derivative of the objective vanishes, so that there is ever less justification for dropping the second derivative term.
+\item Without second derivative information we have nothing to say how long the step should be.
+\end{enumerate}
+\item In practice 1. leads to steepest descent often requiring huge numbers of steps as the optimum is approached.
+\item To use only first derivatives check out {\em quasi-Newton} methods.  
+\item What about co-ordinate descent, that worked well for the Lasso?
+\item This can also take forever for some problems. 
+\item For the previous example, Newton takes 20 steps and co-ordinate descent over 4000 (for reduced accuracy). Here are the first 20\ldots
+\end{itemize}
+\end{frame}
+
+\begin{frame}{First 20 coordinate descent steps}
+% insert 'autoplay' to have it start automatically
+\begin{center}
+\animategraphics[scale=.45,controls,buttonfg=.5,buttonsize=.72em]{2}{ani/cd}{0}{40}
+\end{center}
+\end{frame}
+
+\begin{frame}\frametitle{Computing $\hat \bp$ and $\pi(\bp|{\bf y})$}
+\begin{itemize}
+\item Let $l(\bp) \equiv \log \pi (\y |\bp)$ and ${\bf S}_\lambda$ be the combined penalty matrix.
+\item 
+$
+\hat \bp = \underset{\bp}{\text{argmax}}~l(\bp ) -\bp \ts {\bf S}_\lambda \bp/2 \Rightarrow 
+\left . \pdif{l}{\bp} \right |_{\hat \bp} - {\bf S}_\lambda \hat \bp = {\bf 0}
+$
+\item Optimized using Newton iteration (until $\hat \bp$ converged): 
+
+$\hat \bp \leftarrow \hat \bp + ( \hat{\bm{{\cal I}}} +{\bf S}_\lambda)^{-1}\left (\left .\pdif{l}{\bp}\right |_{\hat \bp} - {\bf S}_\lambda \hat \bp \right ), \text{  where  } 
+ \hat{\bm{{\cal I}}} = - \pddif{l}{\bp}{\bp\ts}$.
+
+\item Taylor expand about $\hat \bp$ for approximate posterior
+\begin{align*}
+\log \pi(\bp|{\bf y}) &= l(\bp) - \bp\ts {\bf S}_\lambda \bp/2 + c\\
+&\simeq l(\hat \bp) - \frac{1}{2}\hat \bp\ts {\bf S}_\lambda \hat \bp - \frac{1}{2}(\bp - \hat \bp)\ts (\hat{\bm{{\cal I}}} +{\bf S}_\lambda)(\bp - \hat \bp) + c
+\end{align*}
+\item Hence\footnote{generally requires $\text{dim}(\bp)=o(n^{1/3})$} approximately
+$
+\pi_G(\bp|{\bf y}) \propto e^{- \frac{1}{2}(\bp - \hat \bp)\ts (\hat{\bm{{\cal I}}} +{\bf S}_\lambda)(\bp - \hat \bp)}$, so
+$$ 
+\bp | {\bf y} \sim \text{N}(\hat \bp,(\hat{\bm{{\cal I}}} +{\bf S}_\lambda)^{-1} )
+$$
+\end{itemize}
+\end{frame}
+
+\begin{frame}\frametitle{Smoothing parameter selection}
+\begin{itemize}
+\item Marginal likelihood 
+$
+\pi (\y|\bp) = \int \pi({\bf y}|\bp) \pi(\bp|{\bm \lambda}) d\bp
+$
+is intractable.
+\item But we can re-use the Gaussian approximate posterior, $\pi_G$  
+$$
+\pi({\bf y}|{\bm \lambda}) = \frac{\pi({\bf y}|\hat \bp)\pi(\hat \bp|{\bm \lambda})}{\pi(\hat \bp|{\bf y})} \simeq 
+\frac{\pi({\bf y}|\hat \bp)\pi(\hat \bp)|{\bm \lambda})}{\pi_G(\hat \bp|{\bf y})}
+$$
+\item This is tractable and is also equivalent to replacing the log of the ML integrand with its second order Taylor expansion about $\hat \bp$ and integrating the tractable result: {\em Laplace Approximation}.
+$$
+2 \log \pi(\y|{\bm \lambda}) \simeq 2l(\hat \bp) - \hat \bp \ts {\bf S}_\lambda \hat \bp
++ \log |{\bf S}_\lambda|_+ - \log |\hat{\bm{{\cal I}}} +{\bf S}_\lambda | + c
+$$
+\item Proceeding as in the Gaussian case:
+$$
+\text{EDF} = \text{trace}\{(\hat{\bm{{\cal I}}} +{\bf S}_\lambda)^{-1}\hat{\bm{{\cal I}}}  \}
+$$ 
+\end{itemize}
+\end{frame}
+
+\begin{frame}{The penalized least squares link}
+\begin{itemize}
+\item The above theory was not  tied to exponential families, but in the EF case $\text{var}(y_i) = V(\mu_i)\phi$, and $V$ is known for each distribution.
+\item Let $\alpha(\mu_i) = 1 + (y_i-\mu_i) (V^{\prime}(\mu_i)/V(\mu_i)+g^{\prime\prime}(\mu_i)/g^\prime(\mu_i))$ and $w_i = \alpha (\mu_i)V(\mu_i)^{-1} g^{\prime}(\mu_i)^{-2}$ (and note that $\E (\alpha$) = 1).
+\item The Hessian of the negative log likelihood $\hat{\bm{{\cal I}}} = \X\ts{\bf WX}$ where $\bf W$ is diagonal and ${\bf W}_{ii} = w_i$.
+\item Defining $z_i = g^\prime(\mu_i)(y_i-\mu_i)/\alpha(\mu_i) + \eta_i$ Newton's method is identical to {\em Penalized  Iteratively Re-weighted Least Squares}\footnote{$\iota_i$ is usually zero, but may be a small constant ensuring finite $\hat \eta_i$. $\|{\bf V}\|_W^2 = {\bf v}\ts {\bf Wv}$.}\ldots
+\begin{enumerate}
+\item Set $\hat \mu_i = y_i + \iota_i $ and iterate 2 and 3 to convergence.
+\item Compute $z_i$ and $w_i$ from the current $\hat \eta_i$ and $\hat \mu_i = g^{-1} (\hat \eta_i)$.
+\item Find $\hat \bp = \text{argmin}_\bp ~~ \|{\bf z} - \X\bp\|_W + \bp\ts {\bf S}_\lambda\bp$ and $\hat {\bm \eta} = \X \hat \bp$. 
+\end{enumerate}
+\item Replacing $w_i$ with $E(w_i)$ is known as {\em Fisher Scoring}.
+\item A simple approach estimates $\bm \lambda$ for each the working  model.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Deviance based GCV}
+\begin{itemize}
+\item For exponential family GAM/GLM there is a generalization of the residual sum of squares, know as the {\em deviance}:
+$$
+D(\bp) = 2(l_s - l(\bp))\phi
+$$
+where $l_s$ is the saturated likelihood --- the highest value the likelihood could take if there was a parameter for each $y_i$.
+\item For Gaussian data the deviance {\em is} the residual sum of squares.
+\item The GCV criterion then generalizes to
+$$
+\text{GCV} = n D(\hat \bp)/(n-\text{EDF})^2.
+$$ 
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Nested optimization for $\hat \lambda$ and implicit differentiation}
+\begin{itemize}
+\item ML or GCV are optimized w.r.t. ${\bm \rho}  = \log {\bm \lambda}$ by Newton's method.
+\item Each trial $\bm \rho$ vector proposed by Newton's method requires an inner Newton iteration for the corresponding $\hat \bp$, plus evaluation of the gradient and Hessian of the ML or GCV criterion. 
+\item These derivatives in turn require derivatives of $\hat \bp$ w.r.t. $\bm \rho$.
+$$
+\text{By definition of } \hat \bp, {~~~~}\left . \pdif{l}{\bp} \right |_{\hat \bp} - {\bf S}_\lambda \hat \bp = {\bf 0} ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+$$
+\item Noting that ${\bf S}_\lambda = \sum_j \lambda_j{\bf S}_j$ and differentiating w.r.t. $\rho_j$
+$$
+\left .\pddif{l}{\bp}{\bp\ts}\right |_{\hat \bp} \dif{\hat \bp}{\rho_j} - \lambda_j {\bf S}_j \hat \bp - {\bf S}_\lambda \dif{\hat \bp}{\rho_j} = {\bf 0} \Rightarrow 
+\dif{\hat \bp}{\rho_j} = - \lambda_j(\hat{\bm{{\cal I}}} + {\bf S}_\lambda)^{-1} {\bf S}_j \hat \bp. 
+$$
+\item $2^\text{nd}$ derivs follow similarly. Criterion derivs are then routine.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Example: diabetic retinopathy}
+\begin{itemize}
+\item The {\tt wesdr} data\footnote{see Chong Gu's {\tt gss} package in R} look at the relationship between development of retinopathy, duration of disease, BMI and percentage glycocylated haemoglobin in a cohort of diabetics.
+\begin{center}
+  \includegraphics[scale=.4]{wesdr.pdf}
+\end{center}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{A retinopathy model}
+\begin{itemize}
+\item A possible model for these data is ${\tt ret}_i \sim \text{bin}(1,\mu_i)$
+\begin{multline*}
+\text{logit}(\mu_i) = \alpha + f_1({\tt dur}_i) + f_2({\tt gly}_i) + f_3({\tt bmi}_i) \\+ 
+f_4({\tt dur}_i,{\tt gly}_i) + f_5({\tt dur}_i,{\tt bmi}_i) + f_6({\tt gly}_i,{\tt bmi}_i)
+\end{multline*}
+where $\text{logit}(\mu) = \log\{\mu/(1-\mu)\}$.
+\item The model can be estimated using {\tt gam} from R package {\tt mgcv}:
+{\scriptsize \begin{verbatim}
+k <- 7 ## choosing basis size
+b <- gam(ret~s(dur,k=k)+s(gly,k=k)+s(bmi,k=k)+
+     ti(dur,gly,k=k)+ti(dur,bmi,k=k)+ti(gly,bmi,k=k),
+     select=TRUE,data=wesdr,family=binomial,method="REML")
+\end{verbatim}}
+\item {\tt ti} are tensor product smooths with main effects excluded as covered previously. 
+\item \verb+select=TRUE+ adds a penalty for each smooth, so that it can be penalized to zero. Consider the eigen decomposition of a penalty matrix ${\bf S} = {\bf U}{\bm \Lambda}{\bf U}\ts$. Let ${\bf U}_0$ be the cols of $\bf U$ with corresponding eigenvalues 0. ${\bf S}_0 = {\bf U}_0{\bf U}_0\ts$ is a penalty on the null space of $\bf S$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Retinopathy results}
+\begin{itemize}
+\item Using \verb+plot(b,scheme=1,...)+ we see that there is a non-zero interaction between {\tt gly} and {\tt bmi}. 
+
+\begin{center}
+  \includegraphics[scale=.4]{wesfit.pdf}
+\end{center}
+
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Retinopathy summary}
+
+{\tiny
+\begin{verbatim}
+> summary(b)
+
+Family: binomial 
+Link function: logit 
+
+Formula:
+ret ~ s(dur, k = k) + s(gly, k = k) + s(bmi, k = k) + ti(dur, 
+    gly, k = k) + ti(dur, bmi, k = k) + ti(gly, bmi, k = k)
+
+Parametric coefficients:
+            Estimate Std. Error z value Pr(>|z|)    
+(Intercept) -0.40366    0.08979  -4.496 6.93e-06 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Approximate significance of smooth terms:
+                  edf Ref.df Chi.sq p-value    
+s(dur)      3.347e+00      6 15.092 0.00103 ** 
+s(gly)      9.892e-01      6 87.169 < 2e-16 ***
+s(bmi)      2.263e+00      6 11.724 0.00138 ** 
+ti(dur,gly) 2.539e-04     36  0.000 0.64886    
+ti(dur,bmi) 8.409e-05     36  0.000 0.61919    
+ti(gly,bmi) 1.706e+00     35  7.505 0.00581 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+R-sq.(adj) =  0.221   Deviance explained = 18.4%
+-REML = 387.27  Scale est. = 1         n = 669
+\end{verbatim}}
+{\scriptsize \ldots the interaction seems to be `significant'.}
+
+\end{frame}
+
+\begin{frame}[fragile]{Retinopathy interpretation}
+\begin{itemize}
+\item So the duration effect can be interpreted alone --- steadily increasing risk for the first decade, then a decline --- this may be an age or `harvesting effect' the long duration individuals being those with good disease control.
+\item For the interaction we need to look at the combined effect. e.g.
+{\scriptsize
+\begin{verbatim}
+vis.gam(b,view=c("gly","bmi"),se=T,phi=30,theta=-30,too.far=.15)
+vis.gam(b,view=c("gly","bmi"),plot.type="contour",too.far=.15)
+\end{verbatim}}
+\begin{center}
+  \includegraphics[scale=.45]{wesint.pdf}
+\end{center}
+
+\end{itemize}
+\end{frame}
+
+\end{document}
+

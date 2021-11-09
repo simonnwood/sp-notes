@@ -1,0 +1,18 @@
+\frametitle{Profiling}
+\begin{itemize}
+\item Once your code is tested and functioning correctly, it may still be inconveniently slow to run.
+\item This is a frequent and substantial problem in big data settings.
+\item {\em Profiling} is the process of investigating which parts of your code are taking the most time to run, so that you can examine closely the time consuming steps and try to improve them.
+\begin{enumerate}
+\item In {\tt R} inefficiencies often arise from loops with many iterations but little work done at each iteration. Vectorization helps.
+\item In statistical methods generally, inefficiencies often arise from careless coding of matrix operations.
+\end{enumerate}
+\item {\tt R} can measure the time taken by each function of code using \ldots
+{\scriptsize \begin{verbatim}
+Rprof()
+## some code to profile
+Rprof(NULL)
+summaryRprof()
+\end{verbatim}}
+\item Note that it can be important to profile memory usage too.
+\end{itemize}

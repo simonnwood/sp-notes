@@ -1,0 +1,252 @@
+\documentclass{beamer}
+
+% for themes, etc.
+\mode<presentation>
+{ \usetheme{boxes} }
+\setbeamertemplate{navigation symbols}{}
+\usepackage{times}  % fonts are up to you
+\usefonttheme{serif} 
+\usepackage{graphicx, color,pgf}
+\usepackage{multimedia}
+%\usepackage{media9}
+%\usepackage{lmodern}
+\usepackage{amsmath,amsfonts,amsthm, amssymb}
+\usepackage{bm}
+\usepackage{animate}
+\newcommand{\dif}[2]{\frac{{\rm d} #1}{{\rm d} #2}}
+\newcommand{\ddif}[3]{\frac{{\rm d}^2 #1}{{\rm d} #2 {\rm d} #3}}
+\newcommand{\ildif}[2]{{\rm d} #1/{{\rm d} #2 }}
+\newcommand{\ilpdif}[2]{\partial #1/{\partial #2 }}
+\newcommand{\pdif}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\pddif}[3]{\frac{\partial^2 #1}{\partial #2 \partial #3}}
+\newcommand{\ilpddif}[3]{\partial^2 #1/{\partial #2 \partial #3}}
+\newcommand{\comb}[2]{\left (\begin{array}{c}{#1}\\{#2}\end{array}\right )}
+\newcommand{\perm}[2]{^{#1}{\rm P}_{#2}}
+\newcommand{\gfrac}[2]{\mbox{$ { \textstyle{ \frac{#1}{#2} }\displaystyle}$}}
+\newcommand{\defn}{\begin{quote}{\bf Definition. }}
+\newcommand{\edefn}{\end{quote}}
+\newcommand{\thm}{\begin{theorem}}
+\newcommand{\ethm}{\end{theorem}}
+\newcommand{\its}{^{\sf -T}} % transpose inverse
+\newcommand{\fv}{\hat{\bm{\mu}}}
+\newcommand{\X}{{\bf X}}
+\newcommand{\Xt}{\X\ts}
+\newcommand{\y}{{\bf y}}
+\newcommand{\A}{{\bf A}}
+\newcommand{\bp}{{\bm \beta}}
+\newcommand{\bmat}[1]{\left [ \begin{array}{#1}}
+\newcommand{\emat}{\end{array}\right ]}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\beq}{\begin{equation}}
+\newcommand{\eeq}{\end{equation}}
+\newcommand{\Gi}{{\bf G}^{-1}}
+\newcommand{\B}{{\bf B}}
+\newcommand{\Bt}{{\bf B}\ts}
+\newcommand{\D}{{\bf D}}
+\newcommand{\V}{{\bf V}}
+\newcommand{\p}{{\bf P}}
+\newcommand{\K}{{\bf K}}
+\newcommand{\Uo}{{\bf U}_1}
+\newcommand{\Tk}{{\bf T}_k}
+\newcommand{\Tm}{{\bf T}_m}
+\newcommand{\Tkm}{{\bf T}_{km}}
+\newcommand{\grad }{\nabla}
+
+\newcommand{\eps}[3]
+{{\begin{center}
+ \rotatebox{#1}{\scalebox{#2}{\includegraphics{#3}}}
+ \end{center}}
+}
+\newcommand{\epstwo}[6]
+{{\begin{center}
+\rotatebox{#1}{\scalebox{#2}{\includegraphics{#3}}}
+\rotatebox{#4}{\scalebox{#5}{\includegraphics{#6}}}
+\end{center}}
+}
+
+
+\newcommand{\tr}{{\rm tr}}
+\renewcommand*{\thefootnote}{\fnsymbol{footnote}}
+\newcommand{\bd}[1]{\ensuremath{\mbox{\boldmath $#1$}}}
+\newcommand{\ts}{^{\mbox{\sf \tiny T}}}
+% these will be used later in the title page
+\title{Gibbs sampling for Bayesian Inference}
+
+\author{{\bf Simon Wood}, University of Edinburgh, U.K.}
+
+
+\date{}
+
+
+% have this if you'd like a recurring outline
+%\AtBeginSection[]  % "Beamer, do the following at the start of every section"
+%{
+%\begin{frame}<beamer>
+%\frametitle{Outline} % make a frame titled "Outline"
+%\tableofcontents[currentsection]  % show TOC and highlight current section
+%\end{frame}
+%}
+%\usetheme{Dresden}
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}{One at a time updating}
+\begin{itemize}
+\item In MH sampling it can be difficult to find a distribution that makes good proposals for the whole parameter vector, $\bm \theta$.
+\item But there is nothing in the MH scheme to prevent us using a proposal that updates the parameters in smaller blocks, or even one at a time, cycling through the elements of $\bm \theta$.
+\item Such single element proposals are easier to tune.
+\item Another interesting fact is that if our proposal distribution is $\pi({\bm \theta}|{\bf y})$ then the MH acceptance probability is exactly 1 (try it).
+\item This observation is not very practical for all at once updating of $\bm\theta$, but it turns out to be very useful for one at a time updating, and is one way of motivating {\em Gibbs sampling}.  
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Gibbs sampling}
+\begin{itemize}
+\item Let ${\bm \theta}_{-i}$ denote the elements of $\bm \theta$ other than $\theta_i$.
+\item Suppose we want a random draw from $\pi({\bm \theta}|{\bf y})$, and we already have a random draw, ${\bm \theta}_{-i}^*$, from $\pi({\bm \theta}_{-i}|{\bf y})$. 
+\item All we need to do is generate $\theta_i^*$ from $\pi(\theta_i|{\bm \theta}_{-i}^*,{\bf y})$ and append this to ${\bm \theta}_{-i}^*$ to get ${\bm \theta}^* \sim \pi({\bm \theta}|{\bf y}) = \pi(\theta_i|{\bm \theta}_{-i},{\bf y})\pi({\bm \theta}_{-i}|{\bf y})$.
+\item To get a slightly different draw from the same distribution we could discard $\theta_i^*$ and draw a fresh value in the same way.
+\item We could repeatedly cycle through all elements of $\bm \theta$, dropping each and replacing with a draw from its conditional $\pi(\theta_i|{\bm \theta}_{-i}^*,{\bf y})$. 
+\item This method is {\em Gibbs sampling}.
+\item To use it we need to identify the conditional densities. 
+\item When identification of a conditional is not possible, we can use a Metropolis Hastings step for that parameter, or more efficient one dimensional alternatives.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{A simple example}
+\begin{itemize}
+\item Consider $n$ observations from model $x_i \sim N(\mu, \sigma^2)$, with priors
+\begin{itemize}
+\item $\tau = 1/\sigma^2 \sim \text{gamma}(a,b)$, i.e. prior $\pi(\tau) = b^a \tau^{a-1} e^{-b\tau}/\Gamma(a)$ 
+\item Independently, $\mu \sim N(c,d)$.\end{itemize}
+\item The joint density of $\bf x$, $\mu$ and $\tau$ is
+\begin{eqnarray*}
+\pi({\bf x},\tau,\mu) &=& \pi({\bf x}|\tau,\mu)\pi(\tau)\pi(\mu) \\&\propto& \tau^{n/2} e^{-\sum_i \tau(x_i-\mu)^2/2} e^{-(\mu-c)^2/(2d)} \tau^{a-1} e^{-b\tau}
+\end{eqnarray*}
+\item By Bayes Theorem, the conditional for each parameter will be proportional to $\pi({\bf x},\tau,\mu)$. The trick is to recognize the conditional from its kernel - i.e from the terms actually involving the parameter.
+\item e.g. $ \pi(\tau|{\bf x},\mu) \propto \tau^{n/2+a-1}e^{-\sum_i \tau(x_i-\mu)^2/2 - b\tau} $,  recognizable as a $\text{gamma}(n/2+a,\sum_i (x_i-\mu)^2/2 + b)$.
+\item Similarly, but with a bit more effort, $$
+\mu|{\bf x},\tau \sim N\{(dn\bar x\tau + c)/(dn\tau + 1), d/(dn\tau+1)\}
+$$
+\end{itemize} 
+
+\end{frame}
+
+\begin{frame}[fragile]{Checking the priors}
+\begin{itemize}
+\item Let's apply the preceding model to the {\tt nhtemp} data. This will involve choosing the constants $a$, $b$, $c$ and $d$ defining the priors.
+\item We should look at the data, and check the priors\ldots
+{\scriptsize \begin{verbatim}
+x <- nhtemp ## just to save later typing
+a <- 1.2; b <- .6 ## gamma prior shape and scale
+c <- 50; d <- 100 ## normal prior mean and variance
+## check data and priors...
+par(mfrow=c(1,3),mar=c(4,4,1,1))
+hist(x,main="")
+tau <- seq(0,10,length=400)
+plot(tau,dgamma(tau,a,b),type="l")
+mu <- seq(0,100,length=400)
+plot(mu,dnorm(mu,c,d^.5),type="l")
+\end{verbatim}}
+\end{itemize}
+\vspace*{-.5cm}
+\eps{-90}{.4}{check-prior.eps}
+\end{frame}
+
+\begin{frame}[fragile]{Gibbs sampling loop}
+\begin{itemize}
+\item Now we can run the Gibbs sampling loop\ldots
+
+{\scriptsize \begin{verbatim}
+ns <- 10000 ## number of samples
+th <- matrix(0,2,ns) ## sample storage
+mu <- 0;tau <- 0 ## initial states
+n <- length(x) 
+## store constants needed repeatedly...
+dn <- d*n;dnx <- dn*mean(x) 
+
+for (i in 1:ns) { ## Gibbs loop
+  ## update mu | tau, x ... 
+  mu <- rnorm(1,(dnx*tau+c)/(dn*tau+1),sqrt(d/(dn*tau+1)))
+  ## update tau | mu, x ... 
+  tau <- rgamma(1,n/2+a,sum((x-mu)^2)/2 + b)
+  
+  th[,i] <- c(mu,1/sqrt(tau)) ## store as mean and sd
+}
+\end{verbatim}}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Checking the chains}
+\begin{itemize}
+\item First look at the trace plots\ldots
+{\scriptsize \begin{verbatim}
+par(mfrow=c(2,1))
+## see ?plotmath for adding maths to plots
+plot(th[1,],type="l",ylab=expression(mu))
+plot(th[2,],type="l",ylab=expression(sigma))
+\end{verbatim}}
+\vspace*{-.5cm}
+\eps{-90}{.4}{nh-trace.eps}
+\item Convergence appears to be very rapid, and mixing good.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Checking autocorrelation}
+\begin{itemize}
+\item Let's check the impression of rapid mixing with ACF plots\ldots 
+{\scriptsize \begin{verbatim}
+par(mfrow=c(1,2))
+acf(th[1,]);acf(th[2,])
+\end{verbatim}}
+\eps{-90}{.4}{nh-acf.eps}
+\item The samples appear to be effectively independent of each other - actually this behaviour is special to this example - parameters with high posterior correlation would give chains with higher autocorrelation. 
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Did the data matter?}
+\begin{itemize}
+\item A common error is to believe that having updated your beliefs about the parameters using data, then {\em all} those beliefs are now validated by data. The Covid literature provides many examples.
+\item To avoid this it is a good idea to compare priors to posteriors, to see what effect the data had, if any. {\scriptsize \begin{verbatim}
+hist(th[1,],xlab=expression(mu),main="",probability=TRUE)
+mu <- seq(50,52,length=100)
+lines(mu,dnorm(mu,c,d^.5),col=2)
+hist(1/th[2,]^2,xlab=expression(tau),main="",probability=TRUE)
+tau <- seq(0.1,1.2,length=100) 
+lines(tau,dgamma(tau,a,b),col=2)
+\end{verbatim}}
+\vspace*{-1cm}
+\eps{-90}{.4}{nh-popr.eps}
+\item The posteriors are very different to the priors, which have little influence - here the posteriors are determined by the data. 
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Posterior means and CIs}
+\begin{itemize}
+\item Nothing is different here to in the MH sampling case (except that we only have 2 parameter in this example).
+{\scriptsize \begin{verbatim}
+> pm <- rowMeans(th)
+> names(pm) <- c("mu","sigma")
+> pm ## posterior mean
+       mu     sigma 
+51.158764  1.263793 
+> 
+> ci <- apply(th,1,quantile,probs=c(.025,.975))
+> colnames(ci) <- c("mu","sigma")
+> ci ## confidence intervals
+            mu    sigma
+2.5%  50.83651 1.064045
+97.5% 51.48939 1.511449
+\end{verbatim}}
+\end{itemize}
+\end{frame}
+
+
+
+\end{document}
+

@@ -1,0 +1,22 @@
+\frametitle{CIs, posterior means etc.}
+
+{\scriptsize \begin{verbatim}
+> pm <- rowMeans(th) ## posterior mean
+> ## transform to original scale...
+> pm[2:3] <- exp(pm[2:3])
+> pm[3] <- pm[3] + 1
+> names(pm) <- c("mu","sig","df")
+> pm
+       mu       sig        df
+51.175612  1.176176 27.191217
+>
+> ## 95% Credible Intervals...
+> ci <- apply(th,1,quantile,prob=c(.025,.975))
+> ci[,2:3] <- exp(ci[,2:3]) ;ci[,3] <- ci[,3]+1
+> colnames(ci) <- c("mu","sig","df")
+> ci
+            mu      sig         df
+2.5%  50.85020 0.893452    3.09977
+97.5% 51.48983 1.484936 1766.29037
+\end{verbatim}}
+

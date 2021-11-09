@@ -1,0 +1,10 @@
+model {
+  for (i in 1:N) {
+    mu[i] <- alpha + beta * t[i]
+    x[i] ~ dt(mu[i],tau,df)
+  }
+  alpha ~ dnorm(50,.01)
+  beta ~ dnorm(0,.1)
+  tau ~ dgamma(1.4,.6)
+  df ~ dunif(2,100)
+}

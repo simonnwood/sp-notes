@@ -1,0 +1,18 @@
+\frametitle{Programming {\em log} likelihoods}
+\begin{itemize}
+\item The large sample MLE results relate to the log likelihood.
+\item It is usually much better to optimize the log likelihood than the likelihood, as the likelihood may easily underflow to zero.
+\item In R the built in densities usually allow you to compute directly on the log probability scale.
+\item Never compute the likelihood and the take its log!
+{\scriptsize \begin{verbatim}
+> log(prod(dnorm(x,2,2)))  ## 100 obs in x
+[1] -219.7226
+> sum(dnorm(x,2,2,log=TRUE)) ## stable version
+[1] -219.7226
+>
+> log(prod(dnorm(x,2,2))) ## 400 obs in x - problem!
+[1] -Inf
+> sum(dnorm(x,2,2,log=TRUE)) ## stable version
+[1] -888.4871
+\end{verbatim}}
+\end{itemize}

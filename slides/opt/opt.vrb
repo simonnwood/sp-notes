@@ -1,0 +1,17 @@
+\frametitle{Numerically exact derivatives}
+\begin{itemize}
+\item We can work out the derivatives of the objective by hand, or using a computer algebra package, and code them up.
+\begin{itemize}
+\item {\bf Always} check such derivative code by finite differencing.
+\item {\bf Always, Always, Always}.
+\end{itemize}
+\item Alternatively we can use {\em automatic differentiation} (AD) methods\footnote{See {\em Core Statistics} \S5.5.3}, which compute derivatives of a function directly from the code implementing the function.
+\item R function {\tt deriv} offers a simple AD implementation for differentiation of R expressions.
+\item Let's use it to obtain a function evaluating Rosenbrock's function, its gradient vector and Hessian matrix (attached as attributes to the return value).
+{\small \begin{verbatim}
+rb <- deriv(expression(k*(z-x^2)^2 + (1-x)^2),
+            c("x","z"), ## diff w.r.t. these
+            function.arg=c("x","z","k"),
+            hessian=TRUE)
+\end{verbatim}}
+\end{itemize}

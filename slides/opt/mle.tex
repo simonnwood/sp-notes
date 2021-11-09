@@ -1,0 +1,188 @@
+\documentclass{beamer}
+
+% for themes, etc.
+\mode<presentation>
+{ \usetheme{boxes} }
+\setbeamertemplate{navigation symbols}{}
+\usepackage{times}  % fonts are up to you
+\usefonttheme{serif} 
+\usepackage{graphicx, color,pgf}
+\usepackage{multimedia}
+%\usepackage{media9}
+%\usepackage{lmodern}
+\usepackage{amsmath,amsfonts,amsthm, amssymb}
+\usepackage{bm}
+\usepackage{animate}
+\newcommand{\dif}[2]{\frac{{\rm d} #1}{{\rm d} #2}}
+\newcommand{\ddif}[3]{\frac{{\rm d}^2 #1}{{\rm d} #2 {\rm d} #3}}
+\newcommand{\ildif}[2]{{\rm d} #1/{{\rm d} #2 }}
+\newcommand{\ilpdif}[2]{\partial #1/{\partial #2 }}
+\newcommand{\pdif}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\pddif}[3]{\frac{\partial^2 #1}{\partial #2 \partial #3}}
+\newcommand{\ilpddif}[3]{\partial^2 #1/{\partial #2 \partial #3}}
+\newcommand{\comb}[2]{\left (\begin{array}{c}{#1}\\{#2}\end{array}\right )}
+\newcommand{\perm}[2]{^{#1}{\rm P}_{#2}}
+\newcommand{\gfrac}[2]{\mbox{$ { \textstyle{ \frac{#1}{#2} }\displaystyle}$}}
+\newcommand{\defn}{\begin{quote}{\bf Definition. }}
+\newcommand{\edefn}{\end{quote}}
+\newcommand{\thm}{\begin{theorem}}
+\newcommand{\ethm}{\end{theorem}}
+\newcommand{\its}{^{\sf -T}} % transpose inverse
+\newcommand{\fv}{\hat{\bm{\mu}}}
+\newcommand{\X}{{\bf X}}
+\newcommand{\Xt}{\X\ts}
+\newcommand{\y}{{\bf y}}
+\newcommand{\A}{{\bf A}}
+\newcommand{\bp}{{\bm \beta}}
+\newcommand{\bmat}[1]{\left [ \begin{array}{#1}}
+\newcommand{\emat}{\end{array}\right ]}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\beq}{\begin{equation}}
+\newcommand{\eeq}{\end{equation}}
+\newcommand{\Gi}{{\bf G}^{-1}}
+\newcommand{\B}{{\bf B}}
+\newcommand{\Bt}{{\bf B}\ts}
+\newcommand{\D}{{\bf D}}
+\newcommand{\V}{{\bf V}}
+\newcommand{\p}{{\bf P}}
+\newcommand{\K}{{\bf K}}
+\newcommand{\Uo}{{\bf U}_1}
+\newcommand{\Tk}{{\bf T}_k}
+\newcommand{\Tm}{{\bf T}_m}
+\newcommand{\Tkm}{{\bf T}_{km}}
+\newcommand{\grad }{\nabla}
+\newcommand{\eps}[3]
+{{\begin{center}
+ \rotatebox{#1}{\scalebox{#2}{\includegraphics{#3}}}
+ \end{center}}
+}
+\newcommand{\tr}{{\rm tr}}
+\renewcommand*{\thefootnote}{\fnsymbol{footnote}}
+\newcommand{\bd}[1]{\ensuremath{\mbox{\boldmath $#1$}}}
+\newcommand{\ts}{^{\mbox{\sf \tiny T}}}
+% these will be used later in the title page
+\title{Maximum Likelihood Estimation}
+
+\author{{\bf Simon Wood}, University of Edinburgh, U.K.}
+
+
+\date{}
+
+
+% have this if you'd like a recurring outline
+%\AtBeginSection[]  % "Beamer, do the following at the start of every section"
+%{
+%\begin{frame}<beamer>
+%\frametitle{Outline} % make a frame titled "Outline"
+%\tableofcontents[currentsection]  % show TOC and highlight current section
+%\end{frame}
+%}
+%\usetheme{Dresden}
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}{Some models}
+\begin{itemize}
+\item {\em Logistic regression:} $y_i \sim \text{bernouilli}(\mu_i)$ where 
+$$
+\log\{\mu_i/(1-\mu_i)\} = \eta_i \equiv \beta_0 + x_{i1}\beta_1 + x_{i2} \beta_2 + \ldots
+$$
+\item {\em Poisson regression:} $y_i \underset{\text{ind}}{\sim} \text{Poi}(\mu_i)$ where
+$$
+\log(\mu_i) = \beta_0 + x_{i1}\beta_1 + x_{i2} \beta_2 + \ldots
+$$ 
+\item {\em Linear Mixed Model:}
+$$
+{\bf y} = \X \bp + {\bf Zb} + {\bm \epsilon} \text{  where  } {\bf b} \sim N({\bf 0}, {\bm \psi}_{\gamma}) \text{  and  } {\bm \epsilon} \sim N({\bf 0}, {\bf I}\sigma^2)
+$$
+so ${\bf y} \sim N(\X \bp,{\bf Z}{\bm \psi}_{\gamma}{\bf Z}\ts + {\bf I} \sigma^2)$.
+\item What general method can we use to estimate parameters of these model, and others? Least squared no longer the best option.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Maximum Likelihood Estimation}
+\begin{itemize}
+\item Preceding models all specify a p.d.f. $\pi_\theta({\bf y})$ for data vector ${\bf y}$.
+\item ${\bm \theta}$ is an unknown parameter vector determining the shape of $\pi_\theta$. 
+\item The {\em Likelihood} of $\bm \theta$ is $\pi_\theta({\bf y})$ considered as a function of $\bm \theta$ with the observed $\bf y$ plugged in. $L({\bm \theta}) = \pi_\theta({\bf y}_{\text{ obs.}})$.
+\item $\bm \theta $ values that make the observed data appear probable are more {\em likely} than values that make it appear improbable. 
+\item The {\em log likelihood} is $l({\bm \theta}) = \log L({\bm \theta})$.
+\item The {\em Maximum Likelihood Estimator} (MLE) is 
+$$
+\hat {\bm \theta} = \underset{\theta}{\text{argmax}} ~ l({\bm \theta}).
+$$
+\item Generally we need numerical optimization to find $\hat {\bm \theta}$.
+
+\end{itemize}
+\end{frame}
+
+
+
+
+
+\begin{frame}{MLE properties}
+\begin{itemize}
+\item If $n=\text{dim}({\bf y}) \to \infty$ and $l$ is sufficiently regular
+$$
+\hat {\bm \theta} \sim N({\bm \theta}_t,\hat{\bm{{\cal I}}}^{-1})
+$$
+where $\hat{\bm{{\cal I}}} $ is the Hessian of the negative log likelihood at the MLE ($\hat {\cal I}_{ij} = -\ilpddif{l}{\theta_i}{\theta_j}$), and the true parameter value is ${\bm \theta}_t$.
+\item Let $\hat {\bm \theta}_0$ be the MLE under $r$ restrictions defining a hypothesis $H_0:R({\bm \theta}) = {\bf 0}$. If $H_0$ is true, then for regular $l$ and $n \to \infty$
+$$
+2 \{l(\hat {\bm \theta}) - l(\hat {\bm \theta}_0)\} \sim \chi^2_r
+$$
+This is the basis of the {\em generalized likelihood ratio test} (GLRT) of $H_0$ versus $H_1:R({\bm \theta}) \ne {\bf 0}$ 
+\item Note the generality. If we have a computable likelihood we can use this theory, provided we can maximize the likelihood. 
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Programming {\em log} likelihoods}
+\begin{itemize}
+\item The large sample MLE results relate to the log likelihood.
+\item It is usually much better to optimize the log likelihood than the likelihood, as the likelihood may easily underflow to zero. 
+\item In R the built in densities usually allow you to compute directly on the log probability scale.
+\item Never compute the likelihood and the take its log!
+{\scriptsize \begin{verbatim}
+> log(prod(dnorm(x,2,2)))  ## 100 obs in x
+[1] -219.7226
+> sum(dnorm(x,2,2,log=TRUE)) ## stable version
+[1] -219.7226
+> 
+> log(prod(dnorm(x,2,2))) ## 400 obs in x - problem!
+[1] -Inf
+> sum(dnorm(x,2,2,log=TRUE)) ## stable version
+[1] -888.4871
+\end{verbatim}}  
+\end{itemize} 
+\end{frame}
+
+\begin{frame}{Simple one parameter example}
+\begin{itemize}
+\item Model: $ y_i \sim \text{Poi}\{\exp(\beta x_i)\}$ (independent).
+\item Poisson p.f. is $\pi(y_i) = \lambda_i^{y_i} \exp(-\lambda_i)/y_i!$ and here $\lambda_i = \exp(\beta x_i)$.
+\item The log likelihood is therefore
+$$
+l(\beta) = \sum_{i=1}^n y_i \beta x_i - \exp(\beta x_i) - \log y_i!
+$$
+\item Left is $x_i, y_i$ and fit. Right is $l(\beta)$.
+\end{itemize}
+\eps{0}{.3}{fig-likelihood-fig-1.pdf}
+\end{frame}
+
+\begin{frame}{What distribution of $\hat \beta$ means}
+\begin{itemize}
+\item Grey are replicate $l(\beta)$ curves for replicate sets of $x_i, y_i$ data.
+\item Black dots and ticks show MLEs for each. Kernel density estimate the $\hat \beta$ distribution. $\beta=2.5 $ was truth here.
+\end{itemize}
+\vspace*{-1cm}
+
+\eps{0}{.5}{fig-beta-dist-1.pdf}
+\end{frame}
+
+
+\end{document}
+

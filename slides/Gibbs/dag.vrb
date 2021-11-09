@@ -1,0 +1,7 @@
+\frametitle{JAGS: computing with automatic Gibbs sampling}
+\begin{itemize}
+\item JAGS (Just Another Gibbs Sampler) is a stand alone software package for automatic Gibbs sampling.
+\item It has a convenient R interface package {\tt rjags}, which in turn interfaces readily with the {\tt coda} R package for MCMC diagnostics.
+\item See \verb+http://mcmc-jags.sourceforge.net/+ to get your own copy of JAGS.
+\item \verb+install.packages("rjags")+ to install {\tt rjags} in R.
+\end{itemize}

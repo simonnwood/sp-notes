@@ -1,0 +1,349 @@
+\documentclass{beamer}
+
+% for themes, etc.
+\mode<presentation>
+{ \usetheme{boxes} }
+\setbeamertemplate{navigation symbols}{}
+\usepackage{times}  % fonts are up to you
+\usefonttheme{serif} 
+\usepackage{graphicx, color,pgf}
+\usepackage{multimedia}
+%\usepackage{media9}
+%\usepackage{lmodern}
+\usepackage{amsmath,amsfonts,amsthm, amssymb}
+\usepackage{bm}
+\usepackage{animate}
+\newcommand{\dif}[2]{\frac{{\rm d} #1}{{\rm d} #2}}
+\newcommand{\ddif}[3]{\frac{{\rm d}^2 #1}{{\rm d} #2 {\rm d} #3}}
+\newcommand{\ildif}[2]{{\rm d} #1/{{\rm d} #2 }}
+\newcommand{\ilpdif}[2]{\partial #1/{\partial #2 }}
+\newcommand{\pdif}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\pddif}[3]{\frac{\partial^2 #1}{\partial #2 \partial #3}}
+\newcommand{\ilpddif}[3]{\partial^2 #1/{\partial #2 \partial #3}}
+\newcommand{\comb}[2]{\left (\begin{array}{c}{#1}\\{#2}\end{array}\right )}
+\newcommand{\perm}[2]{^{#1}{\rm P}_{#2}}
+\newcommand{\gfrac}[2]{\mbox{$ { \textstyle{ \frac{#1}{#2} }\displaystyle}$}}
+\newcommand{\defn}{\begin{quote}{\bf Definition. }}
+\newcommand{\edefn}{\end{quote}}
+\newcommand{\thm}{\begin{theorem}}
+\newcommand{\ethm}{\end{theorem}}
+\newcommand{\its}{^{\sf -T}} % transpose inverse
+\newcommand{\fv}{\hat{\bm{\mu}}}
+\newcommand{\X}{{\bf X}}
+\newcommand{\Xt}{\X\ts}
+\newcommand{\y}{{\bf y}}
+\newcommand{\A}{{\bf A}}
+\newcommand{\bp}{{\bm \beta}}
+\newcommand{\bmat}[1]{\left [ \begin{array}{#1}}
+\newcommand{\emat}{\end{array}\right ]}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\beq}{\begin{equation}}
+\newcommand{\eeq}{\end{equation}}
+\newcommand{\Gi}{{\bf G}^{-1}}
+\newcommand{\B}{{\bf B}}
+\newcommand{\Bt}{{\bf B}\ts}
+\newcommand{\D}{{\bf D}}
+\newcommand{\V}{{\bf V}}
+\newcommand{\p}{{\bf P}}
+\newcommand{\K}{{\bf K}}
+\newcommand{\Uo}{{\bf U}_1}
+\newcommand{\Tk}{{\bf T}_k}
+\newcommand{\Tm}{{\bf T}_m}
+\newcommand{\Tkm}{{\bf T}_{km}}
+\newcommand{\grad }{\nabla}
+
+\newcommand{\eps}[3]
+{{\begin{center}
+ \rotatebox{#1}{\scalebox{#2}{\includegraphics{#3}}}
+ \end{center}}
+}
+\newcommand{\epstwo}[6]
+{{\begin{center}
+\rotatebox{#1}{\scalebox{#2}{\includegraphics{#3}}}
+\rotatebox{#4}{\scalebox{#5}{\includegraphics{#6}}}
+\end{center}}
+}
+
+
+\newcommand{\tr}{{\rm tr}}
+\renewcommand*{\thefootnote}{\fnsymbol{footnote}}
+\newcommand{\bd}[1]{\ensuremath{\mbox{\boldmath $#1$}}}
+\newcommand{\ts}{^{\mbox{\sf \tiny T}}}
+% these will be used later in the title page
+\title{Bootstrapping}
+
+\author{{\bf Simon Wood}, University of Edinburgh, U.K.}
+
+
+\date{}
+
+
+% have this if you'd like a recurring outline
+%\AtBeginSection[]  % "Beamer, do the following at the start of every section"
+%{
+%\begin{frame}<beamer>
+%\frametitle{Outline} % make a frame titled "Outline"
+%\tableofcontents[currentsection]  % show TOC and highlight current section
+%\end{frame}
+%}
+%\usetheme{Dresden}
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}{Sampling distributions}
+\begin{itemize}
+\item When we talk about the distribution of an estimator, $\hat {\bm \theta}$, we are considering the randomness that $\hat {\bm \theta}$ inherits from the randomness in the data $\bf y$.
+\item If we repeatedly replicated the process of gathering $\bf y$ and estimating $\bm \theta$ we would get a somewhat different $\hat {\bm \theta}$ each time. 
+\item This replicate to replicate variability is the {\em sampling distribution} of $\hat {\bm \theta}$. The basis for inferences about $\bm \theta$. 
+\item When considering maximum likelihood estimation, we looked at theoretical approximations for the distribution of $\hat {\bm \theta}$. 
+\item An alternative is to repeatedly simulate the data generation and estimation process to assess  $\hat {\bm \theta}$'s distribution. {\em Bootstrapping}.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Parametric bootstrapping}
+\begin{itemize}
+\item Suppose we have a model specifying a p.d.f. $\pi_{\theta}({\bf y})$ for our data. 
+\item Let $\hat {\bm \theta}$ be the MLE or other estimate of $\bm \theta$.
+\item Repeatedly simulate ${\bf y}^*$ from $\pi_{\hat \theta}({\bf y})$, and for each ${\bf y}^*$ compute $\hat {\bm \theta}^*$. 
+\item The set of $\hat {\bm \theta}^*$ are a {\em parametric bootstrap} approximation to the sampling distribution of $\hat {\bm \theta}$. 
+\item Typically the variability between the $\hat {\bm \theta}^*$ is a reasonable approximation to the true sampling variability of $\hat {\bm \theta}$.
+\item But the distribution of the bootstrap sample will be centred on $\hat {\bm \theta}$, not the true $\bm \theta$. 
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Simple parametric bootstrap in R}
+
+{\small \begin{verbatim}
+mu <- mean(nhtemp)  ## mean temperature
+sd <- sd(nhtemp)    ## standard dev temp
+n <- length(nhtemp) ## number of data 
+nb <- 10000         ## number of bootstrap samples
+sdb <- mub <- rep(0,nb) ## replicate estimates
+for (i in 1:nb) { ## parametric bootstrap loop
+  yb <- rnorm(n,mu,sd)  ## generate replicate data
+  mub[i] <- mean(yb)    ## estimate mean
+  sdb[i] <- sd(yb)      ## and standard deviation
+}
+\end{verbatim}}
+\eps{-90}{.45}{nht-para-bs.eps}
+
+\end{frame}
+
+\begin{frame}[fragile]{Confidence intervals}
+\begin{itemize}
+\item To illustrate that bootstrapping gets the variability right, compare the bootstrap standard deviation for $\hat \mu$ to its theoretical value.
+{\small \begin{verbatim}
+> c(sd(mub),sd(nhtemp)/sqrt(n))
+[1] 0.1643081 0.1633892
+\end{verbatim}}
+\item For more or less symmetrical sampling distributions {\em bootstrap percentile confidence intervals} can be computed.
+{\small \begin{verbatim}
+> quantile(mub,c(.025,.975))
+    2.5%    97.5% 
+50.83482 51.48179 
+> quantile(sdb,c(.025,.975))
+    2.5%    97.5% 
+1.042289 1.492834
+\end{verbatim}}
+\item Obviously the parametric bootstrap also works with more complex models.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Generating random deviates in R}
+\begin{itemize}
+\item R has built in functions for generating pseudorandom numbers from a wide variety of standard distributions. 
+\item All these functions start with an `{\tt r}', take the number of deviates required as the first argument and further parameters of the distribution as further arguments. 
+\item Examples are: {\tt rnorm}, {\tt rgamma}, {\tt rpois}, {\tt rbinom}, {\tt rgeom}\ldots
+\item All work by starting with uniform deviates\footnote{see appendix C of {\em Core Statistics} for more on this.} and transforming them. There are a variety of fast methods for doing this for specific distributions, but there is also a generic method:
+\begin{enumerate}
+\item Generate a deviate, $u$, from $U(0,1)$.
+\item Evaluate the inverse of the cumulative distribution function (CDF) for the distribution of interest (the {\em quantile function}) at $u$.
+\item The result is a random draw from the distribution of interest.
+\end{enumerate}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{CDFs and quantile functions}
+\begin{itemize}
+\item For r.v. $X$, the CDF is defined as $F(x) = \text{Pr}(X \le x)$.
+\item The {\em quantile function} is the inverse of the CDF defined as $F^-(u) = \min(x|F(x) \ge u)$ (usual inverse for continuous $F$).
+\item If $X \sim F$ and $F(x)$ is continuous then $  F(X) \sim U(0,1)$. \\Proof: Defining $U = F(X) $ and $u = F(x)$, we have
+$$ F(x) = \text{Pr}(X \le x) =  \text{Pr}(F(X) \le F(x)) \Rightarrow u = \text{Pr}(U \le u)$$
+but the r.h.s. is just the CDF of a $U(0,1)$ r.v.
+\item Similarly $U \sim U(0,1) \Rightarrow F^{-} (U) \sim F$, so we can generate from any distribution with a $F^-$ function (continuous or not). In R 
+\begin{itemize}
+\item Quantile functions start with a `{\tt q}'. e.g. {\tt qnorm}, {\tt qpois} \ldots\\
+So \verb+qnorm(runif(3),1,2)+ equivalent to \verb+rnorm(3,1,2)+.
+\item CDFs start with a `{\tt p}'. e.g. {\tt pnorm}, {\tt ppois}, {\tt pgamma} \ldots
+\end{itemize}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Example CDFs}
+\begin{itemize}
+\item Here are three example CDFs for
+\begin{enumerate} 
+\item $N(0,1)$.
+\item A mixture: 0.8 probability of drawing from $N(0,1)$ and 0.2 probability of a zero.
+\item A Poisson with mean 3. 
+\end{enumerate}
+
+\eps{-90}{.35}{cdf.eps}
+\item Recall, $F(x) = \text{Pr}(X \le x)$ and $F^-(u) = \min(x|F(x) \ge u)$.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{The empirical CDF}
+\begin{itemize}
+\item Let $x_1, x_2, \ldots x_n$ be sampled from a distribution with unknown CDF, $F(x)$.
+\item Since $F(x) = \text{Pr}(X \le x)$, we can estimate $F$ by estimating the probabilities on the right, from our sample:
+$$
+\hat F(x) = n^{-1} \sum_i \mathbb{I}(x_i\le x)
+$$
+where $\mathbb{I}(\cdot)$ is the indicator function (1/0 when argument is T/F).
+\item e.g. for  ${\bf x} = (1, 0, 4.3, -.5, .8, 2.3, -.2, 1.1, 1.4, 2)$  
+\end{itemize}
+\vspace*{-.7cm}
+\eps{-90}{.3}{ecdf.eps}
+\end{frame}
+
+\begin{frame}{Empirical CDF sampling: non-parametric bootstrapping}
+\begin{itemize}
+\item Can generate from the estimated $F$, by generating $u \sim U(0,1)$ and evaluating $\hat F^-(u)$ where $\hat F^-(u) = \min(x|\hat F(x) \ge u)$.
+ \eps{-90}{.3}{ecdf.eps}
+\item \ldots but CDF steps are evenly spaced $1/n$ apart on the vertical axis and the jumps occur at the original $x_i$ values\ldots
+\item We are just randomly selecting from the original sample of $x_i$ values with equal probability. {\em Non-parametric bootstrapping}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Non-parametric bootstrap example}
+
+Suppose we are interested in the interquartile range of the New Haven temperature distribution.  
+
+{\scriptsize \begin{verbatim}
+nb <- 10000; n <- length(nhtemp)
+iqb <- rep(0,nb) ## storage for bs interquartile range
+for (i in 1:nb) { ## bootstrap loop
+  yb <- sample(nhtemp,n,replace=TRUE) ## non-parametric bs sample
+  iqb[i] <- diff(quantile(yb,c(.25,.75))) ## bootstrap iqr
+}
+## examine distribution (notice the skew)...
+hist(iqb,freq=FALSE);lines(density(iqb,adjust=2))
+\end{verbatim}}
+\eps{-90}{.5}{nht-np-bs.eps}
+\end{frame}
+
+
+
+\begin{frame}[fragile]{Basic bootstrap confidence interval}
+\begin{itemize}
+\item IQR distribution not at all symmetric. Percentile CI dubious.
+\item Really BS gives distribution of $\hat q^*$ when true IQR is $\hat q$.
+\item Find interval containing 95\% of $\hat q^*$. Write as $(\hat q-b,\hat q + c)$.
+{\small \begin{align*}
+0.95 = \text{Pr}(\hat q - b < \hat q^* <\hat q + c) &= \text{Pr}(-\hat q^* - b < -\hat q < -\hat q^* + c)\\ &= 
+\text{Pr}(\hat q^* + b > \hat q > \hat q^* - c)
+\end{align*}}
+\item View $b$ and $c$ as bootstrap estimates of constants such that
+$$\text{Pr}(\hat q + b > q > \hat q - c) = 0.95.
+$$
+\item That is $(\hat q - c,\hat q +b)$ is a 95\% CI for $q$.
+\item Coincides with percentile interval for symmetric distribution.
+\item Obviously equally valid for parametric bootstrap.
+
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Basic bootstrap CI R code}
+\begin{itemize}
+\item Continuing the interquartile range example. 
+{\scriptsize \begin{verbatim}
+> iq <- diff(quantile(nhtemp,c(.25,.75))) ## original iqr
+> ## 0.025 and 0.975 quantiles of b.s. irq...
+> pci <- quantile(iqb,c(.025,.975)) 
+> names(pci) <- names(iq) <- NULL ## avoid confusing names
+> ## get upper and lower interval margins
+> b <- iq - pci[1]; c <- pci[2] - iq 
+> c(iq-c,iq+b)  ## basic CI 
+0.625 1.650 
+> pci  ## equivalent percentile CI 
+1.000 2.025 
+\end{verbatim}}
+\item Notice the quite large difference between basic and percentile intervals in this case.
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}[fragile]{Bootstrapping multivariate data}
+\begin{itemize}
+\item The bootstrapping idea generalizes readily to multivariate data. 
+\item We simply resample {\em cases} - for tidy data this usually amounts to resampling rows. How?
+\item We can programme bootstrap resampling of univariate data by resampling either the data themselves, or their indices. That is 
+{\small \begin{verbatim}
+xb <- sample(x,n,replace=TRUE)
+\end{verbatim}
+}  
+is equivalent to 
+{\small \begin{verbatim}
+bsi <- sample(1:n,n,replace=TRUE)
+xb <- x[bsi]
+\end{verbatim}
+}  
+\item The second option generalizes immediately to resampling rows of a data matrix 
+{\small \begin{verbatim}
+bsi <- sample(1:n,n,replace=TRUE)
+Xb <- X[bsi,]
+\end{verbatim}
+}  
+\end{itemize}
+\end{frame}
+
+\begin{frame}{A more interesting example}
+\begin{itemize}
+\item Consider a chemical experiment where you have measured yield, $y$, against flow rate of a reagent, $x$, and interest is in the $x$ value maximizing yield. 
+\item Suppose a quadratic model is appropriate
+$$
+y_i = \beta_0 + \beta_1 x_i + \beta_2 x_i^2 + \epsilon_i 
+$$
+where the $\beta_j$ are parameters and $\epsilon_i $ is a zero mean r.v.
+
+\eps{-90}{.3}{quad-mod.eps}
+
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{A more interesting bootstrap}
+\begin{itemize}
+\item We can bootstrap to find a CI for the optimum yield. Suppose {\tt x} and {\tt y} data are in dataframe {\tt dat}. 
+{\scriptsize
+\begin{verbatim}
+n <- nrow(dat); nb <- 1000; mx <- rep(0,nb)
+for (i in 1:nb) { ## bootstrap loop
+  ii <- sample(1:n,n,replace=TRUE) ## resample row indices
+  b <- coef(lm(y ~ x + I(x^2),data=dat[ii,])) ## fit to resample
+  mx[i] <- -b[2]/(2*b[3]) ## compute location of maximum
+}
+quantile(mx,c(0.05,0.95)) ## 90% CI
+  0.3785062 0.4458549
+hist(mx)
+\end{verbatim}
+} 
+\vspace*{-.5cm}
+\eps{-90}{.35}{quad-mod-hist.eps}
+
+\end{itemize}
+\end{frame}
+
+
+
+\end{document}
+
