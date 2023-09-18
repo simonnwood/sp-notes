@@ -1,3 +1,5 @@
+## optim....
+
 nll <- function(theta,t,y) {
 ## -ve log likelihood for AIDS model y_i ~ Poi(alpha*exp(beta*t_i))
 ## theta = (alpha,beta)  
@@ -15,6 +17,8 @@ fit
 V <- chol2inv(chol(fit$hessian)) ## solve(fit$hessian) also possible
 se <- diag(V)^.5 ## extract standard deviations
 se
+
+## optim with grad...
 
 gll <- function(theta,t,y) {
 ## grad of -ve log lik of Poisson AIDS early epidemic model
@@ -37,6 +41,8 @@ fd;gll(th0,t80,y) ## compare
 
 fit <- optim(c(10,.1),nll,gr=gll,y=y,t=t80,method="BFGS",hessian=TRUE)
 fit
+
+## nlm...
 
 hll <- function(theta,t,y) {
 ## Hessian of -ve log lik of Poisson AIDS early epidemic model
@@ -70,18 +76,20 @@ nll2 <- function(theta,t,y) {
 
 nlm(nll2,th0,y=y,t=t80)
 
+## positive parameters...
 
-nll3 <- function(theta,t,y) {
+nll3 <- function(theta,ti,y) {
 ## -ve log likelihood for AIDS model y_i ~ Poi(alpha*exp(beta*t_i))
 ## theta = (log(alpha),beta)
   alpha <- exp(theta[1]) ## so theta[1] unconstrained, but alpha > 0
   beta <- theta[2]  
-  mu <- alpha * exp(beta * t) ## mu = E(y)
+  mu <- alpha * exp(beta * ti) ## mu = E(y)
   -sum(dpois(y,mu,log=TRUE))  ## the negative log likelihood
 } ## nll3
 
-optim(c(log(10),.1),nll3,y=y,t=t80,method="BFGS")
+optim(c(log(10),.1),nll3,y=y,ti=t80,method="BFGS")
 
+## deriv
 
 rb <- deriv(expression(k*(z-x^2)^2 + (1-x)^2),
             c("x","z"), ## diff w.r.t. these
@@ -93,6 +101,7 @@ nlli <- deriv(expression(-y*(log(alpha)+beta*t)+alpha*exp(beta*t)+lgamma(y+1)),
             function.arg=c("alpha","beta","t","y"), 
             hessian=TRUE)
 
+nlli(10,.1,t80,y)
 
 nll4 <- function(th,t,y) {
   nli <- nlli(th[1],th[2],t,y)
@@ -102,5 +111,4 @@ nll4 <- function(th,t,y) {
   nll
 } ## nll4  
 
-
-
+nll4(th0,t80,y)

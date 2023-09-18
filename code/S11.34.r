@@ -16,7 +16,7 @@ pairs(iris)
 X <- sweep(as.matrix(iris[,1:4]),2,colMeans(iris[,1:4])) ## col centred data matrix
 ec <- eigen(t(X)%*%X/(nrow(X)-1))    ## eigen decompose the covariance matrix
 U <- ec$vectors;lambda <- ec$values  ## exract eigenvectors and values
-Z <- X %*% U;                        ## the principle co-ordinated 
+Z <- X %*% U;                        ## the principle co-ordinates
 plot(Z[,1],Z[,2],col=c(1,2,4)[as.numeric(iris$Species)],main="iris PCA",
      xlab="PCA 1",ylab="PCA 2")      ## plot first two components  
 

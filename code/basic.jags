@@ -1,6 +1,6 @@
-model{
-  for (i in 1:N) {
-    x[i] ~ dnorm(mu,tau)
+model {
+  for (i in 1:N){
+    x[i] ~ dnorm(mu,tau) ## comments
   }
   mu ~ dnorm(50,.01)
   tau ~ dgamma(1.4,.6)

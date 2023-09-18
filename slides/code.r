@@ -49,3 +49,7 @@ y <- mu + rnorm(n)
 ## fit model
 fv <- ridge(y,X)
 
+Rprof()
+fv <- ridge(y,X)
+Rprof(NULL)
+summaryRprof()

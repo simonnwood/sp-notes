@@ -1,32 +1,3 @@
-## Section 11, matrix computation solutions.
-
-## 11 tr(AB) = sum_i sum_k A[i,k] * B[k,i] i.e. sum(A*t(B))
-
-## 11.2
-## let mx = E(X), Vx = E[(X-mx)(X-mx)^T]. E(Y) = AE(x) = Amx (= my, say).
-## Now Vy =  E[(Y-my)(Y-my)^T] = E[A(X-mx)(X-mx)^TA^T] = AE[(X-mx)(X-mx)^T]A^T
-## = AVxA^T (recall (AB)^T = B^TA^T)
-
-rmvn <- function(n,m,S) {
-## generate n multivariate normal vectors from MVN(m,S).
-## Let p=length(m). Start with chol decomp R^TR=S, and
-## p vector of N(0,1) random variables Z. R^TZ have cov
-## matrix S, by preceding result. So R^TZ + m gives
-## desired random vector.
-  R <- chol(S)  ## Cholesky factor of cov matrix M
-  p <- length(m)
-  if (p!=nrow(S)&&p!=1) stop("m and S dimensions do not match")
-  Z <- matrix(rnorm(n*p),p,n) ## n standard normal p-vectors
-  t(R)%*%Z+m  ## n MVN(m,S) vectors
-} ## rmvn
-
-## check it is working as intended
-S <- crossprod(matrix(runif(9),3,3))
-m <- runif(3)
-x <- rmvn(10000,m,S) 
-rowMeans(x);m ## check mean 
-cov(t(x));S   ## check covariance
-
 
 ## 11.3 inverse of R...
 n <- 5;R <- qr.R(qr(matrix(runif(n*n),n,n))) ## get an R

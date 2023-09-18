@@ -51,3 +51,18 @@ ff(r=2)
 
 ff <- function(...,res=1) res
 ff(r=2)
+
+## pipes...
+
+hist(exp(rnorm(1000,sd=.5))) ## nested
+
+z <- rnorm(1000,sd=0.5) ## structured
+x <- exp(z)
+hist(x)
+
+rnorm(1000,sd=.5) |> exp() |> hist()
+
+## lognormal qq plot example...
+n <- 1000
+((1:n-.5)/n) |> qlnorm(sdlog=.5) -> q
+rnorm(n,sd=.5) |> exp() |> sort() |> plot(q,y=_,ylab="obs")

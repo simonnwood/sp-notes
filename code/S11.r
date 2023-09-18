@@ -7,6 +7,7 @@ system.time(a1 <- A %*% B %*% y)
 system.time(a2 <- A %*% (B %*% y))
 
 range(a1-a2) ## results the same
+mean(abs(a2))
 
 A <- matrix(1:12,3,4)
 A;t(A)

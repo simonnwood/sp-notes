@@ -37,7 +37,7 @@ points(epi$E,col=4);points(epi$I,col=2)
 
 if (ps) dev.off()
 
-n.rep <- 10000; n.ci <- 0; n <- 20;p <- .2
+n.rep <- 10000; n.ci <- 0; n <- 10;p <- .2
 for (i in 1:n.rep) {
   x <- rbinom(1,n,p)
   p.hat <- x/n

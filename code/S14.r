@@ -78,16 +78,16 @@ nlm(nll2,th0,y=y,t=t80)
 
 ## positive parameters...
 
-nll3 <- function(theta,t,y) {
+nll3 <- function(theta,ti,y) {
 ## -ve log likelihood for AIDS model y_i ~ Poi(alpha*exp(beta*t_i))
 ## theta = (log(alpha),beta)
   alpha <- exp(theta[1]) ## so theta[1] unconstrained, but alpha > 0
   beta <- theta[2]  
-  mu <- alpha * exp(beta * t) ## mu = E(y)
+  mu <- alpha * exp(beta * ti) ## mu = E(y)
   -sum(dpois(y,mu,log=TRUE))  ## the negative log likelihood
 } ## nll3
 
-optim(c(log(10),.1),nll3,y=y,t=t80,method="BFGS")
+optim(c(log(10),.1),nll3,y=y,ti=t80,method="BFGS")
 
 ## deriv
 
@@ -104,9 +104,11 @@ nlli <- deriv(expression(-y*(log(alpha)+beta*t)+alpha*exp(beta*t)+lgamma(y+1)),
 nlli(10,.1,t80,y)
 
 nll4 <- function(th,t,y) {
-  nli <- nlli(th[1],th[2],t,y)
-  nll <- sum(nli)
+  nli <- nlli(th[1],th[2],t,y) ## call nlli to get -ve log lik and deriv terms
+  nll <- sum(nli) ## sum -ve log lik terms
+  ## sum grad vectors ovr observations...
   attr(nll,"gradient") <- colSums(attr(nli,"gradient"))
+  ## sum Hessians over observations...
   attr(nll,"hessian") <- apply(attr(nli,"hessian"),c(2,3),sum)
   nll
 } ## nll4  

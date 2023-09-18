@@ -1,5 +1,5 @@
 
-## 5.8.1 following looks long, but only 3 lines are modified from notes 
+## 5.9.1 following looks long, but only 3 lines are modified from notes 
 
 ecdf3 <- function(x,h=.1) {
 ## function to plot empirical cdf of sample x, smoothed with

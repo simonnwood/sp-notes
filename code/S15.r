@@ -113,6 +113,7 @@ foo <- function(x,y) { ## function to be visualized
   r <- sqrt(x^2+y^2)
   exp(-r*2)*cos(r*10)
 } ## foo
+
 n <- 50; x <- seq(-1,1,length=n); y <- seq(-1,1,length=n)
 xy = expand.grid(x=x,y=y) ## regular x,y grid over 
 xy$z <- foo(xy$x,xy$y)    ## evaluate foo on the grid

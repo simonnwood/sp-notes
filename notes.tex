@@ -80,14 +80,17 @@
 
 \tableofcontents
 
+%%
+%% cover R pipes '|>' and apply functions. put this in section 5.7, after functions, presented as different ways of using functions.
+%%
 
 \section{Software Requirements: R, git, JAGS etc \label{sec:software}}
 
-To complete this course you will need to get yourself a free github account and install the following software on your computer: 
+To complete this course you will need to get yourself a free github account and install the following software on your computer. Only students on {\em Extended} Statistical Programming need the additional software indicated by {\em Extended:}.  
 \begin{itemize}
-\item R or Rstudio, git, pandoc and JAGS.
-\item R packages: ggplot2, rjags, rmarkdown, debug.
-\item Only if you do not already have latex installed, install tinytex. 
+\item R or Rstudio, git. {\em Extended:}  pandoc and JAGS.
+\item R packages: debug, ggplot2. {\em Extended:} rjags, rmarkdown.
+\item {\em Extended:} Only if you do not already have latex installed, install tinytex. 
 \end{itemize}
 It is assumed that you have the basic computer skills to do this. If not, you will need to spend some time online acquiring them (this course is about programming, not basic computer skills). If you have difficulty, you can post questions on piazza for other students to answer. Please answer other student's questions on installation on piazza. 
 
@@ -98,43 +101,53 @@ In more detail.
 \item {\tt R} is the free statistical programming language and environment that we will use. You can get a copy from the Comprehensive R Archive Network (CRAN)\\
 \lstinline+https://cran.r-project.org/+\\
 just follow the links under `Download and Install R'. 
-\item {\tt Rstudio} is an alternative front end for R, which many people prefer to use. It provides an R code editor, R session window, R graphics window and other information, all in a convenient `integrated environment'. If you prefer this to R as available from CRAN, you can get it from\\
-\lstinline+https://www.rstudio.com/+\\
-at the foot of the page, under `R studio desktop', or go straight to \\
-\lstinline+https://www.rstudio.com/products/rstudio/download/#download+
+\item {\tt Rstudio} is an alternative front end for R, which some people prefer to use. It provides an R code editor, R session window, R graphics window and other information, all in one `integrated environment'. If you prefer this to R as available from CRAN, you can get it from\\
+\lstinline+https://posit.co/download/rstudio-desktop/+
+%at the foot of the page, under `R studio desktop', or go straight to \\
+%\lstinline+https://www.rstudio.com/products/rstudio/download/#download+
 \item {\tt git} is a version control system. It helps you to write code in teams, as you must do for this course, without breaking each other's work. It also lets you keep a record of the changes you make, so that you can go back to earlier versions, if you need to. To install {\tt git} follow the instructions at\\
 \lstinline+https://www.git-scm.com/+\\
-On Windows use the default options. {\tt linux} systems often have it installed already and something like \lstinline+sudo apt install git+ will install it if not. 
-\item For Mac or linux you also need to install the Git Credential Manager Core (this is automatically installed for Windows). Instructions are at:\\
-{\scriptsize \verb+https://docs.github.com/en/get-started/getting-started-with-git/caching-your-github-credentials-in-git+}\\
-Linux is slightly fiddly (I used the plain text option 4 for credential storage). 
+On Windows use the default options. {\tt linux} systems often have it installed already and something like \lstinline+sudo apt install git+ will install it if not. \\
+See \verb+https://training.github.com/+ for further information.
+%\item For Mac or linux you also need to install the Git Credential Manager Core (this is automatically installed for Windows). Instructions are at:\\
+%{\scriptsize \verb+https://docs.github.com/en/get-started/getting-started-with-git/caching-your-github-credentials-in-git+}\\
+%Linux is slightly fiddly (I used the plain text option 4 for credential storage). 
+\end{itemize}
+
+{\em Extended:}
+\begin{itemize}
 \item {\tt pandoc} is document conversion software used by the {\tt rmarkdown} package. Installation instructions:\\
 \lstinline+https://pandoc.org/installing.html+ 
 \item {\tt JAGS} stands for `Just Another Gibbs Sampler'. We will use it for programming Bayesian models and sampling from them. Downloads are available here:\\
 \lstinline+https://sourceforge.net/projects/mcmc-jags/files/JAGS/4.x/+\\
-but under linux something like \lstinline+sudo apt install jags+ can be used. Note that if you have a new apple/mac with an apple silicon processor (rather than intel), then you will need to install MacPorts from\\ 
-\lstinline+https://www.macports.org/install.php+\\
-then install JAGS as described here\\
-\lstinline+https://ports.macports.org/port/jags/+
+but under linux something like \lstinline+sudo apt install jags+ can be used. 
+%Note that if you have a new apple/mac with an apple silicon processor (rather than intel), then you will need to install MacPorts from\\ 
+%\lstinline+https://www.macports.org/install.php+\\
+%then install JAGS as described here\\
+%\lstinline+https://ports.macports.org/port/jags/+
 \end{itemize}
 
 Once the above are installed, you will need to install some packages from the R session command line. R/Rstudio can install packages in a local directory/folder for you, but I tend to start R as administrator/super user/root and then install them (e.g. on linux I would start R from the command line as \lstinline+sudo R+). Here are the packages you need:
 \begin{itemize}
-\item {\tt ggplot2} provides a nice alternative to built in R graphics. Install by typing\\
-\lstinline+install.packages("ggplot2")+\\
-at the R command line.
-\item {\tt rmarkdown} provides a neat way of documenting data analyses using R. Install using\\
- \lstinline+install.packages("rmarkdown")+
-\item {\tt rjags} lets you use JAGS directly from R. Install using\\
- \lstinline+install.packages("rjags")+
-\item Finally we need a debugging package, to help you to find errors in your code, or understand how code is working by stepping through it. What is built into R and Rstudio is not great, and a much better option is Mark Bravington's debug package. This is not available from CRAN, but only from Mark's repository, so to install, you need to do this:
+\item Firstly we need a debugging package, to help you to find errors in your code, or understand how code is working by stepping through it. What is built into R and Rstudio is not great, and a much better option is Mark Bravington's debug package. This is not available from CRAN, but only from Mark's repository, so to install, you need to do this:
 \begin{lstlisting}
 options(repos=c("https://markbravington.github.io/Rmvb-repo",
         getOption( "repos")))
+install.packages("mvbutils")      
 install.packages("debug")
 \end{lstlisting}
 {\tt debug} requires the {\tt tcltk} package, which is installed by default in R, but has requirements which are not met by default on all mac installations. If installation fails for this reason you need to read the error message carefully - it will probably tell you to install {\tt Xquartz}.
-
+\item {\tt ggplot2} provides a nice alternative to built in R graphics. Install by typing\\
+\lstinline+install.packages("ggplot2")+\\
+at the R command line.
+\end{itemize}
+{\em Extended:}
+\begin{itemize}
+\item {\tt rjags} lets you use JAGS directly from R. Install using\\
+ \lstinline+install.packages("rjags")+\\
+once installed you should try it by typing \lstinline+library(rjags)+ within R, and preferably running the first example from the helpfile \lstinline+?jags.samples+.
+\item {\tt rmarkdown} provides a neat way of documenting data analyses using R. Install using\\
+\lstinline+install.packages("rmarkdown")+
 \item {\tt rmarkdown} requires a latex installation in order to allow you to produce pdf documents. So, {\em only if you do not already have latex installed}, install {\tt tinytex} with
 \lstinline+install.packages("tinytex")+
 then if you are {\em really sure} that you do not already have latex installed run 
@@ -163,7 +176,7 @@ An easy way to set up a central repository is to use {\tt github}.\index{github!
 \item Login to your {\tt github} account on {\tt github.com}, click on {\tt Repositories} and then click on {\tt New} to set up a new repository.
 \item Follow the instructions. You probably want your repository to be private if it is for working on assessed coursework.
 \end{itemize}
-For group homework, one person sets up the repo and invites their team mates to collaborate on it. 
+For group homework, one person sets up the repo and invites their team mates to collaborate on it\footnote{To stop participating in a repo, click on your picture at top right of github home page, select settings and then Repositories - you get a list of repos and can leave any of them.}. 
 \begin{itemize}
 \item Log on to {\tt github}, nagivate to your repo, and click on {\tt Settings}.
 \item Click on {\tt Manage Access} from the left hand menu, and then on {\tt Invite a collaborator} - you will need their github user name. 
@@ -173,7 +186,7 @@ You can add files directly to your repo, via the web interface, but we will shor
 
 \subsection{Using {\tt git}}
 
-Mostly, you will interact with your {\tt github} repo via the {\tt git} software, and your local copy of your {\tt github} repo. You will use {\tt git} by typing commands in a terminal window. To check everything is working before using {\tt git} for the first time you might open a terminal window and check the {\tt git} version, a follows:\index{git}
+Mostly, you will interact with your {\tt github} repo via the {\tt git} software, and your local copy of your {\tt github} repo. You will use {\tt git} by typing commands in a terminal window. To check everything is working before using {\tt git} for the first time you might open a terminal window and check the {\tt git} version, as follows:\index{git}
 \begin{lstlisting}
 git --version
 \end{lstlisting}
@@ -248,7 +261,7 @@ If your {\tt git push} command fails (and it will tell you if it has!) then you 
 git pull
 \end{lstlisting}
 This will get the latest versions of the files from the {\tt github} repo, compare them to your local copies, and attempt to resolve conflicts automatically where possible. Where auto-fixing is not possible, it will modify your local copies so that whenever there is a conflict your local files contain both your code and the conflicting code from the {\tt github} master, with clear marking of which is which. 
-\item You check the conflicting files, changing the code to resolve any remaining flagged conflicts (often just selecting one or other of the alternative). 
+\item You check the conflicting files, changing the code to resolve any remaining flagged conflicts (often just selecting one or other of the alternatives). 
 \item Now redo the commit and push steps
 \begin{lstlisting}
 git commit -a -m"resolved conflict in favour of small end cracking"
@@ -308,9 +321,9 @@ Programming is the process of writing instructions to make a computer perform so
 \end{enumerate}
 Note that while `population' might mean something concrete like `population of people in the UK' it might be much more abstract like `the population of all experimental results that this experiment could have produced when replicated under the same conditions'. \index{random sample}\index{population}
 
-To understand the difference between statistical and non-statistical data analysis consider data on reported cases of Covid-19 each day. Many charts of these data are produced, and analyses are performed, such as producing running averages or looking for trends in the data. None of these analyses are statistical, as no attempt is made to consider what population the case data might be viewed as a random sample of. They are certainly not a random sample of the people who have Covid-19 on a given day, and neither is it remotely clear how the number of cases relates to the number of people with Covid on a particular day.  The government and media present these data {\em as if} they were a random sample from the population of Covid cases, but this is simply misleading. Any decent applied statistician should be able to list several sources of bias likely to occur by treating them as such. 
+To understand the difference between statistical and non-statistical data analysis consider data on reported cases of Covid-19 each day. Many charts of these data were produced, and analyses were performed, such as producing running averages or looking for trends in the data. None of these analyses are statistical, as no attempt was made to consider what population the case data might be viewed as a random sample of. They are certainly not a random sample of the people who had Covid-19 on a given day, and neither is it remotely clear how the number of cases relates to the number of people with Covid on a particular day.  The government and media presented these data {\em as if} they were a random sample from the population of Covid cases, but this was simply misleading. Any decent applied statistician should be able to list several sources of bias likely to occur by treating them as such. 
 
-In contrast, each week the UK Office for National Statistics publishes the results of testing a randomly selected sample of the UK population for Covid. The analysis includes estimates of trends and uncertainties, from a proper statistical analysis. Unsurprisingly the ONS analysis often appears to contradict the naive interpretations of the case data given by the media and government. More surprisingly the media and government seem to give more weight to the non-statistical analyses of case data than to the statistical analyses of the ONS data, despite the latter being essentially unbiased and of known accuracy, while the former have bias of unknown magnitude. Even more surprisingly, the UK appears to be unique in even conducting unbiased sampling to establish Covid prevalence.
+In contrast, each week the UK Office for National Statistics published the results of testing a randomly selected sample of the UK population for Covid. The analysis included estimates of trends and uncertainties, from a proper statistical analysis. Unsurprisingly the ONS analysis often appeared to contradict the naive interpretations of the case data given by the media and government. More surprisingly the media and government seemed to give more weight to the non-statistical analyses of case data than to the statistical analyses of the ONS data, despite the latter being essentially unbiased and of known accuracy, while the former had bias of unknown magnitude. Even more surprisingly, the UK appears to have been unique in even conducting unbiased sampling to establish Covid prevalence.
 
 The Covid cases example illustrates why statistical analysis software is dangerous. The easier software is to use, the easier it is to produce an analysis of data that resembles a statistical analysis in every superficial respect, but not in the key one that the data are in some sense a random sample from a population of interest.  Beware!
 
@@ -360,7 +373,7 @@ Curly brackets, \lstinline+{}+, enclose the R code defining how the function arg
 [1] -1.248441
 \end{lstlisting}
 
-R is an interpreted language. Code\footnote{I'll use `code' to mean programmes and commands written in R (or indeed other computer languages).} is interpreted and executed line by line as it is encountered. This contrasts with compiled languages, where code is converted to binary instructions en masse, and this binary `machine code' (the native language of the computers processor) is then executed separately. R evaluates lines of code when they appear complete, and a line end has been encountered. If you want to split code over several lines then you need to be careful that the line does not appear complete before you meant it to be. e.g. suppose we want to evaluate $a=1+2+3+4+5$\index{interpreted language}
+R is an interpreted language. Code\footnote{I'll use `code' to mean programmes and commands written in R (or indeed other computer languages).} is interpreted and executed line by line as it is encountered. This contrasts with compiled languages, where code is converted to binary instructions en masse, and this binary `machine code' (the native language of the computer's processor) is then executed separately. R evaluates lines of code when they appear complete, and a line end has been encountered. If you want to split code over several lines then you need to be careful that the line does not appear complete before you meant it to be. e.g. suppose we want to evaluate $a=1+2+3+4+5$\index{interpreted language}
 \begin{lstlisting}
 > a <- 1 + 2 + 3 ## split line but it looks complete to R!
 > + 4 + 5 
@@ -400,7 +413,7 @@ Anything after \lstinline+#+ on a line is ignored by R, so is a comment. It is a
 \item \lstinline+x <- c(10,2,7,89,43,1)+ creates an example vector to work on. The {\tt c} function takes the individual numbers supplied to it, and concatenates them into a single vector (it can also concatenate vectors). The results are stored in vector \lstinline+x+ using the assignment operator \lstinline+<-+. Notice how {\tt x} is created automatically by this assignment. Unlike in many computer languages, we do not have to declare {\tt x} first. 
 \item \lstinline+ii <- which(x%/%10 > 0)+ creates a vector, {\tt ii}, of the indices of the double digit numbers in \lstinline+x+. It does this by computing the result of integer division by 10, for each element of {\tt x}, using the \lstinline+%/%+ operator, and then testing whether this result is greater than 0. The result of \lstinline+x%/%10 > 0+ will be a vector of {\tt TRUE} or {\tt FALSE} values of the same length as {\tt x}. For the given example it is $({\tt TRUE},{\tt FALSE},{\tt FALSE},{\tt TRUE},{\tt TRUE},{\tt FALSE})$. This vector is supplied directly to the {\tt which} function, which returns the indices for which the vector is {\tt TRUE} (1,4 and 5 for the example given). 
 \item \lstinline^xs <- rep(0,length(ii)+length(x))^ creates a vector of zeroes into which the individual digits will be inserted, using the {\tt rep} function. {\tt rep} simply repeats its first argument the number of times specified in its second argument. The {\tt length} function returns the number of elements in an existing vector. We need {\tt xs} to be the length of {\tt x} plus an extra element for each double digit number.
-\item \lstinline^iis <- ii+1:length(ii)-1^ creates a vector, {\tt iis}, containing the indices (locations) of the 10s digits in {\tt xs}. We have to account for the fact that each time we insert a digit, all the digits after move along one place, relative to where they were. So, the first 10s digit will occupy the same slot in {\tt x} and {\tt xs}, but the next 10s digit will be one element later in {\tt xs} than in {\tt x}, the next 2 elements later, and so on. \lstinline+1:length(ii)-1+ creates a sequence 0,1,2\ldots to add to {\tt ii} to achieve this. It uses the \lstinline+:+ operator --- if {\tt a} and {\tt b} are integers (and $a<=b$) \lstinline+a:b+ generates the sequence $a,a+1,a+2,\ldots,b$.\index{sequence}\index{vector!indexing}
+\item \lstinline^iis <- ii+1:length(ii)-1^ creates a vector, {\tt iis}, containing the indices (locations) of the 10s digits in {\tt xs}. We have to account for the fact that each time we insert a digit, all the digits after move along one place, relative to where they were. So, the first 10s digit will occupy the same slot in {\tt x} and {\tt xs}, but the next 10s digit will be one element later in {\tt xs} than in {\tt x}, the next 2 elements later, and so on. \lstinline+1:length(ii)-1+ creates a sequence 0,1,2\ldots to add to {\tt ii} to achieve this. It uses the \lstinline+:+ operator --- if {\tt a} and {\tt b} are integers (and $a \le b$) \lstinline+a:b+ generates the sequence $a,a+1,a+2,\ldots,b$.\index{sequence}\index{vector!indexing}
 \item \lstinline+xs[iis] <- x[ii]%/%10+ computes the 10s digits of the double digit numbers, indexed by {\tt ii}, using \lstinline+x[ii]%/%10+, and assigns them to the elements of {\tt xs} indexed by {\tt iis}.
 \item \lstinline+xs[-iis] <- x%%10+ computes the units digit for all the numbers in {\tt x} using \lstinline+x%%10+ where \lstinline+%%+ is the operator computing the remainder after integer division. These digits are stored in the elements of {\tt xs} {\em not} reserved for 10s digits. That is, \lstinline+xs[-iis]+, all the elements {\em except} those indexed by {\tt iis}. 
 \end{enumerate}
@@ -464,7 +477,7 @@ Line by line it works like this:
 \item \lstinline+pow <- strsplit(poem," ")[[1]]+ splits {\tt poem} into a vector of its individual words, using\\ \lstinline+strsplit(poem," ")+, which splits the string in {\tt poem} at the breaks given by spaces, \lstinline+" "+. {\tt strsplit} can take a vector of strings as its first argument, and returns a {\em list} of vectors containing the split strings. In our case the list only has one element, which is what the \lstinline+[[1]]+ part of the code accesses. 
 \item \lstinline+n.words <- length(pow)+ counts the words in {\tt poem}, since there is one element of {\tt pow} per word.
 \item \lstinline+freq <- tabulate(nchar(pow))+ counts how many 1 letter, 2 letter, 3 letter, etc. words are in {\tt poem}. First function {\tt nchar} counts the letters in each word and then {\tt tabulate} tallies them up. Really we should have stripped out punctuation marks first - {\tt gsub} could be used to do this.
-\item \lstinline+ie <- grep("e",pow,fixed=TRUE)+ finds the indices of the words containing an `e' using the {\tt grep} function. By default {\tt grep} can do much more complicated pattern matching using `regular expressions (see {\tt ?regex}). For the moment this is turned off using \lstinline+fixed=TRUE+ (otherwise characters like \lstinline+.+ and \lstinline+*+ are not matched as you might expect, but treated differently).
+\item \lstinline+ie <- grep("e",pow,fixed=TRUE)+ finds the indices of the words containing an `e' using the {\tt grep} function. By default {\tt grep} can do much more complicated pattern matching using `regular expressions' (see {\tt ?regex}). For the moment this is turned off using \lstinline+fixed=TRUE+ (otherwise characters like \lstinline+.+ and \lstinline+*+ are not matched as you might expect, but treated differently).
 \item \lstinline+n.e <- length(ie)+ is the count of `e' words.
 \item \lstinline+ia <- grep("a",pow,fixed=TRUE)+ finds the indices of the words containing an `a'.
 \item \lstinline+iea <- ia[ia %in% ie]+ finds the indices of words containing an `a' and an `e'. \lstinline+ia %in% ie+ gives a {\tt TRUE} for each element of {\tt ia} that occurs in {\tt ie} and a {\tt FALSE} for each element of {\tt ia} that doesn't. Hence {\tt iea} will contain the indices of the words containing both letters.
@@ -524,7 +537,7 @@ The most basic type of data structure in R is a vector (a one dimensional array)
 > bb[3:8]     ## print elements 3:8 
 [1]  3 -3  5  6  7  8
 \end{lstlisting}
-Whatever the type of a vector, some of its elements can always be set to {\tt NA} (not available), if required. Also numbers can take the values \verb+Inf+, \verb+-Inf+ and \verb+NaN+ (not a number e.g. $log(-1)$). \index{NA}\index{NaN}
+Whatever the type of a vector, some of its elements can always be set to {\tt NA} (not available), if required. Also numbers can take the values \verb+Inf+, \verb+-Inf+ and \verb+NaN+ (not a number e.g. $\log(-1)$). \index{NA}\index{NaN}
 
 
 Since vectors are the basic data structure, operators and most functions are also vectorized - they operate on whole vectors. For example given two vectors, {\tt a} and {\tt b} of the same length then \lstinline+c <- sin(a) * b+ actually forms \lstinline+c[i] <- sin(a[i]) * b[i]+ for all {\tt i} from 1 to the length of the vector. Similarly \lstinline^c <- a * b + 2^ actually forms \lstinline^c[i] <- a[i] * b[i] + 2^ for the same set of {\tt i} values. \index{vectorized code}
@@ -637,7 +650,7 @@ $txt
 [1] "furin cleavage site"
 \end{lstlisting}  
 
-\subsubsection{Data frames and factors -- statistical data structures \label{sec:factors}}
+\subsubsection{Data frames, factors and dates -- statistical data structures \label{sec:factors}}
 
 R provides two types of data structure that are particularly useful for statistics: {\bf factor} variables are a special class of variables especially useful for data that consist of labels that serve to classify other data; {\bf data frames} are 2 dimensional arrays of data where the columns are variables, {\em which can be of different types}, and the rows are observations. 
 
@@ -680,9 +693,21 @@ b <- factor(a, levels = c("ann","sue","fred","george")); b
 \end{lstlisting}
 Examine the underlying numeric values stored in {\tt a} and {\tt b} to make sure you understand exactly what has happened here. Finally, extract the levels of {\tt a} to a vector {\tt al} using the {\tt levels} function, and the numeric representation of {\tt a} to another vector, {\tt an}. Now use just {\tt al} and {\tt an} to reproduce a vector of the level labels for each entry in {\tt a}.
  
-
- 
-
+\noindent {\bf Dates} can conveniently be represented using objects of class \verb+"Date"+. See {\tt ?Date} for a description, {\tt ?as.Date} and {\tt format.Date} for converting between text and \verb+Date+ format and {\tt ?julian} for converting to 'time since some origin', for example. \index{dates} Times and dates can also be stored together in objects of class \verb+"POSIXct"+. See {\tt ?DateTimeClasses} for details. Particular advantages of these representations are the ability to reliably compute time differences, and to extract parts of the time and date. Here is a short example, sufficient to give an idea of what is possible. \index{times}
+\begin{verbatim}
+> ## create date-time data (format is actually default here)
+> d <- as.POSIXct(c("2016-06-28 21:30:00","2016-06-29 22:00:00",
++                   "2016-06-30 22:30:00"),format="%Y-%m-%d %H:%M:%S")     
+> julian(d,origin=as.Date("2016-01-01")) ## get day since Jan 1 2016
+Time differences in days
+[1] 179.8542 180.8750 181.8958
+attr(,"origin")
+[1] "2016-01-01 GMT"
+> format(d,"%T") ## extract times as text
+[1] "21:30:00" "22:00:00" "22:30:00"
+> as.Date(d)     ## get dates as class 'Date'
+[1] "2016-06-28" "2016-06-29" "2016-06-30"
+\end{verbatim}
 
 \subsection{Attributes}
 
@@ -929,6 +954,38 @@ ff <- function(...,res=1) res;f(r=2)
 
 \noindent {\bf Exercise:} turn your code from the section \ref{sec:loops} exercise into a general root finding function that takes an initial interval, a function (which may depend on some extra constants) the root of which is to be found (that is the value of its argument at which the function is zero). Try your function out with the function from the previous exercise, and with $g(x) = x^b - e^{ax} + 2$ where $b \ge 1$ and $a>0$. Make sure that your function checks that the initial supplied interval brackets the solution, and can deal with increasing or decreasing functions. Function {\tt stop} can be used to jump out of a function and print an error message if a problem is detected. \index{error}\index{stop} If your function does not work as expected, try stepping through it using the {\tt mtrace} from the {\tt debug} package to figure out where the error is.   
 
+\subsection{Pipes}
+
+Suppose that we want to generate 1000 random deviates from a $N(0,0.5^2)$ distribution, exponentiate them, and plot a histogram of the result. A single line of R code would accomplish this task using nested function calls.
+\begin{lstlisting}
+hist(exp(rnorm(1000,sd=.5)))
+\end{lstlisting}
+However the more levels of nesting there are the more awkward this can be to read. An obvious alternative is  
+\begin{lstlisting}
+z <- rnorm(1000,sd=.5)
+x <- exp(z)
+hist(x)
+\end{lstlisting}
+Code written like this is much easier to read {\em and much easier to debug if something goes wrong}. But it is also devoting several lines of code to a rather trivial task. Writing in this way can make the code for a more complex task become rather lengthy. That in turn can make the overall structure of the code more difficult to follow. \index{pipes}
+
+For this reason it is sometimes useful to use {\em pipes}, to feed the results from one function directly to the arguments of another. 
+In R the pipe operator is \lstinline+|>+ (see \lstinline+?"|>"+ or \lstinline+?pipeOp+). Here it is used for the same simple example
+\begin{lstlisting}
+rnorm(1000,sd=.5) |> exp() |> hist()
+\end{lstlisting}
+The result of the function call \lstinline+rnorm(1000,sd=.5)+ is a vector of 1000 numbers. The pipe operator takes that vector and feeds it in as the first (in this case only) argument of function \lstinline+exp+. Function \lstinline+exp()+ produces a vector of 1000 transformed numbers and the second pipe operator feeds that in  
+as the first argument of \lstinline+hist()+.
+
+The functions in a piped sequence can be supplied with other arguments, and you can also pipe to an argument other than the first using the \lstinline+_+ placeholder. The following illustrates these features. It generates quantiles of a lognormal density and plots the ordered simulated transformed data against these. 
+\begin{lstlisting}
+n <- 1000
+((1:n-.5)/n) |> qlnorm(,sdlog=.5) -> q
+rnorm(n,sd=.5) |> exp() |> sort() |> plot(q,y=_,ylab="obs")
+\end{lstlisting}
+Notice how additional named arguments have been supplied to \lstinline+qlnorm+ and \lstinline+plot+. Notice also how \lstinline+y=_+ has been used to indicate that the result of \lstinline+sort()+ is to be piped to the second argument of \lstinline+plot+. Finally note the enclosing brackets in \lstinline+((1:n-.5)/n)+. Why are these necessary? Because \lstinline+|>+ has higher precedence than \lstinline+/+. Without the brackets \lstinline+n+ is fed in as the first argument of \lstinline+qlnorm+ generating an \lstinline+NA+, by which the vector \lstinline+1:n-.5+ is then divided -- not what is wanted at all.    
+
+Piping has become very popular, as it often nicely expresses how we think about sequential data processing tasks. However with popularity has come overuse, for tasks where it obscures more than it illuminates. Code consisting of half a page or more of sequential piping is rarely readable, and is all but impossible to debug if something goes wrong. For easy debugging we need code broken down into small steps, preferably with intermediate quantities readily accessible: like explicit nested function calls piping does not provide this. Use it thoughtfully.
+
 \subsection{Planning and coding example: plotting an empirical CDF}
 
 The cumulative distribution function, $F$, of a random variable $X$ is defined as $F(x) = \text{Pr}(X\le x)$. Hence if we have a random sample $x_1, x_2, \ldots, x_n$ of observations of $X$ we can define an {\em empirical} cumulative distribution function
@@ -1015,6 +1072,52 @@ For each distribution, with name {\lstinline+dist+}, say, there are four functio
 \item {\lstinline+qdist+} is the quantile function of {\lstinline+dist+}.
 \item {\lstinline+rdist+} generates independent pseudorandom deviates from {\lstinline+dist+}. 
 \end{enumerate}
+
+\subsection{The {\tt apply} functions}
+
+Often the same operation has to be applied over one or more margins of an array (e.g. over the rows or the columns of a matrix), or over the elements of a list, or over subsets of some vector. R functions {\tt apply}, {\tt lapply} and {\tt tapply} achieve this. Here are some examples.
+\begin{lstlisting}
+a <- array(1:24,c(2,3,4)) ## creating an example 2 by 3 by 4 array
+\end{lstlisting}
+Let's apply the \lstinline+sum+ function to the set of elements sharing each value (i.e. 1 and 2) of the first index of \lstinline+a+
+\begin{lstlisting}
+apply(a,1,sum)
+# [1] 144 156
+\end{lstlisting}
+Or perhaps we would like to apply the \lstinline+prod+ function to all elements of \lstinline+a+ sharing each combination of its first and third indices \index{apply}
+\begin{lstlisting}
+apply(a,c(1,3),prod)
+#      [,1] [,2] [,3]  [,4]
+# [1,]   15  693 3315  9177
+# [2,]   48  960 4032 10560
+\end{lstlisting}
+
+For vectors (and remember that the multi-dimensional arrays can always be accessed as vectors as well) it is often the case that functions should be applied to irregular subsets of the vector. This is easily achieved by assigning the level of a factor variable to each subset and using \lstinline+tapply+. For example let's sum the integers 1 to 10, divided into 3 groups. 
+\begin{lstlisting}
+x <- 1:10
+fac <- factor(c(1,2,2,3,1,2,2,3,1,1))
+tapply(x,fac,sum)
+#  1   2    3 
+# 25 18 12
+\end{lstlisting}
+It is not unusual to require groups defined by combinations of factors. Here a second factor is introduced, and {\tt sum} applied to the set of elements corresponding each unique combination of factor levels.\index{tapply}
+\begin{lstlisting}
+fac2 <- factor(rep(c("a","b"),each=5))
+tapply(x,list(fac2,fac),sum)
+#    1    2   3
+# a  6    5   4
+# b 19 13 8
+\end{lstlisting}
+An \lstinline+NA+ results for an factor combinations not occurring in the data
+
+\lstinline+lapply+ is even simpler. The same function is applied to each element of a list. Here is an example illustrating its application to a list containing vectors of different lengths, where the second smallest entry of each is required. The example also illustrates the supply of a custom function (to any of the \lstinline+apply+ functions).
+\begin{lstlisting}
+b <- list(a=1:5,b=c(4,2,7),c=-10:10)
+unlist(lapply(b,function(x) sort(x)[2]))
+# a  b   c 
+# 2  4 -9
+\end{lstlisting}
+\lstinline+lapply+ returns a list of the same length as the input list. Here \lstinline+unlist+ has been used to turn this into a vector. \index{lapply} \index{unlist}
 
 \section{Simulation I: stochastic models and simulation studies \label{sec:sim1}}
 
@@ -1112,7 +1215,7 @@ For example the time from infection to onset of Covid-19 symptoms follows a log 
 [1] 0.00389
 > hist(d,breaks=0:100) ## plots a histogram with bar breaks as given
 \end{lstlisting}
-\eps{-90}{.5}{i2d.eps}\index{histogram}
+\eps{-90}{.55}{i2d.eps}\index{histogram}
 
 \noindent {\bf Exercise:} The {\em Central Limit Theorem} states that the distribution of the sum or mean of a set of $n$ independent identically distributed finite variance random variables tends to a normal distribution as $n \to \infty$. Produce an illustration of this by simulating random variables $X_n = n^{-1} \sum_{i}^n U_i$ where the $U_i$ are i.i.d. exponential random variables, with rate parameter 1 (see {\tt ?rexp}). For $n=2^1,,2^2,\ldots,2^9$ produce histograms illustrating the distribution of 10000 simulated values of each $X_n$. \lstinline+par(mfrow=c(3,3))+ will set up a graphics window to show all the histograms on the same page.   
 
@@ -1120,7 +1223,7 @@ For example the time from infection to onset of Covid-19 symptoms follows a log 
 
 \subsection{Simulation from a simple epidemic model}
 
-Let's put a few things together and build a slightly more complicated simulation. SEIR (Susceptible-Exposed-Infective-Recovered\footnote{often a euphemism for recovered or dead}) models are commonly used in disease modelling. In the simplest version almost everyone starts out susceptible, and then move to the exposed class according to their daily probability of being infected by someone in the infected class. This daily probability is assumed proportional to the number of people in the infected class, with constant of proportionality $\beta$. People move from the exposed to infected class with a constant probability, $\gamma$ , each day, and move from the infected to the R class with a different constant probability, $\delta$. 
+Let's put a few things together and build a slightly more complicated simulation. SEIR (Susceptible-Exposed-Infectious-Recovered\footnote{often a euphemism for recovered or dead}) models are commonly used in disease modelling. In the simplest version almost everyone starts out susceptible, and then move to the exposed class according to their daily probability of being infected by someone in the infectious class. This daily probability is assumed proportional to the number of people in the infectious class, with constant of proportionality $\beta$. People move from the exposed to infectious class with constant probability, $\gamma$ , each day, and move from the infectious to the R class with a different constant probability, $\delta$. 
 
 Suppose that we want to simulate from this stochastic SEIR model, maintaining a record of the populations in the different classes over time. And suppose in particular that we are interested in investigating scenarios in which people's daily probability of catching the disease is variable from person to person, so that each has a different $\beta$ value. In fact let's assume that each person has their own $\beta_i$ drawn from a gamma distribution. As usual we first need to think about code design. 
 \begin{enumerate}
@@ -1323,7 +1426,7 @@ Anna    15/6/00 GB          2    B
 Anna    15/6/00 GB          3    A
 .       .       .           .    .
 \end{verbatim}
-But if we are only interested in birth dates and nationality of students, then we would really want to simplify to
+But if we are only interested in birth dates\footnote{calender dates often need handling in special ways --- see {\tt ?as.Date} and {\tt ?julian} to get started.}\index{date data!as.Date}\index{date data!julian} and nationality of students, then we would really want to simplify to
 \begin{verbatim}
 name    d.o.b.  nationality 
 George  11/2/01 GB          
@@ -1617,7 +1720,7 @@ $$
 $$
 Model formula operators {\tt *} and {\tt :} implement interactions. \verb+a*b+ indicates that the main effect terms and the terms for the interaction of {\tt a} and {\tt b} are to be included in a model. \verb+a:b+ just includes the interaction terms, but not the main effects. So  \verb+a*b+ and \verb@a + b + a:b@ are equivalent. Higher order interaction operate the same way. For example \verb+a*b*c+ is equivalent to \verb@a + b + c + a:b + a:c + b:c + a:b:c@
 
-Of course you might want to include interactions of several variables, only up to a certain order. This is where the \verb+^+ operator comes in. Suppose we want the ineractions of {\tt a}, {\tt b}, {\tt c} and {\tt d} up to order 2 (and not up to order 4 as \verb+a*b*c*d+ would generate). \verb%(a+b+c+d)^2% will do just that, being equivalent to 
+Of course you might want to include interactions of several variables, only up to a certain order. This is where the \verb+^+ operator comes in. Suppose we want the interactions of {\tt a}, {\tt b}, {\tt c} and {\tt d} up to order 2 (and not up to order 4 as \verb+a*b*c*d+ would generate). \verb%(a+b+c+d)^2% will do just that, being equivalent to 
 $$
 \verb&a + b + c + d + a:b + a:c + a:d + b:c + b:d + c:d&    
 $$
@@ -1784,7 +1887,7 @@ transmanual   2.7072     0.5662   4.782 3.09e-06 ***
 \end{verbatim}}
 If we don't consider {\tt displ} then there appears to be a strong and significant effect of {\tt trans}. Why? Well, on examination of the data, it appears that manual cars tend to have smaller engines than automatic ones. And because smaller engines have lower fuel consumption, manual cars therefore appear to be more efficient. But if you control for engine size ({\tt displ}) then there is no additional effect of transmission. 
 
-So are manual cars more efficient or not? That's not so easy to answer. For a given engine size it appears not, but for a given performance level the answer might well be yes: the automatics need a larger engine for the same performance, and therefore are less efficient for a given performance level. Clearly the interpretation of statistical model analyses require care. It requires particular care not to interpret effects as casual without alot more evidence than a statistical model of observational data can provide. In this example the {\tt displ} variable that probably drives the apparent {\tt trans} effect is one of the measured predictors. But in many cases it's quite possible that a variable we have not measured is driving both the response variable and the predictor, with no causal relationship between the response and the predictor at all.   
+So are manual cars more efficient or not? That's not so easy to answer. For a given engine size it appears not, but for a given performance level the answer might well be yes: the automatics need a larger engine for the same performance, and therefore are less efficient for a given performance level. Clearly the interpretation of statistical model analyses require care. It requires particular care not to interpret effects as causal without alot more evidence than a statistical model of observational data can provide. In this example the {\tt displ} variable that probably drives the apparent {\tt trans} effect is one of the measured predictors. But in many cases it's quite possible that a variable we have not measured is driving both the response variable and the predictor, with no causal relationship between the response and the predictor at all.   
 
 This can really matter. For example there has been a good deal of work attempting to prove that lock down measures, and only lock down measures, are what controlled Covid-19 in various places at various times in the pandemic. But ultimately almost all that these studies show is an {\em association} between lockdown and reduced Covid transmission. It is impossible to rule out that the spontaneous changes in people's behaviour, which included clamouring for lockdowns on social media, were enough both to stop transmission increasing and to push governments into action. Nor to rule out that measures short of full lockdown, which were invariably associated with, but preceded, full lockdown, were what caused infections to start to decline.        
 
@@ -2592,13 +2695,13 @@ $hessian ## the numerically approximated second derivative matrix of the objecti
 [1,]   3.034268    669.9001
 [2,] 669.900082 164447.5279
 \end{lstlisting} 
-Suppose we would like to obtain the approximate standard deviation of $\hat \alpha$ and $\hat \beta$. This is now easy - just invert the Hessian to get the approximate covariance matrix of the parameter estimators, and extract the square root of its diagonal elements.
-\begin{lstlisting}
+Suppose we would like to obtain the approximate standard deviation of $\hat \alpha$ and $\hat \beta$. This is now easy - just invert the Hessian to get the approximate covariance matrix of the parameter estimators, and extract the square root of its diagonal elements.\index{Cholesky decomposition!and matrix inversion}
+\begin{lstlisting} 
 > V <- chol2inv(chol(fit$hessian)) ## solve(fit$hessian) also possible
 > se <- diag(V)^.5 ## extract standard deviations
 > se
 [1] 1.80971894 0.00777364
-\end{lstlisting}\index{Cholesky decomposition!and matrix inversion}
+\end{lstlisting}
 Now try {\tt optim} using BFGS with a supplied gradient function. Here is the gradient function.
 \begin{lstlisting}
 gll <- function(theta,t,y) {
@@ -2609,7 +2712,7 @@ gll <- function(theta,t,y) {
     sum(y*t) - alpha*sum(t*ebt)) ## -dl/dbeta
 } ## gll
 \end{lstlisting}
-Any time we code up gradients we need to test them, by comparing the coded gradients with {\em finite difference} approximations (see section \ref{sec:deriv}), as follows. 
+Any time we code up gradients we need to test them, by comparing the coded gradients with {\em finite difference} approximations (see section \ref{sec:deriv}), as follows. \index{finite difference}
 \begin{lstlisting}
 fd <- th0 <- c(10,.1) ## test param value, and approx grad vec
 nll0 <- nll(th0,t=t80,y=y) ## nll at th0
@@ -2658,7 +2761,7 @@ hll <- function(theta,t,y) {
   H
 } ## hll
 \end{lstlisting}
-Again it is essential to test this. A finite difference approximation to the Hessian is readily obtained by differencing the gradient vectors produced by {\tt gll}\ldots
+Again it is essential to test this. A finite difference approximation to the Hessian is readily obtained by differencing the gradient vectors produced by {\tt gll}\ldots \index{finite difference} \index{Hessian}
 \begin{lstlisting}
 gll0 <- gll(th0,t=t80,y=y) ## grad of nll at th0
 eps <- 1e-7  ## finite difference interval 
@@ -2746,11 +2849,11 @@ Notice how the first element of {\tt par} is $\log(\hat \alpha)$ now. Obviously 
 
 \subsection{Getting derivatives \label{sec:deriv}}
 
-As we have seen, {\tt optim} and {\tt nlm} approximate any required derivatives not supplied by the user, using finite difference approximations. We already was how this works in code, when checking derivative functions. Mathematically the approximation is as follows\footnote{See also {\em Core Statistics}, \S5.5.2}. Let ${\bm e}_i$ be a vector of zeroes except for its $i^\text{th}$ element which is one. Then for a small $\epsilon$
+As we have seen, {\tt optim} and {\tt nlm} approximate any required derivatives not supplied by the user, using finite difference approximations. We already saw how this works in code, when checking derivative functions. Mathematically the approximation is as follows\footnote{See also {\em Core Statistics}, \S5.5.2}. Let ${\bm e}_i$ be a vector of zeroes except for its $i^\text{th}$ element which is one. Then for a small $\epsilon$
 $$
 \pdif{D}{\theta_i} \simeq \frac{D({\bm \theta} + \epsilon {\bf e}_i) - D({\bm \theta})}{\epsilon}
 $$ 
-How small should $\epsilon$ be?
+How small should $\epsilon$ be? \index{finite difference}
 \begin{itemize}
 \item Too large and the approximation will be poor (Taylor's theorem).
 \item Too small and ${\bm \theta} + \epsilon {\bf e}_i$ will only differ from ${\bm \theta}$ in a few (or even none!) of its least significant digits, losing precision.
@@ -2763,11 +2866,11 @@ Optimization is more reliable and efficient if we have numerically exact first d
 \item {\bf Always, Always, Always}.
 \end{enumerate}
 
-Alternatively we can use {\em automatic differentiation} (AD) methods, which compute derivatives of a function directly from the code implementing the function. R function {\tt deriv} offers a simple AD implementation for differentiation of R expressions. Suppose we want to use if to obtain the gradient and Hessian of the AIDS model negative log likelihood, 
+Alternatively we can use {\em automatic differentiation} (AD) methods, which compute derivatives of a function directly from the code implementing the function. R function {\tt deriv} offers a simple AD implementation for differentiation of R expressions. Suppose we want to use if to obtain the gradient and Hessian of the AIDS model negative log likelihood, \index{derivative}
 $$
 l(\alpha,\beta) = \sum_{i=1}^n y_i \{\log(\alpha) + \beta t_i\} - \sum_{i=1}^n ( \alpha e^{\beta t_i} - \log (y_i!) ).
 $$
-Now {\tt deriv} does not know how to differentiate functions involving {\tt sum} - it actually only knows about a modest subset of functions (see {\tt ?deriv}). But since our log likelihood is actual a sum of contributions to the overall log likelihood from individual $t_i$, $y_i$ pairs, we can differentiate the terms in the sum and add up the derivatives. The following function call will produce a function {\tt nlli} evaluating the terms in the negative log likelihood summation. This function returns a vector of the individual terms, and that vector has attributes giving the gradient vector and Hessian for each of the terms.     
+Now {\tt deriv} does not know how to differentiate functions involving {\tt sum} - it actually only knows about a modest subset of functions (see {\tt ?deriv}). But since our log likelihood is a sum of contributions to the overall log likelihood from individual $t_i$, $y_i$ pairs, we can differentiate the terms in the sum and add up the derivatives. The following function call will produce a function {\tt nlli} evaluating the terms in the negative log likelihood summation. This function returns a vector of the individual terms, and that vector has attributes giving the gradient vector and Hessian for each of the terms.     
 \begin{lstlisting}
 nlli <- deriv( ## what to differentiate...
             expression(-y*(log(alpha)+beta*t)+alpha*exp(beta*t)+lgamma(y+1)),
@@ -2885,7 +2988,7 @@ dev.off()
 \end{lstlisting}
 This was actually the command I used to produce the first plot in the previous section. The first argument to {\tt postscript} is the filename. You either need to change to the directory where you want the file to go using \lstinline+setwd+ before calling \lstinline+postscript+, or give a full path in the filename. {\tt width} and {\tt height} give the width and height of the plot in inches. See {\tt ?postscript} for how to use other units. It is essential to close the postscript file using \lstinline+dev.off()+ when done --- you won't get a properly formed file otherwise. Other commonly use devices are {\tt pdf}, {\tt png}, {\tt jpeg} and {\tt tiff}. \index{graphics file} \index{graphic device}
 
-A very common adjustment needed when printing to file is to change the size of the axis lables and axis titles. In base R the arguments \lstinline+cex.axis+ and \lstinline+cex.lab+ can provided to most high level plot functions to change these. Values $>1$ enlarge, while $<1$ shrinks. You may also want to change plot symbols sizes, with \lstinline+cex+, or change the symbol with \lstinline+pch+ (a number or a character, including \lstinline+"."+ for the smallest possible point). Line widths are controlled with \lstinline+lwd+. See \lstinline+?par+ for all the graphical parameters that can be set. Several are high level parameters set at plot device level, but the rest can be supplied to most high level plotting functions. There are so many options that they are not listed for each high level plotting function, but are passed via \lstinline+...+, which makes sense as they often control lower level plotting functions. \index{plot options}\index{par}\index{plot!sizing}  
+A very common adjustment needed when printing to file is to change the size of the axis lables and axis titles. In base R the arguments \lstinline+cex.axis+ and \lstinline+cex.lab+ can be provided to most high level plot functions to change these. Values $>1$ enlarge, while $<1$ shrinks. You may also want to change plot symbols sizes, with \lstinline+cex+, or change the symbol with \lstinline+pch+ (a number or a character, including \lstinline+"."+ for the smallest possible point). Line widths are controlled with \lstinline+lwd+. See \lstinline+?par+ for all the graphical parameters that can be set. Several are high level parameters set at plot device level, but the rest can be supplied to most high level plotting functions. There are so many options that they are not listed for each high level plotting function, but are passed via \lstinline+...+, which makes sense as they often control lower level plotting functions. \index{plot options}\index{par}\index{plot!sizing}  
 
 {\tt ggsave} is an even easier option for plotting {\tt ggplot2} plots to file. For example
 \begin{lstlisting}
@@ -2895,7 +2998,7 @@ produced the second plot in the previous section. {\tt ggsave} infers the plot f
 
 \subsection{Some univariate data plots \label{sec:1d-plot}}
 
-Suppose that you are interested in visualizing the distribution of a single variable. For a continuous variable perhaps the simplest plot is a histogram. This divides the range of your data into a series of contiguous intervals, and counts the number data falling within each of them. The intervals (also know as {\em bins}) are then arranged along a horizontal axis, and bars are plotted above each interval, with {\em area} proportional to the number of observations in the interval. If the intervals all have the same width, then the {\em height} of the bar is also proportional to the number of observations in the interval.   
+Suppose that you are interested in visualizing the distribution of a single variable. For a continuous variable perhaps the simplest plot is a histogram. This divides the range of your data into a series of contiguous intervals, and counts the number of data falling within each of them. The intervals (also know as {\em bins}) are then arranged along a horizontal axis, and bars are plotted above each interval, with {\em area} proportional to the number of observations in the interval. If the intervals all have the same width, then the {\em height} of the bar is also proportional to the number of observations in the interval.   
 
 As an example the {\tt faithful} data frame in R contains 272 observations of the duration of the Old Faithful geyser's {\tt eruptions} in minutes (it also contains {\tt waiting} time between eruptions). Suppose we are interested in the distribution of eruption times. Here is the code to produce a couple of alternative histograms.
 \begin{lstlisting}
@@ -2907,7 +3010,8 @@ hist(faithful$eruptions,breaks=quantile(faithful$eruptions,seq(0,1,length=15)),
 \eps{-90}{.6}{geyser-base.eps}
 The left plot is from the first default call to \lstinline+hist+. The number and location of the x axis breaks defining the intervals has been chosen automatically, and the intervals are all of equal width. The y axis shows the count in each bar. Note the obvious interpretation of the bar heights as being proportional to counts per unit x axis interval. 
 
-We do not have to stick with the automatically computed intervals. The second call to \lstinline+hist+ produces the right hand plot. In addition to its lurid colour and nicer labels, the main noticeable feature is that I have supplied the breaks between intervals, and have not spaced those breaks evenly. In fact I have used the {\tt quantile} function to set the breaks at 15 empirical quantiles (equally spaced in probability) of the distribution of eruption durations\footnote{Recall that the $q^{th}$ quantile, $\tau_q$, of random variable $X$ is defined so that $P(X<\tau_q) = q$.}. So here we have bars of uneven width, the height of which is still proportional to the number of observations per unit interval, but whose area is proportional to the counts in each interval. One caveat about `area' here: by area I mean width as measured on the x axis, multiplied by height as measured on the y axis. Since the axes are plotted with different scalings on the page, the bars will not have the same `on the page' area. Note also that the y axis label is changed to `Density', since while the bar heights are proportional to density, they are not any longer proportional to the frequency (count) of observations in the intervals. 
+We do not have to stick with the automatically computed intervals. The second call to \lstinline+hist+ produces the right hand plot. In addition to its lurid colour and nicer labels, the main noticeable feature is that I have supplied the breaks between intervals, and have not spaced those breaks evenly. In fact I have used the {\tt quantile} function to set the breaks at 15 empirical quantiles (equally spaced in probability) of the distribution of eruption durations\footnote{Recall that the $q^{th}$ quantile, $\tau_q$, of random variable $X$ is defined so that $P(X<\tau_q) = q$.}. So here we have bars of uneven width, the height of which is still proportional to the number of observations per unit interval, but whose area is proportional to the counts in each interval. %One caveat about `area' here: by area I mean width as measured on the x axis, multiplied by height as measured on the y axis. Since the axes are plotted with different scalings on the page, the bars will not have the same `on the page' area. 
+Note also that the y axis label is changed to `Density', since while the bar heights are proportional to density, they are not any longer proportional to the frequency (count) of observations in the intervals. 
 
 Actually uneven intervals are rarely used when plotting histograms, and it is more usual to use the {\tt breaks} argument  to supply a larger number of evenly spaced breaks, to provide more detail. One problem with histograms is that simply shifting the interval breaks a constant small amount can change the shape of the histogram, as points get moved between intervals. This is one reason for sometimes favouring a direct estimate of the pdf of the data, based on the sample. 
 
@@ -2952,7 +3056,7 @@ Why did the automatic bandwidth choice lead to a kernel density estimate that wa
 acf(faithful$eruptions); pacf(faithful$eruptions)
 \end{lstlisting}
 \eps{-90}{.6}{geyser-acf.eps}    
-\ldots the correlations or partial correlations for each lag are plotted. Clearly there is strong negative correlations between the duration of one eruption and the next. Short eruptions follow long eruptions (and the other way around). The PACF suggests that the correlation at lag 2 is close to perfectly explained by the lag 1 correlation, but the negative correlation at lag 3 may be a bit less than would be expected from the lag 1 effect. In both plots the blue lines indicate how large a correlation has to be to be detectably different from zero at the 5\% level.  
+\ldots the correlations or partial correlations for each lag are plotted. Clearly there is strong negative correlation between the duration of one eruption and the next. Short eruptions follow long eruptions (and the other way around). The PACF suggests that the correlation at lag 2 is close to perfectly explained by the lag 1 correlation, but the negative correlation at lag 3 may be a bit less than would be expected from the lag 1 effect. In both plots the blue lines indicate how large a correlation has to be to be detectably different from zero at the 5\% level.  
 
 \subsubsection{Discrete univariate data}
 
@@ -2980,7 +3084,7 @@ par(mfrow=c(1,2))
 D <- rbind(cd,d-cd) ## create matrix of counts to plot
 rownames(D) <- c("covid","not covid")
 barplot(D,las=2,main="All deaths Mar 20-Aug 21",legend.text=TRUE,
-args.legend=list(x=7,y=150000)) 
+args.legend=list(x=7,y=150000)) ## where to put legend on plot
 barplot(D[,1:10],las=2,main="Age 0-44 deaths  Mar 20-Aug 21")
 \end{lstlisting}
 \eps{-90}{.5}{deaths2.eps} 

@@ -34,7 +34,7 @@ bs.ls <- matrix(sample(morley$Speed,n*1000,replace=TRUE),n,1000)
 bs.mean <- colMeans(bs.ls)
 quantile(bs.mean,c(.025,.975))
 
-## 6.1.2 One of many alternaives for doing this...
+## 6.1.2 One of many alternatives for doing this...
 
 n <- 2^(1:9) ## the n sequence
 m <- 10000   ## sample sizes

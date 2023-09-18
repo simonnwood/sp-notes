@@ -165,7 +165,7 @@ plot(mu,dnorm(mu,c,d^.5),type="l")
 {\scriptsize \begin{verbatim}
 ns <- 10000 ## number of samples
 th <- matrix(0,2,ns) ## sample storage
-mu <- 0;tau <- 0 ## initial states
+mu <- 0;tau <- 0.1 ## initial states
 n <- length(x) 
 ## store constants needed repeatedly...
 dn <- d*n;dnx <- dn*mean(x) 
